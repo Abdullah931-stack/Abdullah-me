@@ -79,7 +79,7 @@ export default function Timeline({ entries }: TimelineProps) {
 
                             {/* Content Card */}
                             <div
-                                className={`card ms-12 w-full md:ms-0 md:w-[calc(50%-2rem)] ${isEven ? "md:me-auto md:pe-8" : "md:ms-auto md:ps-8"
+                                className={`group relative rounded-3xl border border-white/10 bg-white/5 p-6 transition-all duration-300 hover:bg-white/10 hover:border-white/20 ms-12 w-full md:ms-0 md:w-[calc(50%-2rem)] ${isEven ? "md:me-auto md:pe-8" : "md:ms-auto md:ps-8"
                                     }`}
                             >
                                 {/* Date & Age */}

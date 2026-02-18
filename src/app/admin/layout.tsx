@@ -3,46 +3,23 @@
 import { useState, useEffect } from "react";
 import { useRouter, usePathname } from "next/navigation";
 import Link from "next/link";
+import { motion, AnimatePresence } from "framer-motion";
 
 /**
- * Admin Dashboard Layout
- * Per 04-PAGE-SPECIFICATIONS.md:
- * - Sidebar navigation
- * - Auth check — redirects to /admin/login if not authenticated
- * - CMS sections: Projects, Timeline, Social Links, Messages, Survey, Export
+ * Admin Dashboard Layout — Quiet Luxury Edition
+ * 
+ * - Deep Zinc 950 Background
+ * - Glassmorphism Sidebar & Header
+ * - Minimalist Navigation
  */
 
 const SIDEBAR_LINKS = [
-    {
-        href: "/admin",
-        label: "Overview",
-        icon: "📊",
-    },
-    {
-        href: "/admin/projects",
-        label: "Projects",
-        icon: "📁",
-    },
-    {
-        href: "/admin/timeline",
-        label: "Timeline",
-        icon: "📅",
-    },
-    {
-        href: "/admin/social-links",
-        label: "Social Links",
-        icon: "🔗",
-    },
-    {
-        href: "/admin/messages",
-        label: "Messages",
-        icon: "✉️",
-    },
-    {
-        href: "/admin/survey",
-        label: "Survey Analytics",
-        icon: "📈",
-    },
+    { href: "/admin", label: "Overview", icon: "📊" },
+    { href: "/admin/projects", label: "Projects", icon: "📁" },
+    { href: "/admin/timeline", label: "Timeline", icon: "📅" },
+    { href: "/admin/social-links", label: "Social Links", icon: "🔗" },
+    { href: "/admin/messages", label: "Messages", icon: "✉️" },
+    { href: "/admin/survey", label: "Survey Analytics", icon: "📈" },
 ];
 
 export default function AdminLayout({
@@ -74,8 +51,8 @@ export default function AdminLayout({
 
     if (isLoading) {
         return (
-            <div className="flex min-h-screen items-center justify-center bg-[#0A0F14]">
-                <div className="h-8 w-8 animate-spin rounded-full border-2 border-teal-500 border-t-transparent" />
+            <div className="flex min-h-screen items-center justify-center bg-zinc-950">
+                <div className="h-8 w-8 animate-spin rounded-full border-2 border-white/20 border-t-white" />
             </div>
         );
     }
@@ -89,15 +66,15 @@ export default function AdminLayout({
     }
 
     return (
-        <div className="flex min-h-screen bg-[#0A0F14] text-white">
+        <div className="flex min-h-screen bg-zinc-950 text-white font-sans">
             {/* Sidebar */}
             <aside
-                className={`fixed inset-y-0 left-0 z-50 w-64 transform border-r border-gray-800 bg-[#0D1117] transition-transform duration-300 md:relative md:translate-x-0 ${sidebarOpen ? "translate-x-0" : "-translate-x-full"
+                className={`fixed inset-y-0 left-0 z-50 w-64 transform border-r border-white/10 bg-zinc-950/80 backdrop-blur-xl transition-transform duration-300 md:relative md:translate-x-0 ${sidebarOpen ? "translate-x-0" : "-translate-x-full"
                     }`}
             >
                 {/* Logo */}
-                <div className="flex h-16 items-center border-b border-gray-800 px-6">
-                    <h1 className="text-lg font-bold text-teal-400">Admin Panel</h1>
+                <div className="flex h-20 items-center px-6 border-b border-white/5">
+                    <h1 className="text-xl font-bold tracking-tight text-white">Admin<span className="text-zinc-500">Panel</span></h1>
                 </div>
 
                 {/* Navigation */}
@@ -109,12 +86,12 @@ export default function AdminLayout({
                                 key={link.href}
                                 href={link.href}
                                 onClick={() => setSidebarOpen(false)}
-                                className={`flex items-center gap-3 rounded-lg px-4 py-2.5 text-sm transition-all ${isActive
-                                    ? "bg-teal-500/10 text-teal-400"
-                                    : "text-gray-400 hover:bg-gray-800 hover:text-white"
+                                className={`flex items-center gap-3 rounded-xl px-4 py-3 text-sm font-medium transition-all duration-200 ${isActive
+                                    ? "bg-white/10 text-white shadow-sm border border-white/5"
+                                    : "text-zinc-400 hover:bg-white/5 hover:text-white"
                                     }`}
                             >
-                                <span>{link.icon}</span>
+                                <span className="text-lg opacity-80">{link.icon}</span>
                                 {link.label}
                             </Link>
                         );
@@ -122,11 +99,11 @@ export default function AdminLayout({
                 </nav>
 
                 {/* Bottom Actions */}
-                <div className="absolute bottom-0 w-full border-t border-gray-800 p-4">
+                <div className="absolute bottom-0 w-full border-t border-white/10 p-4 space-y-2">
                     {/* Export */}
                     <a
                         href="/api/admin/export"
-                        className="mb-2 flex items-center gap-3 rounded-lg px-4 py-2.5 text-sm text-gray-400 transition-all hover:bg-gray-800 hover:text-white"
+                        className="flex items-center gap-3 rounded-xl px-4 py-3 text-sm font-medium text-zinc-400 transition-all hover:bg-white/5 hover:text-white"
                     >
                         <span>💾</span> Export Data
                     </a>
@@ -134,7 +111,7 @@ export default function AdminLayout({
                     {/* Back to Site */}
                     <Link
                         href="/"
-                        className="mb-2 flex items-center gap-3 rounded-lg px-4 py-2.5 text-sm text-gray-400 transition-all hover:bg-gray-800 hover:text-white"
+                        className="flex items-center gap-3 rounded-xl px-4 py-3 text-sm font-medium text-zinc-400 transition-all hover:bg-white/5 hover:text-white"
                     >
                         <span>🌐</span> View Site
                     </Link>
@@ -142,7 +119,7 @@ export default function AdminLayout({
                     {/* Logout */}
                     <button
                         onClick={handleLogout}
-                        className="flex w-full items-center gap-3 rounded-lg px-4 py-2.5 text-sm text-red-400 transition-all hover:bg-red-500/10"
+                        className="flex w-full items-center gap-3 rounded-xl px-4 py-3 text-sm font-medium text-red-400 transition-all hover:bg-red-500/10 hover:text-red-300"
                     >
                         <span>🚪</span> Sign Out
                     </button>
@@ -150,21 +127,26 @@ export default function AdminLayout({
             </aside>
 
             {/* Overlay for mobile sidebar */}
-            {sidebarOpen && (
-                <div
-                    className="fixed inset-0 z-40 bg-black/50 md:hidden"
-                    onClick={() => setSidebarOpen(false)}
-                />
-            )}
+            <AnimatePresence>
+                {sidebarOpen && (
+                    <motion.div
+                        initial={{ opacity: 0 }}
+                        animate={{ opacity: 1 }}
+                        exit={{ opacity: 0 }}
+                        className="fixed inset-0 z-40 bg-black/60 backdrop-blur-sm md:hidden"
+                        onClick={() => setSidebarOpen(false)}
+                    />
+                )}
+            </AnimatePresence>
 
             {/* Main Content */}
-            <div className="flex flex-1 flex-col">
+            <div className="flex flex-1 flex-col overflow-hidden">
                 {/* Top Bar */}
-                <header className="flex h-16 items-center justify-between border-b border-gray-800 px-6">
+                <header className="flex h-20 items-center justify-between border-b border-white/5 bg-zinc-950/50 backdrop-blur-md px-6 lg:px-8">
                     {/* Mobile Menu Toggle */}
                     <button
                         onClick={() => setSidebarOpen(!sidebarOpen)}
-                        className="rounded-lg p-2 text-gray-400 hover:text-white md:hidden"
+                        className="rounded-lg p-2 text-zinc-400 hover:bg-white/5 hover:text-white md:hidden"
                     >
                         <svg
                             width="24"
@@ -182,18 +164,22 @@ export default function AdminLayout({
 
                     <div className="hidden md:block" />
 
-                    <div className="text-sm text-gray-400">
-                        {new Date().toLocaleDateString("en-US", {
-                            weekday: "long",
-                            year: "numeric",
-                            month: "long",
-                            day: "numeric",
-                        })}
+                    <div className="flex items-center gap-4">
+                        <div className="text-sm font-medium text-zinc-400 bg-white/5 px-4 py-2 rounded-full border border-white/5">
+                            {new Date().toLocaleDateString("en-US", {
+                                weekday: "long",
+                                year: "numeric",
+                                month: "long",
+                                day: "numeric",
+                            })}
+                        </div>
                     </div>
                 </header>
 
                 {/* Page Content */}
-                <main className="flex-1 overflow-y-auto p-6">{children}</main>
+                <main className="flex-1 overflow-y-auto p-6 lg:p-8 bg-zinc-950 scrollbar-thin scrollbar-thumb-white/10 scrollbar-track-transparent">
+                    {children}
+                </main>
             </div>
         </div>
     );

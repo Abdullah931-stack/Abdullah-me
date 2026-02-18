@@ -101,15 +101,12 @@ export default function CardShuffle({ projects }: CardShuffleProps) {
                                         transition: { duration: 0.4 },
                                     }}
                                     transition={{ duration: 0.5, ease: "easeOut" }}
-                                    className="absolute inset-0 cursor-pointer overflow-hidden rounded-[16px] border border-[var(--color-border)]"
+                                    className="absolute inset-0 cursor-pointer overflow-hidden rounded-3xl border border-white/10 bg-white/5 backdrop-blur-md"
                                     style={{
-                                        background: "var(--color-surface)",
-                                        backdropFilter: "blur(16px)",
-                                        WebkitBackdropFilter: "blur(16px)",
                                         boxShadow:
                                             offset === 0
-                                                ? "var(--shadow-lg)"
-                                                : "var(--shadow-sm)",
+                                                ? "0 25px 50px -12px rgba(0, 0, 0, 0.5)"
+                                                : "0 10px 15px -3px rgba(0, 0, 0, 0.1)",
                                     }}
                                     onClick={isActive ? undefined : handleNext}
                                 >

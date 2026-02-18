@@ -25,10 +25,12 @@
     },
     "hero": {
         "greeting": "Hi, I'm",
-        "name": "Abdullah",
+        "name": "Abdullah.",
         "role": "Software Developer",
         "bio": "I turn ideas into professional digital products",
-        "cta": "Discover my journey"
+        "cta": "Contact Me",
+        "work": "My Work",
+        "badge": "Available for new projects"
     },
     "projects": {
         "title": "My Projects",

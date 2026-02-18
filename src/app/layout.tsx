@@ -1,11 +1,19 @@
 import type { Metadata } from "next";
 import "@/app/globals.css";
-import { readexPro, plusJakartaSans } from "@/app/fonts";
+import { IBM_Plex_Sans_Arabic, Geist } from "next/font/google";
+
+const geist = Geist({ subsets: ["latin"], variable: "--font-geist" });
+const ibmArabic = IBM_Plex_Sans_Arabic({
+  subsets: ["arabic"],
+  weight: ["300", "500", "700"],
+  variable: "--font-ibm",
+});
 
 /**
- * Root layout — required by Next.js 16.
- * Must contain <html> and <body> tags.
- * Locale-specific attributes (lang, dir) are set in [locale]/layout.tsx.
+ * Root layout — "Quiet Luxury" Edition
+ * - Enforces Dark Mode (Zinc 950)
+ * - Fonts: Geist (EN), IBM Plex Sans Arabic (AR)
+ * - Required <html> & <body> tags for Next.js 16
  */
 export const metadata: Metadata = {
   title: {
@@ -22,9 +30,10 @@ export default function RootLayout({
   children: React.ReactNode;
 }) {
   return (
-    <html data-theme="dark" suppressHydrationWarning>
+    <html lang="ar" dir="rtl" className="dark" data-theme="dark" suppressHydrationWarning>
       <body
-        className={`${readexPro.variable} ${plusJakartaSans.variable} antialiased`}
+        className={`${geist.variable} ${ibmArabic.variable} antialiased bg-background text-foreground font-sans selection:bg-white/20`}
+        suppressHydrationWarning
       >
         {children}
       </body>
