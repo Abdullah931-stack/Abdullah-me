@@ -172,7 +172,7 @@ export default function FooterClient({ socialLinks }: FooterClientProps) {
                     </p>
 
                     <div className="flex items-center gap-4 text-xs text-zinc-600">
-                        <span>{t("madeWith")} ❤️</span>
+                        <span>{t("madeWith")} Abdullah</span>
                         <span className="h-3 w-px bg-zinc-800"></span>
                         <Link
                             href={`/${otherLocale}`}
