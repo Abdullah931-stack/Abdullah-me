@@ -3,103 +3,103 @@
 
 ---
 
-## 1. نظرة عامة على المنتج (Product Overview)
+## 1. Product Overview
 
-| البند | التفاصيل |
+| Parameter | Details |
 |---|---|
-| **اسم المشروع** | الصفحة الشخصية المتقدمة (Advanced Personal Page) |
-| **النوع** | موقع شخصي احترافي (Personal Portfolio & Brand Website) |
-| **الهدف الأساسي** | تقديم هوية رقمية متقدمة تجمع بين عرض المشاريع، سرد الرحلة المهنية، التفاعل مع الزوار، وإدارة المحتوى عبر لوحة تحكم |
-| **الجمهور المستهدف** | العملاء المحتملون، أصحاب العمل، المجتمع التقني |
-| **الطابع العام** | الفخامة والهدوء (Luxury & Serenity) |
+| **Project Name** | Advanced Personal Page |
+| **Type** | Professional Portfolio & Brand Website |
+| **Core Objective** | Deliver a premium digital identity that showcases projects, narrates the developer's journey, engages visitors dynamically, and manages content via an admin dashboard. |
+| **Target Audience** | Potential clients, employers, and the tech community. |
+| **General Aesthetic** | Luxury & Serenity |
 
 ---
 
-## 2. قائمة الميزات الوظيفية (Functional Requirements)
+## 2. Functional Requirements (FR)
 
-### FR-01: الصفحة الرئيسية (Home — The Hook)
+### FR-01: Home Page (The Hook)
 
-| المعرّف | المتطلب                                                                          | الأولوية  |
-| ------- | -------------------------------------------------------------------------------- | --------- |
-| FR-01.1 | قسم "من أنا" بنبذة تعريفية تطفو بتأثير احترافي                                   | **عالية** |
-| FR-01.2 | صورة شخصية ثناءية الأبعاد (3D Character) مع فيزياء حركة واقعية (2.5D Parallax)   | **عالية** |
-| FR-01.3 | تأثير التباين الحركي: المجسم يتبع حركة البطاقة بتأخير (Inertia/Lag) دون مغادرتها | **عالية** |
-| FR-01.4 | قسم مختصر لـ "مشاريعي" ببطاقات تتنقل تلقائياً كل 5 ثوانٍ                         | **عالية** |
-| FR-01.5 | بطاقات المشاريع: صور تطفو بهدوء + تمويه خفيف + نبذة بسيطة                        | **عالية** |
-| FR-01.6 | الضغط على بطاقة مشروع → الانتقال لصفحة المشروع التفصيلية                         | **عالية** |
-
----
-
-### FR-02: رحلتي والقصة (The Story)
-
-| المعرّف | المتطلب | الأولوية |
+| ID | Requirement | Priority |
 |---|---|---|
-| FR-02.1 | الوصول عبر الضغط على بطاقة "من أنا" من الصفحة الرئيسية | **عالية** |
-| FR-02.2 | سجل زمني (Timeline) بأسلوب البطاقات المتتابعة | **عالية** |
-| FR-02.3 | كل بطاقة تحتوي: تاريخ التعلم/المشروع، العمر آنذاك، صورة المهارة/المشروع | **عالية** |
-| FR-02.4 | ملخص قصصي يظهر على اليمين (محتوى إنساني: الدوافع، الظروف، التأثير الشخصي) | **عالية** |
-| FR-02.5 | التركيز على الجانب الإنساني بعيداً عن التفاصيل التقنية المعقدة | **متوسطة** |
+| FR-01.1 | "About Me" section with a floating text animation. | **High** |
+| FR-01.2 | Two-and-a-half dimensional (2.5D) parallax character image with realistic physics. | **High** |
+| FR-01.3 | Parallax depth effect: The character follows card movement with inertia/lag without leaving the boundaries. | **High** |
+| FR-01.4 | Short "My Projects" section with cards that cycle automatically every 5 seconds. | **High** |
+| FR-01.5 | Project cards: Floating images + subtle blur + brief summary. | **High** |
+| FR-01.6 | Clicking a project card redirects to its detailed project page. | **High** |
 
 ---
 
-### FR-03: معرض المشاريع (Portfolio)
+### FR-02: Journey (The Story)
 
-| المعرّف | المتطلب | الأولوية |
+| ID | Requirement | Priority |
 |---|---|---|
-| FR-03.1 | قسم عرض رئيسي: ملخص المشروع على اليمين، الصور على اليسار | **عالية** |
-| FR-03.2 | الصور يمكن أن تكون ثابتة أو متغيرة تلقائياً | **عالية** |
-| FR-03.3 | صفحة تفصيلية عند الضغط على المشروع | **عالية** |
-| FR-03.4 | رابط معاينة (Preview Link) للمشروع | **عالية** |
-| FR-03.5 | معرض صور قابل للتقليب اليدوي أو تلقائي كل 5 ثوانٍ | **عالية** |
-| FR-03.6 | خاصية التكبير لملء الشاشة (Fullscreen Zoom) مع الحفاظ على الأبعاد والجودة | **عالية** |
-| FR-03.7 | الشرح التفصيلي: قصة التطوير، المشاكل والحلول، سرعة البناء، المهارات والتقنيات، سبب الإنشاء | **عالية** |
+| FR-02.1 | Accessed by clicking the "About Me" card from the Home page. | **High** |
+| FR-02.2 | Interactive chronological timeline presented as sequential cards. | **High** |
+| FR-02.3 | Each card contains: date of achievement/learning, age at that time, and skill/project image. | **High** |
+| FR-02.4 | Storytelling summary displayed on the right focusing on human context: motivations, circumstances, and personal impact. | **High** |
+| FR-02.5 | Focus on the human narrative, avoiding overly complex technical jargon. | **Medium** |
 
 ---
 
-### FR-04: التفاعل والتواصل (Engagement)
+### FR-03: Portfolio
 
-| المعرّف | المتطلب | الأولوية |
+| ID | Requirement | Priority |
 |---|---|---|
-| FR-04.1 | **الاستبيان:** بطاقات احترافية مع أسئلة عن كيفية معرفة الزائر بي وأهدافه | **عالية** |
-| FR-04.2 | الاستبيان يوفر خيارات جاهزة + خيارات حرة | **عالية** |
-| FR-04.3 | إمكانية تخطي أي سؤال أو الاستبيان بالكامل | **عالية** |
-| FR-04.4 | **المحادثة:** قسم تواصل يتيح مراسلة صاحب الموقع مباشرة | **عالية** |
-| FR-04.5 | **المساعدة:** قسم لاستقبال نصائح الزوار، شكاوى، أو ملاحظات تقنية | **عالية** |
+| FR-03.1 | Main showcase layout: Project summary on the right, images on the left. | **High** |
+| FR-03.2 | Images can be static or cycle automatically. | **High** |
+| FR-03.3 | Clicking a project opens its detailed page. | **High** |
+| FR-03.4 | Project live preview link. | **High** |
+| FR-03.5 | Image gallery with manual navigation or auto-slide every 5 seconds. | **High** |
+| FR-03.6 | Fullscreen image zoom functionality maintaining aspect ratio and quality. | **High** |
+| FR-03.7 | Detailed description including: development story, challenges and solutions, build duration, skills/technologies, and motivation. | **High** |
 
 ---
 
-### FR-05: لوحة التحكم (Admin Dashboard)
+### FR-04: Engagement & Contact
 
-| المعرّف | المتطلب | الأولوية |
+| ID | Requirement | Priority |
 |---|---|---|
-| FR-05.1 | تسجيل دخول بحساب المالك الخاص | **حرجة** |
-| FR-05.2 | تعديل روابط التواصل الاجتماعي | **عالية** |
-| FR-05.3 | قسم تحليلات ذكي لإجابات الاستبيان محللة حسب الفئات | **عالية** |
-| FR-05.4 | تحميل ملف JSON ببيانات الحسابات وإجاباتها الدقيقة | **عالية** |
-| FR-05.5 | صندوق وارد لقراءة رسائل الزوار والعملاء | **عالية** |
-| FR-05.6 | إعادة توجيه الرسائل تلقائياً إلى البريد الإلكتروني | **عالية** |
-| FR-05.7 | 🆕 **التحليلات السلوكية** عبر **Vercel Analytics** (لا تستهلك قاعدة البيانات) | **عالية** |
+| FR-04.1 | **Interactive Survey:** Card-based UI asking visitors how they discovered the developer and their goals. | **High** |
+| FR-04.2 | Survey provides pre-defined options + free text fields. | **High** |
+| FR-04.3 | Option to skip individual questions or the entire survey. | **High** |
+| FR-04.4 | **Chat/Contact:** A contact section allowing visitors to message the owner directly. | **High** |
+| FR-04.5 | **Feedback/Support:** A channel for visitors to submit tips, complaints, or technical notes. | **High** |
 
 ---
 
-### FR-06: التنقل والعناصر المشتركة (Navigation & Shared Components)
+### FR-05: Admin Dashboard (CMS)
 
-| المعرّف | المتطلب | الأولوية |
+| ID | Requirement | Priority |
 |---|---|---|
-| FR-06.1 | روابط التواصل (واتساب، لينكد إن، مستقل) متاحة دائماً في الـ Footer | **عالية** |
-| FR-06.2 | نظام مرن يسمح بإضافة وسائل تواصل جديدة مستقبلاً | **متوسطة** |
-| FR-06.3 | الضغط على بطاقة "من أنا" يوصل لصفحة "رحلتي" | **عالية** |
+| FR-05.1 | Secure login restricted exclusively to the owner's account. | **Critical** |
+| FR-05.2 | Ability to manage and update social links. | **High** |
+| FR-05.3 | Analytics panel summarizing survey responses categorized by target groups. | **High** |
+| FR-05.4 | Option to export user responses and accounts details in JSON format. | **High** |
+| FR-05.5 | Inbox to read messages sent via the contact form. | **High** |
+| FR-05.6 | Automated message forwarding to the owner's email address. | **High** |
+| FR-05.7 | Behavioral analytics tracking via **Vercel Analytics** (without database read/write overhead). | **High** |
 
 ---
 
-## 3. المتطلبات غير الوظيفية (Non-Functional Requirements)
+### FR-06: Navigation & Shared Components
 
-| المعرّف | المتطلب                                                                                           | الأولوية   |
-| ------- | ------------------------------------------------------------------------------------------------- | ---------- |
-| NFR-01  | **الأداء:** الأولوية القصوى لسرعة الموقع وتقليل زمن التحميل                                       | **حرجة**   |
-| NFR-02  | **التصميم المتجاوب:** تصميم مخصص ومنفصل لكل من PC والهواتف و التابلت                              | **حرجة**   |
-| NFR-03  | **الطابع البصري:** فخامة وهدوء مع ألوان احترافية                                                  | **عالية**  |
-| NFR-04  | **الحركات:** حركات بسيطة في الأقسام العامة، وتأثيرات حركية "شديدة الاحترافية" في الصفحات الرئيسية | **عالية**  |
-| NFR-05  | **قابلية التوسع:** النظام يدعم إضافة وسائل تواصل ومحتوى جديد                                      | **متوسطة** |
-| NFR-06  | 🆕 **أمن الـ API:** حماية Rate Limiting عبر **Upstash** لمنع الـ Spam (5 رسائل/IP/ساعة)          | **عالية**  |
-| NFR-07  | 🆕 **أمن البيانات:** تفعيل RLS على جميع الجداول + تعطيل Sign-up (المالك فقط)         | **حرجة**   |
+| ID | Requirement | Priority |
+|---|---|---|
+| FR-06.1 | Social link shortcuts (WhatsApp, LinkedIn, Mostaql) persistently available in the Footer. | **High** |
+| FR-06.2 | Flexible footer architecture allowing dynamic additions of new platforms in the future. | **Medium** |
+| FR-06.3 | Clicking the "About Me" card redirects to the "Journey" page. | **High** |
+
+---
+
+## 3. Non-Functional Requirements (NFR)
+
+| ID | Requirement | Priority |
+|---|---|---|
+| NFR-01 | **Performance:** Maximum optimization for load speeds and minimized page weight. | **Critical** |
+| NFR-02 | **Responsive Design:** Independent, tailored layouts for Desktop, Mobile, and Tablet devices. | **Critical** |
+| NFR-03 | **Visual Identity:** Luxury & Serenity theme with professional, harmonious color palettes. | **High** |
+| NFR-04 | **Animations:** Subtle micro-interactions on general components, with premium animation density on main landing pages. | **High** |
+| NFR-05 | **Scalability:** System architecture designed to support adding new content and social integrations smoothly. | **Medium** |
+| NFR-06 | **API Security:** Rate limiting via **Upstash** to prevent spam (max 5 messages/IP/hour). | **High** |
+| NFR-07 | **Data Security:** Row-Level Security (RLS) enabled on all database tables + disabled public signup (owner account only). | **Critical** |
