@@ -159,7 +159,7 @@ abdullah-div/
 ### 1. Clone & Install
 
 ```bash
-git clone https://github.com/your-username/abdullah-div.git
+git clone https://github.com/Abdullah931-stack/Abdullah-div.git
 cd abdullah-div
 npm install
 ```
