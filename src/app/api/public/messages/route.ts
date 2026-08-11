@@ -3,7 +3,7 @@ import { prisma } from "@/lib/prisma";
 import { getMessageRateLimiter, checkRateLimit } from "@/lib/rate-limit";
 import { resend, OWNER_EMAIL } from "@/lib/resend/client";
 import { generateContactEmailHtml, generateContactEmailSubject } from "@/lib/resend/templates";
-import type { MessageInput } from "@/types";
+import type { MessageInput, ContactReason } from "@/types";
 
 /**
  * POST /api/public/messages
@@ -11,7 +11,12 @@ import type { MessageInput } from "@/types";
  * Rate limited: 5 messages per IP per hour.
  * Sends email notification via Resend.
  * Public endpoint — no authentication required.
+ *
+ * v2.0 (§9): uses `reason` + optional `projectRef` instead of `serviceType` + `budget`.
  */
+
+const VALID_REASONS: ContactReason[] = ["general", "bug-report", "academic", "collaboration"];
+
 export async function POST(request: NextRequest) {
     try {
         // Rate limiting
@@ -21,11 +26,7 @@ export async function POST(request: NextRequest) {
 
         if (!allowed) {
             return NextResponse.json(
-                {
-                    success: false,
-                    error: "Too many requests",
-                    retryAfter,
-                },
+                { success: false, error: "Too many requests", retryAfter },
                 { status: 429 }
             );
         }
@@ -36,11 +37,19 @@ export async function POST(request: NextRequest) {
         if (
             !body.senderName?.trim() ||
             !body.senderEmail?.trim() ||
-            !body.serviceType?.trim() ||
+            !body.reason?.trim() ||
             !body.body?.trim()
         ) {
             return NextResponse.json(
                 { success: false, error: "Missing required fields" },
+                { status: 400 }
+            );
+        }
+
+        // Validate reason is a known value (§9.2)
+        if (!VALID_REASONS.includes(body.reason as ContactReason)) {
+            return NextResponse.json(
+                { success: false, error: "Invalid reason value" },
                 { status: 400 }
             );
         }
@@ -57,11 +66,11 @@ export async function POST(request: NextRequest) {
         // Save message to database
         const message = await prisma.message.create({
             data: {
-                senderName: body.senderName.trim(),
+                senderName:  body.senderName.trim(),
                 senderEmail: body.senderEmail.trim(),
-                serviceType: body.serviceType.trim(),
-                budget: body.budget,
-                body: body.body.trim(),
+                reason:      body.reason,
+                projectRef:  body.projectRef?.trim() || null, // §9.3 — only for bug-report
+                body:        body.body.trim(),
             },
         });
 
@@ -69,10 +78,10 @@ export async function POST(request: NextRequest) {
         let emailStatus: "sent" | "failed" = "sent";
         try {
             if (resend && OWNER_EMAIL) {
-
                 await resend.emails.send({
                     from: "Portfolio <onboarding@resend.dev>",
                     to: OWNER_EMAIL,
+                    replyTo: `${body.senderName} <${body.senderEmail}>`,
                     subject: generateContactEmailSubject(body),
                     html: generateContactEmailHtml(body),
                 });
@@ -81,7 +90,6 @@ export async function POST(request: NextRequest) {
             console.error("[API] Resend email error:", emailError);
             emailStatus = "failed";
 
-            // Update message with email failure status
             await prisma.message.update({
                 where: { id: message.id },
                 data: { emailStatus: "failed" },
@@ -89,10 +97,7 @@ export async function POST(request: NextRequest) {
         }
 
         return NextResponse.json(
-            {
-                success: true,
-                data: { id: message.id, emailStatus },
-            },
+            { success: true, data: { id: message.id, emailStatus } },
             { status: 201 }
         );
     } catch (error) {

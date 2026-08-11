@@ -59,6 +59,7 @@ export async function POST(request: NextRequest) {
                 bodyAr: body.bodyAr || "",
                 bodyEn: body.bodyEn || "",
                 previewUrl: body.previewUrl || null,
+                repoUrl: body.repoUrl || null,
                 skills: body.skills || [],
                 buildTime: body.buildTime || null,
                 order: body.order || 0,

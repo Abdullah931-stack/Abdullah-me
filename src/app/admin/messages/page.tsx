@@ -1,7 +1,15 @@
 "use client";
 
 import { useState, useEffect } from "react";
-import type { MessageRow } from "@/types";
+import type { MessageRow, ContactReason } from "@/types";
+
+// Human-readable labels for the inbox column (§9.2)
+const REASON_LABELS: Record<ContactReason, string> = {
+    general:       "General Inquiry",
+    "bug-report":  "Issue Report",
+    academic:      "Academic / Research",
+    collaboration: "Collaboration / Hiring",
+};
 
 /**
  * Admin Messages Inbox Page
@@ -92,8 +100,8 @@ export default function AdminMessagesPage() {
                                         </span>
                                     </div>
                                     <div className="mt-1 flex items-center gap-3 text-xs text-gray-500">
-                                        <span>{msg.serviceType}</span>
-                                        {msg.budget && <span>• {msg.budget}</span>}
+                                        <span>{REASON_LABELS[msg.reason as ContactReason] ?? msg.reason}</span>
+                                        {msg.projectRef && <span>• {msg.projectRef}</span>}
                                         <span>
                                             •{" "}
                                             {new Date(msg.createdAt).toLocaleDateString("en-US", {

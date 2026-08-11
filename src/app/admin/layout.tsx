@@ -6,11 +6,11 @@ import Link from "next/link";
 import { motion, AnimatePresence } from "framer-motion";
 
 /**
- * Admin Dashboard Layout — Quiet Luxury Edition
+ * Admin Dashboard Layout — v2.0 "Signal & Growth"
  * 
- * - Deep Zinc 950 Background
- * - Glassmorphism Sidebar & Header
- * - Minimalist Navigation
+ * §9.1: Deliberately restrained — color tokens only, NO lava-lamp/Lissajous/card-ripple
+ * §9.2: PulseBorder on Save/Publish/Delete buttons only (handled in sub-pages)
+ * Flat --bg background per §9.1 explicit guidance
  */
 
 const SIDEBAR_LINKS = [
@@ -51,8 +51,8 @@ export default function AdminLayout({
 
     if (isLoading) {
         return (
-            <div className="flex min-h-screen items-center justify-center bg-zinc-950">
-                <div className="h-8 w-8 animate-spin rounded-full border-2 border-white/20 border-t-white" />
+            <div className="flex min-h-screen items-center justify-center" style={{ background: 'var(--color-bg)' }}>
+                <div className="h-8 w-8 animate-spin rounded-full border-2 border-t-transparent" style={{ borderColor: 'var(--color-accent)', borderTopColor: 'transparent' }} />
             </div>
         );
     }
@@ -66,15 +66,16 @@ export default function AdminLayout({
     }
 
     return (
-        <div className="flex min-h-screen bg-zinc-950 text-white font-sans">
+        <div className="flex min-h-screen font-sans" style={{ background: 'var(--color-bg)', color: 'var(--color-text)' }}>
             {/* Sidebar */}
             <aside
-                className={`fixed inset-y-0 left-0 z-50 w-64 transform border-r border-white/10 bg-zinc-950/80 backdrop-blur-xl transition-transform duration-300 md:relative md:translate-x-0 ${sidebarOpen ? "translate-x-0" : "-translate-x-full"
+                className={`fixed inset-y-0 left-0 z-50 w-64 transform backdrop-blur-xl transition-transform duration-300 md:relative md:translate-x-0 ${sidebarOpen ? "translate-x-0" : "-translate-x-full"
                     }`}
+                style={{ borderRight: '1px solid var(--color-card-border)', background: 'rgba(5, 15, 10, 0.8)' }}
             >
                 {/* Logo */}
-                <div className="flex h-20 items-center px-6 border-b border-white/5">
-                    <h1 className="text-xl font-bold tracking-tight text-white">Admin<span className="text-zinc-500">Panel</span></h1>
+                <div className="flex h-20 items-center px-6" style={{ borderBottom: '1px solid var(--color-card-border)' }}>
+                    <h1 className="text-xl font-bold tracking-tight" style={{ fontFamily: 'var(--font-space-grotesk), sans-serif' }}>Admin<span style={{ color: 'var(--color-muted)' }}>Panel</span></h1>
                 </div>
 
                 {/* Navigation */}
@@ -87,9 +88,16 @@ export default function AdminLayout({
                                 href={link.href}
                                 onClick={() => setSidebarOpen(false)}
                                 className={`flex items-center gap-3 rounded-xl px-4 py-3 text-sm font-medium transition-all duration-200 ${isActive
-                                    ? "bg-white/10 text-white shadow-sm border border-white/5"
-                                    : "text-zinc-400 hover:bg-white/5 hover:text-white"
+                                    ? "shadow-sm"
+                                    : ""
                                     }`}
+                                style={isActive ? {
+                                    background: 'rgba(74, 222, 128, 0.1)',
+                                    color: 'var(--color-text)',
+                                    border: '1px solid var(--color-card-border)',
+                                } : {
+                                    color: 'var(--color-muted)',
+                                }}
                             >
                                 <span className="text-lg opacity-80">{link.icon}</span>
                                 {link.label}
@@ -99,11 +107,12 @@ export default function AdminLayout({
                 </nav>
 
                 {/* Bottom Actions */}
-                <div className="absolute bottom-0 w-full border-t border-white/10 p-4 space-y-2">
+                <div className="absolute bottom-0 w-full p-4 space-y-2" style={{ borderTop: '1px solid var(--color-card-border)' }}>
                     {/* Export */}
                     <a
                         href="/api/admin/export"
-                        className="flex items-center gap-3 rounded-xl px-4 py-3 text-sm font-medium text-zinc-400 transition-all hover:bg-white/5 hover:text-white"
+                        className="flex items-center gap-3 rounded-xl px-4 py-3 text-sm font-medium transition-all"
+                        style={{ color: 'var(--color-muted)' }}
                     >
                         <span>💾</span> Export Data
                     </a>
@@ -111,7 +120,8 @@ export default function AdminLayout({
                     {/* Back to Site */}
                     <Link
                         href="/"
-                        className="flex items-center gap-3 rounded-xl px-4 py-3 text-sm font-medium text-zinc-400 transition-all hover:bg-white/5 hover:text-white"
+                        className="flex items-center gap-3 rounded-xl px-4 py-3 text-sm font-medium transition-all"
+                        style={{ color: 'var(--color-muted)' }}
                     >
                         <span>🌐</span> View Site
                     </Link>
@@ -142,11 +152,12 @@ export default function AdminLayout({
             {/* Main Content */}
             <div className="flex flex-1 flex-col overflow-hidden">
                 {/* Top Bar */}
-                <header className="flex h-20 items-center justify-between border-b border-white/5 bg-zinc-950/50 backdrop-blur-md px-6 lg:px-8">
+                <header className="flex h-20 items-center justify-between backdrop-blur-md px-6 lg:px-8" style={{ borderBottom: '1px solid var(--color-card-border)', background: 'rgba(5, 15, 10, 0.5)' }}>
                     {/* Mobile Menu Toggle */}
                     <button
                         onClick={() => setSidebarOpen(!sidebarOpen)}
-                        className="rounded-lg p-2 text-zinc-400 hover:bg-white/5 hover:text-white md:hidden"
+                        className="rounded-lg p-2 md:hidden"
+                        style={{ color: 'var(--color-muted)' }}
                     >
                         <svg
                             width="24"
@@ -165,7 +176,7 @@ export default function AdminLayout({
                     <div className="hidden md:block" />
 
                     <div className="flex items-center gap-4">
-                        <div className="text-sm font-medium text-zinc-400 bg-white/5 px-4 py-2 rounded-full border border-white/5">
+                        <div className="text-sm font-medium px-4 py-2 rounded-full" style={{ color: 'var(--color-muted)', background: 'var(--color-surface)', border: '1px solid var(--color-card-border)', fontFamily: 'var(--font-jetbrains-mono), monospace' }}>
                             {new Date().toLocaleDateString("en-US", {
                                 weekday: "long",
                                 year: "numeric",
@@ -177,7 +188,7 @@ export default function AdminLayout({
                 </header>
 
                 {/* Page Content */}
-                <main className="flex-1 overflow-y-auto p-6 lg:p-8 bg-zinc-950 scrollbar-thin scrollbar-thumb-white/10 scrollbar-track-transparent">
+                <main className="flex-1 overflow-y-auto p-6 lg:p-8" style={{ background: 'var(--color-bg)' }}>
                     {children}
                 </main>
             </div>

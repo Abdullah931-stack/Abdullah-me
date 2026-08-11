@@ -6,26 +6,33 @@ import {
 import type { MessageInput } from "@/types";
 
 // ─────────────────────────────────────────────
-// TDD: Tests written BEFORE implementation verification
+// Email template tests — updated for §9 (reason replaces serviceType/budget)
 // ─────────────────────────────────────────────
 
 describe("generateContactEmailHtml", () => {
     const arabicMessage: MessageInput = {
-        senderName: "أحمد",
+        senderName:  "أحمد",
         senderEmail: "ahmed@example.com",
-        serviceType: "SaaS",
-        budget: "$500-$1000",
-        body: "أريد بناء منصة SaaS لإدارة المخزون",
-        locale: "ar",
+        reason:      "academic",
+        body:        "أريد الاستفسار عن بحث مشترك",
+        locale:      "ar",
     };
 
     const englishMessage: MessageInput = {
-        senderName: "John",
+        senderName:  "John",
         senderEmail: "john@example.com",
-        serviceType: "MVP",
-        budget: "$150-$500",
-        body: "I want to build an inventory management MVP",
-        locale: "en",
+        reason:      "general",
+        body:        "I have a general question about your work",
+        locale:      "en",
+    };
+
+    const bugReportMessage: MessageInput = {
+        senderName:  "Sara",
+        senderEmail: "sara@example.com",
+        reason:      "bug-report",
+        projectRef:  "Portfolio Website",
+        body:        "The contact form is broken",
+        locale:      "en",
     };
 
     it("should generate valid HTML email content", () => {
@@ -34,13 +41,27 @@ describe("generateContactEmailHtml", () => {
         expect(html).toContain("</html>");
     });
 
-    it("should include all message fields in the email", () => {
+    it("should include sender name, email, and body", () => {
         const html = generateContactEmailHtml(arabicMessage);
         expect(html).toContain(arabicMessage.senderName);
         expect(html).toContain(arabicMessage.senderEmail);
-        expect(html).toContain(arabicMessage.serviceType);
-        expect(html).toContain(arabicMessage.budget);
         expect(html).toContain(arabicMessage.body);
+    });
+
+    it("should include human-readable reason label (Arabic)", () => {
+        const html = generateContactEmailHtml(arabicMessage);
+        expect(html).toContain("استفسار أكاديمي");
+    });
+
+    it("should include human-readable reason label (English)", () => {
+        const html = generateContactEmailHtml(englishMessage);
+        expect(html).toContain("General Inquiry");
+    });
+
+    it("should include projectRef when reason = bug-report", () => {
+        const html = generateContactEmailHtml(bugReportMessage);
+        expect(html).toContain("Portfolio Website");
+        expect(html).toContain("Project Issue Report");
     });
 
     it("should set RTL direction for Arabic locale", () => {
@@ -55,33 +76,36 @@ describe("generateContactEmailHtml", () => {
         expect(html).toContain('lang="en"');
     });
 
-    it("should use Arabic labels for Arabic locale", () => {
+    it("should use Arabic field labels for Arabic locale", () => {
         const html = generateContactEmailHtml(arabicMessage);
         expect(html).toContain("الاسم");
         expect(html).toContain("البريد الإلكتروني");
+        expect(html).toContain("سبب التواصل");
     });
 
-    it("should use English labels for English locale", () => {
+    it("should use English field labels for English locale", () => {
         const html = generateContactEmailHtml(englishMessage);
         expect(html).toContain("Name");
         expect(html).toContain("Email");
+        expect(html).toContain("Reason");
     });
 });
 
 describe("generateContactEmailSubject", () => {
-    it("should include service type, budget, and sender name", () => {
+    it("should include reason label and sender name — neutral framing (§9.1)", () => {
         const message: MessageInput = {
-            senderName: "Ahmed",
+            senderName:  "Ahmed",
             senderEmail: "ahmed@test.com",
-            serviceType: "SaaS",
-            budget: "$500-$1000",
-            body: "Project details...",
-            locale: "ar",
+            reason:      "collaboration",
+            body:        "I'd like to collaborate",
+            locale:      "en",
         };
 
         const subject = generateContactEmailSubject(message);
-        expect(subject).toContain("SaaS");
-        expect(subject).toContain("$500-$1000");
+        expect(subject).toContain("Collaboration or Hiring Opportunity");
         expect(subject).toContain("Ahmed");
+        // Ensure old freelance framing is gone
+        expect(subject).not.toContain("🚀");
+        expect(subject).not.toContain("Project Request");
     });
 });

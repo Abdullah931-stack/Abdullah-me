@@ -22,6 +22,7 @@ export default function AdminProjectsPage() {
         bodyAr: "",
         bodyEn: "",
         previewUrl: "",
+        repoUrl: "",
         skills: "",
         buildTime: "",
         order: 0,
@@ -112,6 +113,7 @@ export default function AdminProjectsPage() {
             bodyAr: "",
             bodyEn: "",
             previewUrl: "",
+            repoUrl: "",
             skills: "",
             buildTime: "",
             order: project.order,
@@ -131,6 +133,7 @@ export default function AdminProjectsPage() {
             bodyAr: "",
             bodyEn: "",
             previewUrl: "",
+            repoUrl: "",
             skills: "",
             buildTime: "",
             order: 0,
@@ -222,6 +225,13 @@ export default function AdminProjectsPage() {
                                 placeholder="Preview URL"
                                 value={form.previewUrl}
                                 onChange={(e) => setForm({ ...form, previewUrl: e.target.value })}
+                                className="rounded-xl border border-white/10 bg-black/20 px-4 py-3 text-white placeholder-zinc-500 focus:border-white/20 focus:outline-none focus:bg-black/40 transition-all"
+                            />
+                            {/* §9.3 — Repository URL field, adjacent to Preview URL */}
+                            <input
+                                placeholder="Repository URL"
+                                value={form.repoUrl}
+                                onChange={(e) => setForm({ ...form, repoUrl: e.target.value })}
                                 className="rounded-xl border border-white/10 bg-black/20 px-4 py-3 text-white placeholder-zinc-500 focus:border-white/20 focus:outline-none focus:bg-black/40 transition-all"
                             />
                             <input

@@ -1,25 +1,35 @@
-import { Readex_Pro, Plus_Jakarta_Sans } from "next/font/google";
+import { Space_Grotesk, IBM_Plex_Sans_Arabic, JetBrains_Mono } from "next/font/google";
 
 /**
- * Arabic font — Readex Pro
- * Used for all Arabic text content
- * display: 'swap' prevents FOIT (Flash of Invisible Text)
+ * Display / Headings (Latin, numerals) — Space Grotesk
+ * Geometric, technical character — matches systems/signals identity (§3)
  */
-export const readexPro = Readex_Pro({
-    subsets: ["arabic", "latin"],
-    variable: "--font-readex-pro",
-    display: "swap",
-    weight: ["300", "400", "500", "600", "700"],
+export const spaceGrotesk = Space_Grotesk({
+  subsets: ["latin"],
+  variable: "--font-space-grotesk",
+  display: "swap",
+  weight: ["300", "400", "500", "600", "700"],
 });
 
 /**
- * English font — Plus Jakarta Sans
- * Used for all English text content
- * display: 'swap' prevents FOIT (Flash of Invisible Text)
+ * Arabic body & headings — IBM Plex Sans Arabic
+ * High-quality RTL rendering at all weights (§3)
  */
-export const plusJakartaSans = Plus_Jakarta_Sans({
-    subsets: ["latin"],
-    variable: "--font-plus-jakarta-sans",
-    display: "swap",
-    weight: ["300", "400", "500", "600", "700"],
+export const ibmPlexSansArabic = IBM_Plex_Sans_Arabic({
+  subsets: ["arabic"],
+  variable: "--font-ibm-plex-arabic",
+  display: "swap",
+  weight: ["300", "400", "500", "600", "700"],
+});
+
+/**
+ * Technical labels — JetBrains Mono
+ * Eyebrow text, timestamps, tags, section markers (§3)
+ * Used narrowly, NOT for body copy
+ */
+export const jetbrainsMono = JetBrains_Mono({
+  subsets: ["latin"],
+  variable: "--font-jetbrains-mono",
+  display: "swap",
+  weight: ["400", "500", "700"],
 });

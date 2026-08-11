@@ -44,6 +44,7 @@ export type ProjectMinAggregateOutputType = {
   bodyAr: string | null
   bodyEn: string | null
   previewUrl: string | null
+  repoUrl: string | null
   buildTime: string | null
   order: number | null
   isPublished: boolean | null
@@ -62,6 +63,7 @@ export type ProjectMaxAggregateOutputType = {
   bodyAr: string | null
   bodyEn: string | null
   previewUrl: string | null
+  repoUrl: string | null
   buildTime: string | null
   order: number | null
   isPublished: boolean | null
@@ -80,6 +82,7 @@ export type ProjectCountAggregateOutputType = {
   bodyAr: number
   bodyEn: number
   previewUrl: number
+  repoUrl: number
   skills: number
   buildTime: number
   order: number
@@ -109,6 +112,7 @@ export type ProjectMinAggregateInputType = {
   bodyAr?: true
   bodyEn?: true
   previewUrl?: true
+  repoUrl?: true
   buildTime?: true
   order?: true
   isPublished?: true
@@ -127,6 +131,7 @@ export type ProjectMaxAggregateInputType = {
   bodyAr?: true
   bodyEn?: true
   previewUrl?: true
+  repoUrl?: true
   buildTime?: true
   order?: true
   isPublished?: true
@@ -145,6 +150,7 @@ export type ProjectCountAggregateInputType = {
   bodyAr?: true
   bodyEn?: true
   previewUrl?: true
+  repoUrl?: true
   skills?: true
   buildTime?: true
   order?: true
@@ -251,6 +257,7 @@ export type ProjectGroupByOutputType = {
   bodyAr: string
   bodyEn: string
   previewUrl: string | null
+  repoUrl: string | null
   skills: string[]
   buildTime: string | null
   order: number
@@ -293,6 +300,7 @@ export type ProjectWhereInput = {
   bodyAr?: Prisma.StringFilter<"Project"> | string
   bodyEn?: Prisma.StringFilter<"Project"> | string
   previewUrl?: Prisma.StringNullableFilter<"Project"> | string | null
+  repoUrl?: Prisma.StringNullableFilter<"Project"> | string | null
   skills?: Prisma.StringNullableListFilter<"Project">
   buildTime?: Prisma.StringNullableFilter<"Project"> | string | null
   order?: Prisma.IntFilter<"Project"> | number
@@ -313,6 +321,7 @@ export type ProjectOrderByWithRelationInput = {
   bodyAr?: Prisma.SortOrder
   bodyEn?: Prisma.SortOrder
   previewUrl?: Prisma.SortOrderInput | Prisma.SortOrder
+  repoUrl?: Prisma.SortOrderInput | Prisma.SortOrder
   skills?: Prisma.SortOrder
   buildTime?: Prisma.SortOrderInput | Prisma.SortOrder
   order?: Prisma.SortOrder
@@ -336,6 +345,7 @@ export type ProjectWhereUniqueInput = Prisma.AtLeast<{
   bodyAr?: Prisma.StringFilter<"Project"> | string
   bodyEn?: Prisma.StringFilter<"Project"> | string
   previewUrl?: Prisma.StringNullableFilter<"Project"> | string | null
+  repoUrl?: Prisma.StringNullableFilter<"Project"> | string | null
   skills?: Prisma.StringNullableListFilter<"Project">
   buildTime?: Prisma.StringNullableFilter<"Project"> | string | null
   order?: Prisma.IntFilter<"Project"> | number
@@ -356,6 +366,7 @@ export type ProjectOrderByWithAggregationInput = {
   bodyAr?: Prisma.SortOrder
   bodyEn?: Prisma.SortOrder
   previewUrl?: Prisma.SortOrderInput | Prisma.SortOrder
+  repoUrl?: Prisma.SortOrderInput | Prisma.SortOrder
   skills?: Prisma.SortOrder
   buildTime?: Prisma.SortOrderInput | Prisma.SortOrder
   order?: Prisma.SortOrder
@@ -383,6 +394,7 @@ export type ProjectScalarWhereWithAggregatesInput = {
   bodyAr?: Prisma.StringWithAggregatesFilter<"Project"> | string
   bodyEn?: Prisma.StringWithAggregatesFilter<"Project"> | string
   previewUrl?: Prisma.StringNullableWithAggregatesFilter<"Project"> | string | null
+  repoUrl?: Prisma.StringNullableWithAggregatesFilter<"Project"> | string | null
   skills?: Prisma.StringNullableListFilter<"Project">
   buildTime?: Prisma.StringNullableWithAggregatesFilter<"Project"> | string | null
   order?: Prisma.IntWithAggregatesFilter<"Project"> | number
@@ -402,6 +414,7 @@ export type ProjectCreateInput = {
   bodyAr: string
   bodyEn: string
   previewUrl?: string | null
+  repoUrl?: string | null
   skills?: Prisma.ProjectCreateskillsInput | string[]
   buildTime?: string | null
   order?: number
@@ -422,6 +435,7 @@ export type ProjectUncheckedCreateInput = {
   bodyAr: string
   bodyEn: string
   previewUrl?: string | null
+  repoUrl?: string | null
   skills?: Prisma.ProjectCreateskillsInput | string[]
   buildTime?: string | null
   order?: number
@@ -442,6 +456,7 @@ export type ProjectUpdateInput = {
   bodyAr?: Prisma.StringFieldUpdateOperationsInput | string
   bodyEn?: Prisma.StringFieldUpdateOperationsInput | string
   previewUrl?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  repoUrl?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   skills?: Prisma.ProjectUpdateskillsInput | string[]
   buildTime?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   order?: Prisma.IntFieldUpdateOperationsInput | number
@@ -462,6 +477,7 @@ export type ProjectUncheckedUpdateInput = {
   bodyAr?: Prisma.StringFieldUpdateOperationsInput | string
   bodyEn?: Prisma.StringFieldUpdateOperationsInput | string
   previewUrl?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  repoUrl?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   skills?: Prisma.ProjectUpdateskillsInput | string[]
   buildTime?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   order?: Prisma.IntFieldUpdateOperationsInput | number
@@ -482,6 +498,7 @@ export type ProjectCreateManyInput = {
   bodyAr: string
   bodyEn: string
   previewUrl?: string | null
+  repoUrl?: string | null
   skills?: Prisma.ProjectCreateskillsInput | string[]
   buildTime?: string | null
   order?: number
@@ -501,6 +518,7 @@ export type ProjectUpdateManyMutationInput = {
   bodyAr?: Prisma.StringFieldUpdateOperationsInput | string
   bodyEn?: Prisma.StringFieldUpdateOperationsInput | string
   previewUrl?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  repoUrl?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   skills?: Prisma.ProjectUpdateskillsInput | string[]
   buildTime?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   order?: Prisma.IntFieldUpdateOperationsInput | number
@@ -520,6 +538,7 @@ export type ProjectUncheckedUpdateManyInput = {
   bodyAr?: Prisma.StringFieldUpdateOperationsInput | string
   bodyEn?: Prisma.StringFieldUpdateOperationsInput | string
   previewUrl?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  repoUrl?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   skills?: Prisma.ProjectUpdateskillsInput | string[]
   buildTime?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   order?: Prisma.IntFieldUpdateOperationsInput | number
@@ -547,6 +566,7 @@ export type ProjectCountOrderByAggregateInput = {
   bodyAr?: Prisma.SortOrder
   bodyEn?: Prisma.SortOrder
   previewUrl?: Prisma.SortOrder
+  repoUrl?: Prisma.SortOrder
   skills?: Prisma.SortOrder
   buildTime?: Prisma.SortOrder
   order?: Prisma.SortOrder
@@ -570,6 +590,7 @@ export type ProjectMaxOrderByAggregateInput = {
   bodyAr?: Prisma.SortOrder
   bodyEn?: Prisma.SortOrder
   previewUrl?: Prisma.SortOrder
+  repoUrl?: Prisma.SortOrder
   buildTime?: Prisma.SortOrder
   order?: Prisma.SortOrder
   isPublished?: Prisma.SortOrder
@@ -588,6 +609,7 @@ export type ProjectMinOrderByAggregateInput = {
   bodyAr?: Prisma.SortOrder
   bodyEn?: Prisma.SortOrder
   previewUrl?: Prisma.SortOrder
+  repoUrl?: Prisma.SortOrder
   buildTime?: Prisma.SortOrder
   order?: Prisma.SortOrder
   isPublished?: Prisma.SortOrder
@@ -638,6 +660,7 @@ export type ProjectCreateWithoutImagesInput = {
   bodyAr: string
   bodyEn: string
   previewUrl?: string | null
+  repoUrl?: string | null
   skills?: Prisma.ProjectCreateskillsInput | string[]
   buildTime?: string | null
   order?: number
@@ -657,6 +680,7 @@ export type ProjectUncheckedCreateWithoutImagesInput = {
   bodyAr: string
   bodyEn: string
   previewUrl?: string | null
+  repoUrl?: string | null
   skills?: Prisma.ProjectCreateskillsInput | string[]
   buildTime?: string | null
   order?: number
@@ -692,6 +716,7 @@ export type ProjectUpdateWithoutImagesInput = {
   bodyAr?: Prisma.StringFieldUpdateOperationsInput | string
   bodyEn?: Prisma.StringFieldUpdateOperationsInput | string
   previewUrl?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  repoUrl?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   skills?: Prisma.ProjectUpdateskillsInput | string[]
   buildTime?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   order?: Prisma.IntFieldUpdateOperationsInput | number
@@ -711,6 +736,7 @@ export type ProjectUncheckedUpdateWithoutImagesInput = {
   bodyAr?: Prisma.StringFieldUpdateOperationsInput | string
   bodyEn?: Prisma.StringFieldUpdateOperationsInput | string
   previewUrl?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  repoUrl?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   skills?: Prisma.ProjectUpdateskillsInput | string[]
   buildTime?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   order?: Prisma.IntFieldUpdateOperationsInput | number
@@ -761,6 +787,7 @@ export type ProjectSelect<ExtArgs extends runtime.Types.Extensions.InternalArgs 
   bodyAr?: boolean
   bodyEn?: boolean
   previewUrl?: boolean
+  repoUrl?: boolean
   skills?: boolean
   buildTime?: boolean
   order?: boolean
@@ -782,6 +809,7 @@ export type ProjectSelectCreateManyAndReturn<ExtArgs extends runtime.Types.Exten
   bodyAr?: boolean
   bodyEn?: boolean
   previewUrl?: boolean
+  repoUrl?: boolean
   skills?: boolean
   buildTime?: boolean
   order?: boolean
@@ -801,6 +829,7 @@ export type ProjectSelectUpdateManyAndReturn<ExtArgs extends runtime.Types.Exten
   bodyAr?: boolean
   bodyEn?: boolean
   previewUrl?: boolean
+  repoUrl?: boolean
   skills?: boolean
   buildTime?: boolean
   order?: boolean
@@ -820,6 +849,7 @@ export type ProjectSelectScalar = {
   bodyAr?: boolean
   bodyEn?: boolean
   previewUrl?: boolean
+  repoUrl?: boolean
   skills?: boolean
   buildTime?: boolean
   order?: boolean
@@ -829,7 +859,7 @@ export type ProjectSelectScalar = {
   updatedAt?: boolean
 }
 
-export type ProjectOmit<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetOmit<"id" | "slug" | "titleAr" | "titleEn" | "summaryAr" | "summaryEn" | "bodyAr" | "bodyEn" | "previewUrl" | "skills" | "buildTime" | "order" | "isPublished" | "isFeatured" | "createdAt" | "updatedAt", ExtArgs["result"]["project"]>
+export type ProjectOmit<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetOmit<"id" | "slug" | "titleAr" | "titleEn" | "summaryAr" | "summaryEn" | "bodyAr" | "bodyEn" | "previewUrl" | "repoUrl" | "skills" | "buildTime" | "order" | "isPublished" | "isFeatured" | "createdAt" | "updatedAt", ExtArgs["result"]["project"]>
 export type ProjectInclude<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
   images?: boolean | Prisma.Project$imagesArgs<ExtArgs>
   _count?: boolean | Prisma.ProjectCountOutputTypeDefaultArgs<ExtArgs>
@@ -852,6 +882,7 @@ export type $ProjectPayload<ExtArgs extends runtime.Types.Extensions.InternalArg
     bodyAr: string
     bodyEn: string
     previewUrl: string | null
+    repoUrl: string | null
     skills: string[]
     buildTime: string | null
     order: number
@@ -1292,6 +1323,7 @@ export interface ProjectFieldRefs {
   readonly bodyAr: Prisma.FieldRef<"Project", 'String'>
   readonly bodyEn: Prisma.FieldRef<"Project", 'String'>
   readonly previewUrl: Prisma.FieldRef<"Project", 'String'>
+  readonly repoUrl: Prisma.FieldRef<"Project", 'String'>
   readonly skills: Prisma.FieldRef<"Project", 'String[]'>
   readonly buildTime: Prisma.FieldRef<"Project", 'String'>
   readonly order: Prisma.FieldRef<"Project", 'Int'>

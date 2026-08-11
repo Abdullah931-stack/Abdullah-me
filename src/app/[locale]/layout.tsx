@@ -2,7 +2,6 @@ import type { Metadata } from "next";
 import { NextIntlClientProvider } from "next-intl";
 import { getMessages, setRequestLocale } from "next-intl/server";
 import { routing } from "@/i18n/routing";
-import { ThemeProvider } from "@/components/shared/ThemeProvider";
 import Navbar from "@/components/shared/Navbar";
 import Footer from "@/components/shared/Footer";
 import PageTransition from "@/components/shared/PageTransition";
@@ -28,7 +27,8 @@ export const metadata: Metadata = {
 };
 
 // ─────────────────────────────────────────────
-// Layout
+// Layout — v2.0 "Signal & Growth"
+// Dark-only — ThemeProvider removed per §2
 // ─────────────────────────────────────────────
 interface LocaleLayoutProps {
     children: React.ReactNode;
@@ -49,10 +49,12 @@ export default async function LocaleLayout({
 
     // Determine text direction based on locale
     const dir = locale === "ar" ? "rtl" : "ltr";
+
+    // Typography per §3 — Space Grotesk for Latin, IBM Plex Sans Arabic for Arabic
     const fontFamily =
         locale === "ar"
-            ? "var(--font-readex-pro), sans-serif"
-            : "var(--font-plus-jakarta-sans), sans-serif";
+            ? "var(--font-ibm-plex-arabic), sans-serif"
+            : "var(--font-space-grotesk), sans-serif";
 
     return (
         <>
@@ -66,17 +68,14 @@ export default async function LocaleLayout({
                     `,
                 }}
             />
-            <ThemeProvider>
-                <NextIntlClientProvider messages={messages}>
-                    <Navbar />
-                    <PageTransition>
-                        <main className="pt-[72px]">{children}</main>
-                    </PageTransition>
-                    <Footer />
-                    <SurveyPopup />
-                </NextIntlClientProvider>
-            </ThemeProvider>
+            <NextIntlClientProvider messages={messages}>
+                <Navbar />
+                <PageTransition>
+                    <main className="pt-[72px]">{children}</main>
+                </PageTransition>
+                <Footer />
+                <SurveyPopup />
+            </NextIntlClientProvider>
         </>
     );
 }
-

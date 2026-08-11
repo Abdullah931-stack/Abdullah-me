@@ -24,13 +24,11 @@
         "switch": "Switch Language"
     },
     "hero": {
-        "greeting": "Hi, I'm",
+        "eyebrow": "Systems · Signals · Simulation",
         "name": "Abdullah.",
-        "role": "Software Developer",
-        "bio": "I turn ideas into professional digital products",
+        "bio": "Turns complex ideas into working systems — through AI model orchestration and precise simulation of physical phenomena.",
         "cta": "Contact Me",
-        "work": "My Work",
-        "badge": "Available for new projects"
+        "work": "My Work"
     },
     "projects": {
         "title": "My Projects",
@@ -50,27 +48,25 @@
         "age": "Age at the time"
     },
     "contact": {
-        "title": "Start Your Project",
-        "subtitle": "Tell me about your idea and I'll help turn it into reality",
+        "title": "Get in Touch",
+        "subtitle": "I'd be glad to hear from you",
         "name": "Name",
         "email": "Email",
-        "serviceType": "Service Type",
-        "budget": "Budget",
-        "message": "Project Details",
-        "submit": "Start Project 🚀",
-        "services": {
-            "mvp": "MVP — Minimum Viable Product",
-            "saas": "SaaS — Software as a Service",
-            "ai": "AI Integration"
+        "reason": "Reason for reaching out",
+        "message": "Message",
+        "submit": "Send",
+        "reasons": {
+            "general": "General inquiry",
+            "bug-report": "Report an issue in a project",
+            "academic": "Academic / research inquiry",
+            "collaboration": "Collaboration or hiring opportunity"
         },
-        "budgets": {
-            "low": "$150 - $500",
-            "mid": "$500 - $1,000",
-            "high": "+$1,000"
-        },
+        "projectPicker": "Select a project",
+        "projectPickerOther": "Other (not listed)",
+        "projectPickerOtherInput": "Enter the project name",
         "success": {
-            "title": "Request Received! 🎉",
-            "message": "I'll review it and get back to you within 24 hours with an action plan."
+            "title": "Message sent",
+            "message": "Thank you for reaching out. I'll read your message and reply as soon as I can."
         },
         "errors": {
             "required": "This field is required",

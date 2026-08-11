@@ -45,6 +45,7 @@ model Project {
   bodyAr     String  @map("body_ar") @db.Text
   bodyEn     String  @map("body_en") @db.Text
   previewUrl String? @map("preview_url")
+  repoUrl    String? @map("repo_url")
   skills     String[]
   buildTime  String? @map("build_time")
   order      Int     @default(0)
@@ -77,15 +78,16 @@ model ProjectImage {
 // Timeline — Journey / The Story
 // ─────────────────────────────────────────────
 model TimelineEntry {
-  id       String   @id @default(cuid())
+  id       String    @id @default(cuid())
   date     DateTime
+  dateTo   DateTime? @map("date_to")
   age      Int
-  titleAr  String   @map("title_ar")
-  titleEn  String   @map("title_en")
-  storyAr  String   @map("story_ar") @db.Text
-  storyEn  String   @map("story_en") @db.Text
-  imageUrl String?  @map("image_url")
-  order    Int      @default(0)
+  titleAr  String    @map("title_ar")
+  titleEn  String    @map("title_en")
+  storyAr  String    @map("story_ar") @db.Text
+  storyEn  String    @map("story_en") @db.Text
+  imageUrl String?   @map("image_url")
+  order    Int       @default(0)
 
   createdAt DateTime @default(now()) @map("created_at")
   updatedAt DateTime @updatedAt @map("updated_at")
@@ -135,14 +137,18 @@ model SurveyResponse {
 }
 
 // ─────────────────────────────────────────────
-// Messages — Smart Contact Form
+// Messages — Contact Form (v2.0 §9)
+// reason replaces serviceType (§13.4): general | bug-report | academic | collaboration
+// budget is now optional — kept for historical records only, no longer sent by the form
+// projectRef is plain text (no FK) — set only when reason = "bug-report" (§9.3, §12.7)
 // ─────────────────────────────────────────────
 model Message {
   id          String @id @default(cuid())
   senderName  String @map("sender_name")
   senderEmail String @map("sender_email")
-  serviceType String @map("service_type") // MVP | SaaS | AI Integration
-  budget      String // $150-$500 | $500-$1000 | +$1000
+  reason      String @map("reason") // general | bug-report | academic | collaboration
+  projectRef  String? @map("project_ref") // Set when reason = "bug-report"; plain text, no FK
+  budget      String? // Kept optional for backward compat with historical records
   body        String @db.Text
 
   isRead      Boolean @default(false) @map("is_read")

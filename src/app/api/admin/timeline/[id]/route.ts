@@ -25,6 +25,7 @@ export async function PUT(
             where: { id },
             data: {
                 date: body.date ? new Date(body.date) : undefined,
+                dateTo: body.dateTo ? new Date(body.dateTo) : null,
                 age: body.age,
                 titleAr: body.titleAr,
                 titleEn: body.titleEn,

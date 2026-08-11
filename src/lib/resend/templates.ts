@@ -1,12 +1,25 @@
-import type { MessageInput } from "@/types";
+import type { MessageInput, ContactReason } from "@/types";
+
+/**
+ * Human-readable labels for each contact reason (§9.2).
+ * Used in email subject and body — bilingual per message locale.
+ */
+const REASON_LABELS: Record<ContactReason, { ar: string; en: string }> = {
+    general:         { ar: "استفسار عام",                     en: "General Inquiry" },
+    "bug-report":    { ar: "الإبلاغ عن مشكلة في مشروع",      en: "Project Issue Report" },
+    academic:        { ar: "استفسار أكاديمي / بحثي",          en: "Academic / Research Inquiry" },
+    collaboration:   { ar: "فرصة تعاون أو توظيف",             en: "Collaboration or Hiring Opportunity" },
+};
 
 /**
  * Generates an HTML email template for a new contact form message.
  * Contains all message details to help the owner make accept/reject decisions.
+ * Updated per §9 — uses reason + projectRef instead of serviceType + budget.
  */
 export function generateContactEmailHtml(message: MessageInput): string {
     const isArabic = message.locale === "ar";
     const dir = isArabic ? "rtl" : "ltr";
+    const reasonLabel = REASON_LABELS[message.reason]?.[isArabic ? "ar" : "en"] ?? message.reason;
 
     return `
     <!DOCTYPE html>
@@ -81,15 +94,16 @@ export function generateContactEmailHtml(message: MessageInput): string {
             <div class="field-value">${message.senderEmail}</div>
           </div>
           <div class="field">
-            <div class="field-label">${isArabic ? "نوع الخدمة" : "Service Type"}</div>
-            <div class="field-value">${message.serviceType}</div>
+            <div class="field-label">${isArabic ? "سبب التواصل" : "Reason"}</div>
+            <div class="field-value">${reasonLabel}</div>
           </div>
+          ${message.projectRef ? `
           <div class="field">
-            <div class="field-label">${isArabic ? "الميزانية" : "Budget"}</div>
-            <div class="field-value">${message.budget}</div>
-          </div>
+            <div class="field-label">${isArabic ? "المشروع المُبلَّغ عنه" : "Project Reported"}</div>
+            <div class="field-value">${message.projectRef}</div>
+          </div>` : ""}
           <div class="field">
-            <div class="field-label">${isArabic ? "تفاصيل الرسالة" : "Message Details"}</div>
+            <div class="field-label">${isArabic ? "تفاصيل الرسالة" : "Message"}</div>
             <div class="field-value message-body">${message.body}</div>
           </div>
         </div>
@@ -101,7 +115,10 @@ export function generateContactEmailHtml(message: MessageInput): string {
 
 /**
  * Generates the email subject line for a contact form message.
+ * Neutral, non-commercial framing per §9.1.
  */
 export function generateContactEmailSubject(message: MessageInput): string {
-    return `🚀 New Project Request: ${message.serviceType} — ${message.budget} | ${message.senderName}`;
+    const isArabic = message.locale === "ar";
+    const reasonLabel = REASON_LABELS[message.reason]?.[isArabic ? "ar" : "en"] ?? message.reason;
+    return `[Portfolio] ${reasonLabel} — ${message.senderName}`;
 }

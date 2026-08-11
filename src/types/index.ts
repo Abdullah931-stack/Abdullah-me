@@ -47,6 +47,7 @@ export interface Project {
     bodyAr: string;
     bodyEn: string;
     previewUrl: string | null;
+    repoUrl: string | null;
     skills: string[];
     buildTime: string | null;
     order: number;
@@ -63,6 +64,7 @@ export interface Project {
 export interface TimelineEntry {
     id: string;
     date: Date;
+    dateTo: Date | null;
     age: number;
     titleAr: string;
     titleEn: string;
@@ -103,15 +105,16 @@ export interface SurveySubmission {
 // ─────────────────────────────────────────────
 // Messages
 // ─────────────────────────────────────────────
-export type ServiceType = "MVP" | "SaaS" | "AI Integration";
-export type BudgetRange = "$150-$500" | "$500-$1000" | "+$1000";
+
+// §9.2 / §13.4 — replaces the old ServiceType (MVP | SaaS | AI Integration)
+export type ContactReason = "general" | "bug-report" | "academic" | "collaboration";
 export type EmailStatus = "pending" | "sent" | "failed";
 
 export interface MessageInput {
     senderName: string;
     senderEmail: string;
-    serviceType: ServiceType;
-    budget: BudgetRange;
+    reason: ContactReason;
+    projectRef?: string; // Only present when reason = "bug-report" (§9.3)
     body: string;
     locale: Locale;
 }
@@ -120,8 +123,8 @@ export interface Message {
     id: string;
     senderName: string;
     senderEmail: string;
-    serviceType: string;
-    budget: string;
+    reason: string;
+    projectRef?: string | null;
     body: string;
     isRead: boolean;
     emailStatus: EmailStatus;
@@ -129,10 +132,7 @@ export interface Message {
     createdAt: Date;
 }
 
-// ─────────────────────────────────────────────
-// Theme
-// ─────────────────────────────────────────────
-export type Theme = "dark" | "light";
+// Theme type removed — site is dark-only per §2 of UI/UX spec v2.0
 
 // ─────────────────────────────────────────────
 // API Responses
@@ -166,6 +166,7 @@ export interface ProjectRow {
 export interface TimelineRow {
     id: string;
     date: string;
+    dateTo: string | null;
     age: number;
     titleAr: string;
     titleEn: string;
@@ -179,8 +180,8 @@ export interface MessageRow {
     id: string;
     senderName: string;
     senderEmail: string;
-    serviceType: string;
-    budget: string;
+    reason: string;
+    projectRef?: string | null;
     body: string;
     isRead: boolean;
     emailStatus: string;

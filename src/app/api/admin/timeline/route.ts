@@ -40,6 +40,7 @@ export async function POST(request: NextRequest) {
         const entry = await prisma.timelineEntry.create({
             data: {
                 date: new Date(body.date),
+                dateTo: body.dateTo ? new Date(body.dateTo) : null,
                 age: body.age,
                 titleAr: body.titleAr,
                 titleEn: body.titleEn,

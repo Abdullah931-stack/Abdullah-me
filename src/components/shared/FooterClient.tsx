@@ -143,7 +143,7 @@ export default function FooterClient({ socialLinks }: FooterClientProps) {
     const otherLocale = locale === "ar" ? "en" : "ar";
 
     return (
-        <footer className="border-t border-white/5 bg-black py-12">
+        <footer className="border-t py-12" style={{ borderColor: 'var(--color-card-border)', background: 'var(--color-bg)' }}>
             <div className="mx-auto max-w-7xl px-6 flex flex-col items-center justify-center gap-8">
 
                 {/* Social Links — Minimalist */}
@@ -155,7 +155,8 @@ export default function FooterClient({ socialLinks }: FooterClientProps) {
                                 href={link.url}
                                 target="_blank"
                                 rel="noopener noreferrer"
-                                className="text-zinc-500 transition-colors duration-300 hover:text-white"
+                                className="transition-colors duration-300 hover:text-[var(--color-accent)]"
+                                style={{ color: 'var(--color-muted)' }}
                                 aria-label={locale === "ar" ? link.labelAr : link.labelEn || link.platform}
                                 title={locale === "ar" ? link.labelAr : link.labelEn || link.platform}
                             >
@@ -167,16 +168,16 @@ export default function FooterClient({ socialLinks }: FooterClientProps) {
 
                 {/* Copyright & Info */}
                 <div className="flex flex-col items-center gap-4 text-center">
-                    <p className="text-xs text-zinc-600 font-medium tracking-wide">
+                    <p className="text-xs font-medium tracking-wide" style={{ color: 'var(--color-muted)' }}>
                         © {currentYear} ABDULLAH. {t("rights")}.
                     </p>
 
-                    <div className="flex items-center gap-4 text-xs text-zinc-600">
+                    <div className="flex items-center gap-4 text-xs" style={{ color: 'var(--color-muted)' }}>
                         <span>{t("madeWith")} Abdullah</span>
-                        <span className="h-3 w-px bg-zinc-800"></span>
+                        <span className="h-3 w-px" style={{ background: 'var(--color-card-border)' }}></span>
                         <Link
                             href={`/${otherLocale}`}
-                            className="font-medium hover:text-white transition-colors"
+                            className="font-medium hover:text-[var(--color-accent)] transition-colors"
                         >
                             {locale === "ar" ? "English" : "AR"}
                         </Link>

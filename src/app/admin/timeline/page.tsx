@@ -17,6 +17,7 @@ export default function AdminTimelinePage() {
     const [editing, setEditing] = useState<TimelineRow | null>(null);
     const [form, setForm] = useState({
         date: "",
+        dateTo: "",
         age: 0,
         titleAr: "",
         titleEn: "",
@@ -81,6 +82,7 @@ export default function AdminTimelinePage() {
         setEditing(entry);
         setForm({
             date: entry.date.split("T")[0],
+            dateTo: entry.dateTo ? entry.dateTo.split("T")[0] : "",
             age: entry.age,
             titleAr: entry.titleAr,
             titleEn: entry.titleEn,
@@ -95,6 +97,7 @@ export default function AdminTimelinePage() {
     function resetForm() {
         setForm({
             date: "",
+            dateTo: "",
             age: 0,
             titleAr: "",
             titleEn: "",
@@ -115,7 +118,8 @@ export default function AdminTimelinePage() {
                         setEditing(null);
                         resetForm();
                     }}
-                    className="rounded-lg bg-teal-600 px-4 py-2 text-sm font-medium text-white hover:bg-teal-700"
+                    className="rounded-lg px-4 py-2 text-sm font-medium transition-colors"
+                    style={{ background: 'var(--color-accent)', color: 'var(--color-bg)' }}
                 >
                     {showForm ? "Cancel" : "+ New Entry"}
                 </button>
@@ -124,16 +128,34 @@ export default function AdminTimelinePage() {
             {showForm && (
                 <form
                     onSubmit={handleSubmit}
-                    className="mb-8 space-y-4 rounded-xl border border-gray-800 bg-[#0D1117] p-6"
+                    className="mb-8 space-y-4 rounded-xl p-6"
+                    style={{ border: '1px solid var(--color-card-border)', background: 'var(--color-surface)' }}
                 >
                     <div className="grid grid-cols-1 gap-4 md:grid-cols-3">
                         <input
                             type="date"
                             value={form.date}
                             onChange={(e) => setForm({ ...form, date: e.target.value })}
-                            className="rounded-lg border border-gray-700 bg-gray-800 px-4 py-2.5 text-white focus:border-teal-500 focus:outline-none"
+                            className="rounded-lg px-4 py-2.5 focus:outline-none transition-all"
+                            style={{ border: '1px solid var(--color-card-border)', background: 'rgba(255,255,255,0.04)', color: 'var(--color-text)' }}
                             required
                         />
+                        {/* §9.3 — End of Date Range (optional), directly below Date */}
+                        <div>
+                            <label className="block text-xs mb-1" style={{ color: 'var(--color-muted)', fontFamily: 'var(--font-jetbrains-mono), monospace' }}>
+                                End of Date Range (optional)
+                            </label>
+                            <input
+                                type="date"
+                                value={form.dateTo}
+                                onChange={(e) => setForm({ ...form, dateTo: e.target.value })}
+                                className="w-full rounded-lg px-4 py-2.5 focus:outline-none transition-all"
+                                style={{ border: '1px solid var(--color-card-border)', background: 'rgba(255,255,255,0.04)', color: 'var(--color-text)' }}
+                            />
+                            <p className="text-xs mt-1" style={{ color: 'var(--color-muted)', opacity: 0.7 }}>
+                                Leave empty if you know the exact date. Fill in only if this milestone happened sometime between the two dates.
+                            </p>
+                        </div>
                         <input
                             type="number"
                             placeholder="Age"
@@ -141,7 +163,8 @@ export default function AdminTimelinePage() {
                             onChange={(e) =>
                                 setForm({ ...form, age: parseInt(e.target.value) || 0 })
                             }
-                            className="rounded-lg border border-gray-700 bg-gray-800 px-4 py-2.5 text-white focus:border-teal-500 focus:outline-none"
+                            className="rounded-lg px-4 py-2.5 focus:outline-none transition-all"
+                            style={{ border: '1px solid var(--color-card-border)', background: 'rgba(255,255,255,0.04)', color: 'var(--color-text)' }}
                             required
                         />
                         <input
@@ -159,7 +182,8 @@ export default function AdminTimelinePage() {
                             placeholder="Title (English)"
                             value={form.titleEn}
                             onChange={(e) => setForm({ ...form, titleEn: e.target.value })}
-                            className="rounded-lg border border-gray-700 bg-gray-800 px-4 py-2.5 text-white focus:border-teal-500 focus:outline-none"
+                            className="rounded-lg px-4 py-2.5 focus:outline-none transition-all"
+                            style={{ border: '1px solid var(--color-card-border)', background: 'rgba(255,255,255,0.04)', color: 'var(--color-text)' }}
                             required
                         />
                         <input
@@ -194,7 +218,8 @@ export default function AdminTimelinePage() {
                     />
                     <button
                         type="submit"
-                        className="rounded-lg bg-teal-600 px-6 py-2.5 text-sm font-medium text-white hover:bg-teal-700"
+                        className="rounded-lg px-6 py-2.5 text-sm font-medium transition-colors"
+                        style={{ background: 'var(--color-accent)', color: 'var(--color-bg)' }}
                     >
                         {editing ? "Update Entry" : "Create Entry"}
                     </button>
@@ -203,22 +228,23 @@ export default function AdminTimelinePage() {
 
             {isLoading ? (
                 <div className="flex justify-center py-12">
-                    <div className="h-8 w-8 animate-spin rounded-full border-2 border-teal-500 border-t-transparent" />
+                    <div className="h-8 w-8 animate-spin rounded-full border-2 border-t-transparent" style={{ borderColor: 'var(--color-accent)', borderTopColor: 'transparent' }} />
                 </div>
             ) : entries.length === 0 ? (
-                <div className="rounded-xl border border-gray-800 bg-[#0D1117] p-12 text-center">
-                    <p className="text-gray-400">No timeline entries yet.</p>
+                <div className="rounded-xl p-12 text-center" style={{ border: '1px solid var(--color-card-border)', background: 'var(--color-surface)' }}>
+                    <p style={{ color: 'var(--color-muted)' }}>No timeline entries yet.</p>
                 </div>
             ) : (
                 <div className="space-y-3">
                     {entries.map((entry) => (
                         <div
                             key={entry.id}
-                            className="flex items-center justify-between rounded-xl border border-gray-800 bg-[#0D1117] p-4"
+                            className="flex items-center justify-between rounded-xl p-4"
+                            style={{ border: '1px solid var(--color-card-border)', background: 'var(--color-surface)' }}
                         >
                             <div>
                                 <p className="font-medium">{entry.titleEn}</p>
-                                <p className="text-xs text-gray-400">
+                                <p className="text-xs" style={{ color: 'var(--color-muted)' }}>
                                     {new Date(entry.date).toLocaleDateString("en-US", {
                                         year: "numeric",
                                         month: "long",
@@ -229,7 +255,8 @@ export default function AdminTimelinePage() {
                             <div className="flex gap-2">
                                 <button
                                     onClick={() => editEntry(entry)}
-                                    className="text-xs text-teal-400 hover:text-teal-300"
+                                    className="text-xs transition-colors"
+                                    style={{ color: 'var(--color-accent)' }}
                                 >
                                     Edit
                                 </button>

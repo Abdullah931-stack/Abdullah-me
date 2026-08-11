@@ -3,7 +3,7 @@
 
 > **File status:** This document is a **full replacement** for both `docs/03-UI-UX-SPECIFICATIONS.md` and `docs/04-MOTION-SPEC.md`. Delete both source files and replace them with this one before beginning implementation. Visual and motion specifications are merged into a single document because, in this redesign, they are not separable: several components (the background system, the card-grid transition, the border-pulse interaction) are defined by their motion behavior as much as by their static appearance.
 >
-> **Status legend used throughout:** ✅ Decided & final · 🧩 Decided, but blocked on a database/schema change (owner: Abdullah, tracked in §12) · 🔭 Documented future upgrade path, explicitly out of v1 scope.
+> **Status legend used throughout:** ✅ Decided & final · 🧩 Decided, but blocked on a database/schema change (tracked in §13) · 🔭 Documented future upgrade path, explicitly out of v1 scope.
 
 ---
 
@@ -90,7 +90,7 @@ An ambient field of large, softly blurred, vertically-elongated organic shapes (
 ### 4.2 Randomness Model — Composed Sine Waves (binding default)
 
 > [!IMPORTANT]
-> This is the canonical procedural-motion algorithm for the entire site, not just this component. Any future ambient/organic motion should default to this method. See §10.1 for the full rationale.
+> This is the canonical procedural-motion algorithm for the entire site, not just this component. Any future ambient/organic motion should default to this method. See §11.1 for the full rationale.
 
 Each blob's horizontal wobble is the sum of 2–3 sine terms at **irrational-ratio, per-blob-unique frequencies and phases**, evaluated as a pure deterministic function of elapsed time. **`Math.random()` and Simplex/Perlin noise were both evaluated and rejected** for this component:
 
@@ -105,7 +105,7 @@ Each blob's horizontal wobble is the sum of 2–3 sine terms at **irrational-rat
 | Width | `calc(Xvw + Ypx)` per blob, X ≈ 4–9.8, Y ≈ 30–70 | **Must be viewport-relative, not fixed px** — see §4.5 for why this matters |
 | Height | width × (2.4–2.9) | Elongated vertically — "closer to a line than a bubble," per the original brief |
 | Border-radius | `45% 55% 60% 40% / 60% 45% 55% 40%` | Asymmetric, organic |
-| Shape "breathing" | Separate `morph` animation, own duration (`--mdur`, 8–18s), animates `border-radius` only | Must never share a keyframe timeline with position — see §10.2 |
+| Shape "breathing" | Separate `morph` animation, own duration (`--mdur`, 8–18s), animates `border-radius` only | Must never share a keyframe timeline with position — see §11.2 |
 | Field blur | `filter: blur(145px)` on the aggregate blob container | See §4.4 for a critical caveat on this value |
 | Gradient fill (per blob) | `radial-gradient(ellipse at 40% 30%, c1, c2 55%, transparent 85%)` | Soft falloff |
 | Field container margin | `inset: -20% -20%` | Widened from an initial `-10%` for horizontal safety on narrow viewports |
@@ -332,7 +332,7 @@ A reusable component: on contact (mouse or touch) with an element's border, the 
 | Navbar links | ❌ |
 | Skill tags | ❌ |
 | Contact form fields | ❌ |
-| Journey/Timeline entries | ❌ — see §11.6, structural reason, not an oversight |
+| Journey/Timeline entries | ❌ — see §12.6, structural reason, not an oversight |
 
 ### 7.2 Behavior — Directional Reveal, Then Static
 
@@ -384,16 +384,54 @@ This keeps the reference video's core property — **a stable lit state with no 
 
 ### 8.3 Repository Link 🧩
 
-A second button, visually distinct from the existing live-preview button, must be added for the project's source repository. **Blocked on §12.1** — `Project` currently has no `repoUrl` field. Both buttons render conditionally on their respective field being present (no broken/empty-state buttons).
+A second button, visually distinct from the existing live-preview button, must be added for the project's source repository. **Blocked on §13.1** — `Project` currently has no `repoUrl` field. Both buttons render conditionally on their respective field being present (no broken/empty-state buttons).
 
 ---
 
-## 9. Admin Dashboard
+## 9. Contact Page
+
+### 9.1 Framing — General Contact, Not Freelance Intake
 
 > [!IMPORTANT]
-> This page is **not public-facing** (Supabase-authenticated, single-user CMS). Accordingly this section is intentionally brief and decided unilaterally rather than discussed field-by-field — it exists so implementation has *something* to apply rather than leaving the admin panel untouched by the redesign. Fine-grained visual polish here is not worth the review time it would cost.
+> The current implementation (`ContactForm.tsx`) frames the entire section as freelance client intake: heading *"Let's build something amazing,"* submit button *"Start Project 🚀,"* a required `serviceType` field (`MVP | SaaS | AI Integration`), and a required `budget` field (pricing tiers). This predates the redesign and contradicts the no-freelance-tone rule already established for the Hero (§5.3) — this section brings Contact into the same rule.
 
-### 9.1 Theme Application — Deliberately Restrained
+- Heading and submit-button copy are rewritten to a neutral "get in touch" register — no emoji, no "Project" language, no urgency framing.
+- The `budget` field is **removed entirely** — pricing tiers have no place once the page is no longer framed as a freelance-intake form.
+
+### 9.2 Contact Reason — Replaces `serviceType`
+
+The single `serviceType` dropdown (freelance service categories) is replaced by a **contact-reason** selector with four options, deliberately reordered so collaboration/hiring is one option among equals rather than the only path through the form:
+
+1. **General inquiry** — the default, most neutral option
+2. **Report an issue in a project** — new; see §9.3
+3. **Academic / research inquiry** — reflects the site's actual audience better than a purely commercial framing
+4. **Collaboration or hiring opportunity** — retained, but demoted from sole default to one of four equal options
+
+### 9.3 Project Issue Report — Conditional Field
+
+When **"Report an issue in a project"** is selected, a project picker appears:
+
+- Populated with the titles of every published project (`Project.isPublished`), pulled from the Portfolio section — the same list a visitor would see browsing `/portfolio`.
+- The final entry in the list is **"Other (not listed)"** — selecting it reveals a plain text input so the sender can type a project name themselves, covering cases where what they mean isn't in the list for any reason (an unpublished/older project, a misremembered name, etc.).
+- The existing `body` textarea continues to serve as the issue description — no separate "reason" text field is needed; the reason picker plus the project picker plus the existing message body together cover the report completely.
+
+### 9.4 Visual Treatment — Bring Into the Current System
+
+This section was not touched by the rest of the redesign and still uses the pre-redesign palette (`zinc-900` surfaces, a solid white submit button) rather than the green system defined in §2. While this section is being reworked anyway, its surfaces and submit button are brought in line with the rest of the site:
+
+| Element | Current | New |
+|---|---|---|
+| Form container | `bg-zinc-900/50`, `border-white/10` | `--card-border` / glass surface tokens from §2.1 |
+| Input fields | `bg-white/5`, `border-white/10` | Same glass tokens, consistent with cards elsewhere |
+| Submit button | Solid white, black text | `--accent` fill or outline, `PulseBorder`-enabled (already listed as in-scope for "primary CTA buttons" in §7.1 — no new exception needed) |
+
+---
+
+## 10. Admin Dashboard
+
+> This page is **not public-facing** (Supabase-authenticated, single-user CMS). Accordingly this section is kept brief rather than reasoned through field-by-field — visual polish here is not worth the same level of scrutiny as the public-facing pages.
+
+### 10.1 Theme Application — Deliberately Restrained
 
 The v1.3 spec already classified Admin as **Tier 1 / 🟢 Low** animation density ("functionality first"), and that classification is kept. Applying the full public-site system (lava-lamp background, Lissajous curves, card-grid ripple/dissolve, directional-reveal `PulseBorder`) here would be actively counterproductive — a CMS is a tool used repeatedly by one person to get data entry done quickly, not a first-impression surface. Motion and visual richness cost attention; on a data-entry screen that attention should go to the form fields, not the chrome around them.
 
@@ -405,17 +443,17 @@ The v1.3 spec already classified Admin as **Tier 1 / 🟢 Low** animation densit
 | Typography (`Space Grotesk` / `IBM Plex Sans Arabic` / `JetBrains Mono`) | ✅ | `JetBrains Mono` is a good fit for form labels and structured data (dates, IDs) here specifically |
 | Card/surface tokens (glassmorphism `rgba(255,255,255,0.03–0.045)` panels, `--card-border`) | ✅ | Static only — no hover glow needed on non-interactive containers |
 | Lava-lamp background (§4) | ❌ | Would compete with dense forms/tables for attention; a flat `--bg` is correct here |
-| `PulseBorder` (§7) | Buttons only, not full scope | See §9.2 |
+| `PulseBorder` (§7) | Buttons only, not full scope | See §10.2 |
 | Card-grid ripple/dissolve (§6) | ❌ | Not applicable — the admin panel is tables and forms, not a project gallery |
 | Lissajous hero (§5.2) | ❌ | No hero section in the admin panel |
 
-### 9.2 `PulseBorder` in Admin — Narrower Than §7.1's Public Scope
+### 10.2 `PulseBorder` in Admin — Narrower Than §7.1's Public Scope
 
 Applies only to primary action buttons (**Save**, **Publish**, **Delete confirmation**) — not to table rows, not to every input field. Rationale: §7.1 already restricts this effect to "genuine transition gateways" on the public site; in an admin context, the equivalent is a committed action, not a hover-browsable item. Table rows and form fields do not qualify.
 
-### 9.3 New Field Descriptions
+### 10.3 New Field Descriptions
 
-Two fields are added to admin forms as a **direct consequence of decisions made elsewhere in this document** — both are blocked on the schema work tracked in §12, listed here only so the corresponding form UI is specified once the fields exist.
+Two fields are added to admin forms as a **direct consequence of decisions made elsewhere in this document** — both are blocked on the schema work tracked in §13, listed here only so the corresponding form UI is specified once the fields exist.
 
 #### `Project` — Repository URL
 
@@ -437,21 +475,21 @@ Two fields are added to admin forms as a **direct consequence of decisions made 
 | Label (AR) | `نهاية النطاق الزمني (اختياري)` |
 | Field type | Same date picker component as the existing required `date` field, but optional |
 | Placement | Directly below the existing **Date** field, visually grouped with it (e.g. a bracketed/indented sub-field) so the relationship ("this is a range, not two unrelated dates") is clear at a glance |
-| Behavior | Left empty → entry renders on the public Journey page as a precise point (current behavior, unchanged). Filled → entry renders as an uncertainty bracket/arc spanning both dates (§11.5) |
+| Behavior | Left empty → entry renders on the public Journey page as a precise point (current behavior, unchanged). Filled → entry renders as an uncertainty bracket/arc spanning both dates (§12.5) |
 | Validation | If filled, must be chronologically after the primary `date` field; surface a simple inline error otherwise — no need for anything more elaborate than the validation style already used elsewhere in these forms |
 | Helper text | *"Leave empty if you know the exact date. Fill in only if this milestone happened sometime between the two dates."* |
 
-### 9.4 Explicitly Not Addressed Here
+### 10.4 Explicitly Not Addressed Here
 
 Per the framing at the top of this section, the following are left to the implementer's judgment and are not specified further: exact spacing/grid of the existing panels (Projects, Timeline, Social Links, Survey, Messages), table pagination behavior, and any admin-only convenience features not already present in v1.3. None of these were part of the redesign conversation this document consolidates.
 
 ---
 
-## 10. Global Motion Rules
+## 11. Global Motion Rules
 
 *(Consolidates and supersedes the general rules formerly spread across `04-MOTION-SPEC.md` §7–8.)*
 
-### 10.1 Canonical Randomness — Composed Sine Waves
+### 11.1 Canonical Randomness — Composed Sine Waves
 
 Binding default for any future ambient/organic motion on the site (not only the background), for two concrete reasons:
 
@@ -460,19 +498,19 @@ Binding default for any future ambient/organic motion on the site (not only the 
 
 Any future component that wants "true" noise-based motion instead must justify the added dependency and runtime cost explicitly — same bar applied to every decision in this document.
 
-### 10.2 Never Correlate Position and Shape Timing
+### 11.2 Never Correlate Position and Shape Timing
 
 Documented in detail in §4.8 for the background component, but stated here as a **general rule for all future components**: an element's position/path animation must only ever touch `translate*`. Any shape-affecting transform (`scale`, `skew`, `rotate`, `border-radius`) must run on an independently-timed animation. Synchronized timing between the two reads visually as the object tilting/leaning, even with mathematically pure translation values — a real, reproducible perceptual effect, not merely a style preference.
 
-### 10.3 Responsive Sizing Must Derive From Real Viewport Units
+### 11.3 Responsive Sizing Must Derive From Real Viewport Units
 
 Documented in detail in §4.5, generalized here: any generated/animated element's dimensions and off-screen spawn offsets must be computed from real `vw`/`vh`-relative values (or the element's own runtime size via `calc(var(--x) ...)`), never fixed desktop-oriented `px` assumptions — required for correctness down to mobile widths, since the site is fully responsive.
 
-### 10.4 Blur Layering Caveat
+### 11.4 Blur Layering Caveat
 
 Documented in detail in §4.4: never stack two `blur()` filter stages (e.g., an SVG filter's internal blur plus an outer CSS `blur()`) on the same visual layer — causes browser-internal downsampling artifacts at high radii.
 
-### 10.5 Retained From v1.3 (unchanged)
+### 11.5 Retained From v1.3 (unchanged)
 
 | Rule | Detail |
 |---|---|
@@ -482,30 +520,30 @@ Documented in detail in §4.4: never stack two `blur()` filter stages (e.g., an 
 | Lazy-load Framer Motion | Dynamic import to protect first-contentful-paint |
 | Page transitions | Fade, 300–500ms, `ease-in-out` |
 
-### 10.6 Retained From v1.3 — Welcome Survey Popup
+### 11.6 Retained From v1.3 — Welcome Survey Popup
 
 No changes proposed to the Welcome Survey's own transition behavior (soft fade/scale entry and exit, horizontal card transitions between questions) — carried forward as-is from old §4 of `04-MOTION-SPEC.md`.
 
 ---
 
-## 11. Journey / Timeline
+## 12. Journey / Timeline
 
-### 11.1 Removed From v1.3
+### 12.1 Removed From v1.3
 
 The alternating left/right zigzag layout (`Timeline.tsx`) is removed. It was identified during planning as a generic, ubiquitous "our story" template with no functional justification for the left/right alternation (a pure `index % 2` toggle carrying no information).
 
-### 11.2 Identity Correction — No Code Metaphors
+### 12.2 Identity Correction — No Code Metaphors
 
 An earlier planning pass proposed a "Git changelog / commit log" visual metaphor (monospace timestamps, commit-node markers). **This was corrected after clarifying the target professional identity leans EECS-adjacent, not programmer-adjacent** — a commit-log metaphor visually declares "I am a programmer" as strongly as a literal job-title would, which contradicts the no-identity-noun rule in §5.3. Final direction: keep monospace timestamps (numeric precision is still part of the identity) but drop all git/code iconography and terminology — closer to a lab notebook / measurement log register instead.
 
-### 11.3 Layout — Single Rail
+### 12.3 Layout — Single Rail
 
 One rail, aligned to the reading-direction-leading side (right for Arabic/RTL, left for English/LTR).
 
 > [!IMPORTANT]
-> **This choice is conditional, not absolute.** The justification is specifically that the spacing algorithm below (§10.4) encodes real information in the gaps between entries, and the eye must track one continuous axis to read that information — an alternating layout would break that continuity. **If the time-based spacing concept is ever dropped, this single-rail decision must be re-justified rather than assumed to still hold** — "it's simpler than the common zigzag" was explicitly *not* accepted as sufficient justification on its own during planning, and shouldn't be retroactively treated as the reason here.
+> **This choice is conditional, not absolute.** The justification is specifically that the spacing algorithm below (§12.4) encodes real information in the gaps between entries, and the eye must track one continuous axis to read that information — an alternating layout would break that continuity. **If the time-based spacing concept is ever dropped, this single-rail decision must be re-justified rather than assumed to still hold** — "it's simpler than the common zigzag" was explicitly *not* accepted as sufficient justification on its own during planning, and shouldn't be retroactively treated as the reason here.
 
-### 11.4 Spacing Algorithm — Compressed by Real Elapsed Time
+### 12.4 Spacing Algorithm — Compressed by Real Elapsed Time
 
 The gap between two chronologically adjacent entries is a function of their real date difference, not a decorative constant:
 
@@ -519,24 +557,24 @@ gap(Δt) = base + k · ln(1 + Δt_days / τ)
 
 **Why logarithmic, not linear:** near-linear behavior for short gaps (days/weeks) keeps close-together events visually distinct from each other; the log term compresses multi-year gaps so they don't produce absurdly large empty spacing (the original concern that ruled out a naive linear mapping).
 
-### 11.5 Uncertain / Ranged Dates 🧩
+### 12.5 Uncertain / Ranged Dates 🧩
 
 Some entries are known only as "sometime after X, before Y," not a precise date. Fabricating a false precise date for the spacing algorithm was rejected — the visual solution:
 
-- Render as a thin translucent **bracket/arc** spanning the estimated interval on the rail, instead of a solid point — an intentionally honest representation of uncertainty, and consistent with the lab-notebook register from §11.2 (error bars / uncertainty ranges are a standard measurement-report convention).
+- Render as a thin translucent **bracket/arc** spanning the estimated interval on the rail, instead of a solid point — an intentionally honest representation of uncertainty, and consistent with the lab-notebook register from §12.2 (error bars / uncertainty ranges are a standard measurement-report convention).
 - For the spacing algorithm, an uncertain entry's effective position defaults to the **midpoint** of its range.
 - Multiple uncertain entries sharing the same approximate window are **not** stacked identically — they distribute evenly across the shared window using the entry's existing `order` field (no new randomness introduced):
   ```
   position = interval_start + (order_index / (count + 1)) × interval_width
   ```
 
-**Blocked on §12.2** — `TimelineEntry` currently has only a single required `date: DateTime` field; a second optional date field is needed to represent the range end before this can render.
+**Blocked on §13.2** — `TimelineEntry` currently has only a single required `date: DateTime` field; a second optional date field is needed to represent the range end before this can render.
 
-### 11.6 Per-Entry Expand — In-Place, Not the Card-Grid Pattern
+### 12.6 Per-Entry Expand — In-Place, Not the Card-Grid Pattern
 
-Expanding a Journey entry grows it **vertically in place on the rail** (accordion-style) — explicitly **not** the card-grid's fade/ripple/dissolve treatment from §6.3–6.4. Reason: Journey is a continuous vertical reading flow, and a full-screen takeover here would break the reading continuity the single rail (§11.3) is specifically designed to preserve. This is also why `PulseBorder` does not apply to Journey entries (§7.1) — they are not bordered "gateway" containers by design, and forcing a border onto one just to reuse the interaction would be a regression, not a feature.
+Expanding a Journey entry grows it **vertically in place on the rail** (accordion-style) — explicitly **not** the card-grid's fade/ripple/dissolve treatment from §6.3–6.4. Reason: Journey is a continuous vertical reading flow, and a full-screen takeover here would break the reading continuity the single rail (§12.3) is specifically designed to preserve. This is also why `PulseBorder` does not apply to Journey entries (§7.1) — they are not bordered "gateway" containers by design, and forcing a border onto one just to reuse the interaction would be a regression, not a feature.
 
-### 11.7 Content-Duplication Rule
+### 12.7 Content-Duplication Rule
 
 Determines what text appears when an entry expands:
 
@@ -545,30 +583,31 @@ Determines what text appears when an entry expands:
 | Corresponds to a project with its own Portfolio detail page | **Only** 1–2 lines of personal/temporal context ("why this moment mattered") + a small "Full details →" link to the project page. The technical narrative (§8.1's template) lives exclusively on the project page and must not be duplicated here. |
 | No corresponding project page (e.g., "learned C++ at age 12") | Full expansion — motivation, decision, reflection — since this Journey entry is the *only* place this story will ever be told. |
 
-This distinction requires the UI layer to know whether a `TimelineEntry` relates to a `Project`. **Confirmed by the project owner as a simple, manually-resolved UI-level reference — explicitly not a formal relational foreign key between the two tables**, and out of scope for this document to specify further.
+This distinction requires the UI layer to know whether a `TimelineEntry` relates to a `Project`. This is resolved as a simple, manually-set UI-level reference — **not** a formal relational foreign key between the two tables.
 
-### 11.8 Imagery
+### 12.8 Imagery
 
 `TimelineEntry.imageUrl` (existing field, no schema change) renders as a small non-interactive logo/badge (~24–32px, soft rounded corners) beside the rail's measurement point. Never a full-width hero image, never a lightbox, no hover interaction — it is reinforcement, not a gallery.
 
 ---
 
-## 12. Outstanding Database/Schema Work
+## 13. Outstanding Database/Schema Work
 
 > [!IMPORTANT]
-> **Explicitly out of scope for this document.** This UI/UX specification was produced under a strict division of responsibility: visual and interaction design only. Schema and migration work is the project owner's responsibility. These items are listed here only so implementation isn't blocked by an undocumented dependency — each is a **prerequisite**, not an optional enhancement, for the section referenced.
+> This section covers schema/migration work, not visual design — listed here so implementation isn't blocked by an undocumented dependency. Each item below is a **prerequisite**, not an optional enhancement, for the section it's tied to.
 
 | # | Field needed | Model | Required by | Notes |
 |---|---|---|---|---|
-| 12.1 | `repoUrl` (optional `String`) | `Project` | §8.3 — GitHub button | `previewUrl` already exists and works; this is a second, separate field |
-| 12.2 | A second optional date field (e.g. `dateTo`) | `TimelineEntry` | §11.5 — uncertainty bracket rendering | Currently `TimelineEntry.date` is a single required `DateTime`; confirmed absent from the schema as of this review |
-| 12.3 | Matching admin form inputs | `admin/projects`, `admin/timeline` | Both of the above | Needed once the fields above are added, so they're actually editable |
+| 13.1 | `repoUrl` (optional `String`) | `Project` | §8.3 — GitHub button | `previewUrl` already exists and works; this is a second, separate field |
+| 13.2 | A second optional date field (e.g. `dateTo`) | `TimelineEntry` | §12.5 — uncertainty bracket rendering | Currently `TimelineEntry.date` is a single required `DateTime`; confirmed absent from the schema as of this review |
+| 13.3 | Matching admin form inputs | `admin/projects`, `admin/timeline` | Both of the above | Needed once the fields above are added, so they're actually editable |
+| 13.4 | Repurpose `serviceType` into a `reason` field with new values (`general`, `bug-report`, `academic`, `collaboration`); remove reliance on `budget` | `Message` | §9.2 — contact-reason selector | `budget` is dropped from the form entirely (§9.1); `serviceType`'s current freelance-service values no longer apply |
 
-**Explicitly NOT required:** no relational foreign key between `Project` and `TimelineEntry` — confirmed unnecessary by the project owner (§11.7); any "related project" reference is resolved at the UI level only.
+**Explicitly NOT required:** no relational foreign key between `Project` and `TimelineEntry` (§12.7) — any "related project" reference is resolved at the UI level only.
 
 ---
 
-## 13. Implementation Checklist
+## 14. Implementation Checklist
 
 A condensed cutover list, cross-referencing the sections above:
 
@@ -578,7 +617,8 @@ A condensed cutover list, cross-referencing the sections above:
 - [ ] Build the `LavaBackground` component per §4, including the off-screen-offset and position/shape-timing rules (§4.7–4.8) — these are bug fixes discovered during prototyping, not optional refinements.
 - [ ] Build the Lissajous hero component (3-curve converging variant, §5.2) and update Hero copy per the no-identity-noun rule (§5.3).
 - [ ] Build `PulseBorder` as a shared component (§7) and wire it into the scope list in §7.1 only.
-- [ ] Rebuild `Timeline.tsx` per §11 (single rail, log-compressed spacing, uncertainty brackets pending §12.2).
+- [ ] Rebuild `Timeline.tsx` per §12 (single rail, log-compressed spacing, uncertainty brackets pending §13.2).
 - [ ] Update `ProjectDetail.tsx` gallery navigation and lightbox styling per §8.2.
 - [ ] Apply the body-content template (§8.1) when writing/editing each project's `bodyAr`/`bodyEn`.
-- [ ] Track §12's three schema items with the project owner before their dependent UI pieces (§8.3, §11.5) can ship.
+- [ ] Complete §13's four schema items before their dependent UI pieces (§8.3, §9.3, §12.5) can ship.
+- [ ] Rework `ContactForm.tsx` per §9 (reason selector, conditional project picker, removed budget field, green-system visual tokens).

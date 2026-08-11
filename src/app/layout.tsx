@@ -1,19 +1,11 @@
 import type { Metadata } from "next";
 import "@/app/globals.css";
-import { IBM_Plex_Sans_Arabic, Geist } from "next/font/google";
-
-const geist = Geist({ subsets: ["latin"], variable: "--font-geist" });
-const ibmArabic = IBM_Plex_Sans_Arabic({
-  subsets: ["arabic"],
-  weight: ["300", "500", "700"],
-  variable: "--font-ibm",
-});
+import { spaceGrotesk, ibmPlexSansArabic, jetbrainsMono } from "@/app/fonts";
 
 /**
- * Root layout — "Quiet Luxury" Edition
- * - Enforces Dark Mode (Zinc 950)
- * - Fonts: Geist (EN), IBM Plex Sans Arabic (AR)
- * - Required <html> & <body> tags for Next.js 16
+ * Root Layout — v2.0 "Signal & Growth"
+ * - Dark-only (§2 — no theme toggle)
+ * - Fonts: Space Grotesk (EN), IBM Plex Sans Arabic (AR), JetBrains Mono (labels)
  */
 export const metadata: Metadata = {
   title: {
@@ -30,9 +22,14 @@ export default function RootLayout({
   children: React.ReactNode;
 }) {
   return (
-    <html lang="ar" dir="rtl" className="dark" data-theme="dark" suppressHydrationWarning>
+    <html
+      lang="ar"
+      dir="rtl"
+      className={`${spaceGrotesk.variable} ${ibmPlexSansArabic.variable} ${jetbrainsMono.variable}`}
+      suppressHydrationWarning
+    >
       <body
-        className={`${geist.variable} ${ibmArabic.variable} antialiased bg-background text-foreground font-sans selection:bg-white/20`}
+        className="antialiased bg-[var(--color-bg)] text-[var(--color-text)] font-sans selection:bg-[var(--color-accent)]/20"
         suppressHydrationWarning
       >
         {children}

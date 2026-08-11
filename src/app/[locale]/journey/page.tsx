@@ -30,7 +30,7 @@ export default async function JourneyPage({ params }: JourneyPageProps) {
                 {/* Page Header */}
                 <div className="mb-16 text-center">
                     <h1 className="mb-4 text-4xl font-bold md:text-5xl">{t("title")}</h1>
-                    <p className="text-lg text-[var(--color-text-secondary)]">
+                    <p className="text-lg" style={{ color: 'var(--color-muted)' }}>
                         {t("subtitle")}
                     </p>
                 </div>

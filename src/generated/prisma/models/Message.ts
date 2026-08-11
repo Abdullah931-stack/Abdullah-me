@@ -28,7 +28,8 @@ export type MessageMinAggregateOutputType = {
   id: string | null
   senderName: string | null
   senderEmail: string | null
-  serviceType: string | null
+  reason: string | null
+  projectRef: string | null
   budget: string | null
   body: string | null
   isRead: boolean | null
@@ -41,7 +42,8 @@ export type MessageMaxAggregateOutputType = {
   id: string | null
   senderName: string | null
   senderEmail: string | null
-  serviceType: string | null
+  reason: string | null
+  projectRef: string | null
   budget: string | null
   body: string | null
   isRead: boolean | null
@@ -54,7 +56,8 @@ export type MessageCountAggregateOutputType = {
   id: number
   senderName: number
   senderEmail: number
-  serviceType: number
+  reason: number
+  projectRef: number
   budget: number
   body: number
   isRead: number
@@ -69,7 +72,8 @@ export type MessageMinAggregateInputType = {
   id?: true
   senderName?: true
   senderEmail?: true
-  serviceType?: true
+  reason?: true
+  projectRef?: true
   budget?: true
   body?: true
   isRead?: true
@@ -82,7 +86,8 @@ export type MessageMaxAggregateInputType = {
   id?: true
   senderName?: true
   senderEmail?: true
-  serviceType?: true
+  reason?: true
+  projectRef?: true
   budget?: true
   body?: true
   isRead?: true
@@ -95,7 +100,8 @@ export type MessageCountAggregateInputType = {
   id?: true
   senderName?: true
   senderEmail?: true
-  serviceType?: true
+  reason?: true
+  projectRef?: true
   budget?: true
   body?: true
   isRead?: true
@@ -181,8 +187,9 @@ export type MessageGroupByOutputType = {
   id: string
   senderName: string
   senderEmail: string
-  serviceType: string
-  budget: string
+  reason: string
+  projectRef: string | null
+  budget: string | null
   body: string
   isRead: boolean
   emailStatus: string
@@ -215,8 +222,9 @@ export type MessageWhereInput = {
   id?: Prisma.StringFilter<"Message"> | string
   senderName?: Prisma.StringFilter<"Message"> | string
   senderEmail?: Prisma.StringFilter<"Message"> | string
-  serviceType?: Prisma.StringFilter<"Message"> | string
-  budget?: Prisma.StringFilter<"Message"> | string
+  reason?: Prisma.StringFilter<"Message"> | string
+  projectRef?: Prisma.StringNullableFilter<"Message"> | string | null
+  budget?: Prisma.StringNullableFilter<"Message"> | string | null
   body?: Prisma.StringFilter<"Message"> | string
   isRead?: Prisma.BoolFilter<"Message"> | boolean
   emailStatus?: Prisma.StringFilter<"Message"> | string
@@ -228,8 +236,9 @@ export type MessageOrderByWithRelationInput = {
   id?: Prisma.SortOrder
   senderName?: Prisma.SortOrder
   senderEmail?: Prisma.SortOrder
-  serviceType?: Prisma.SortOrder
-  budget?: Prisma.SortOrder
+  reason?: Prisma.SortOrder
+  projectRef?: Prisma.SortOrderInput | Prisma.SortOrder
+  budget?: Prisma.SortOrderInput | Prisma.SortOrder
   body?: Prisma.SortOrder
   isRead?: Prisma.SortOrder
   emailStatus?: Prisma.SortOrder
@@ -244,8 +253,9 @@ export type MessageWhereUniqueInput = Prisma.AtLeast<{
   NOT?: Prisma.MessageWhereInput | Prisma.MessageWhereInput[]
   senderName?: Prisma.StringFilter<"Message"> | string
   senderEmail?: Prisma.StringFilter<"Message"> | string
-  serviceType?: Prisma.StringFilter<"Message"> | string
-  budget?: Prisma.StringFilter<"Message"> | string
+  reason?: Prisma.StringFilter<"Message"> | string
+  projectRef?: Prisma.StringNullableFilter<"Message"> | string | null
+  budget?: Prisma.StringNullableFilter<"Message"> | string | null
   body?: Prisma.StringFilter<"Message"> | string
   isRead?: Prisma.BoolFilter<"Message"> | boolean
   emailStatus?: Prisma.StringFilter<"Message"> | string
@@ -257,8 +267,9 @@ export type MessageOrderByWithAggregationInput = {
   id?: Prisma.SortOrder
   senderName?: Prisma.SortOrder
   senderEmail?: Prisma.SortOrder
-  serviceType?: Prisma.SortOrder
-  budget?: Prisma.SortOrder
+  reason?: Prisma.SortOrder
+  projectRef?: Prisma.SortOrderInput | Prisma.SortOrder
+  budget?: Prisma.SortOrderInput | Prisma.SortOrder
   body?: Prisma.SortOrder
   isRead?: Prisma.SortOrder
   emailStatus?: Prisma.SortOrder
@@ -276,8 +287,9 @@ export type MessageScalarWhereWithAggregatesInput = {
   id?: Prisma.StringWithAggregatesFilter<"Message"> | string
   senderName?: Prisma.StringWithAggregatesFilter<"Message"> | string
   senderEmail?: Prisma.StringWithAggregatesFilter<"Message"> | string
-  serviceType?: Prisma.StringWithAggregatesFilter<"Message"> | string
-  budget?: Prisma.StringWithAggregatesFilter<"Message"> | string
+  reason?: Prisma.StringWithAggregatesFilter<"Message"> | string
+  projectRef?: Prisma.StringNullableWithAggregatesFilter<"Message"> | string | null
+  budget?: Prisma.StringNullableWithAggregatesFilter<"Message"> | string | null
   body?: Prisma.StringWithAggregatesFilter<"Message"> | string
   isRead?: Prisma.BoolWithAggregatesFilter<"Message"> | boolean
   emailStatus?: Prisma.StringWithAggregatesFilter<"Message"> | string
@@ -289,8 +301,9 @@ export type MessageCreateInput = {
   id?: string
   senderName: string
   senderEmail: string
-  serviceType: string
-  budget: string
+  reason: string
+  projectRef?: string | null
+  budget?: string | null
   body: string
   isRead?: boolean
   emailStatus?: string
@@ -302,8 +315,9 @@ export type MessageUncheckedCreateInput = {
   id?: string
   senderName: string
   senderEmail: string
-  serviceType: string
-  budget: string
+  reason: string
+  projectRef?: string | null
+  budget?: string | null
   body: string
   isRead?: boolean
   emailStatus?: string
@@ -315,8 +329,9 @@ export type MessageUpdateInput = {
   id?: Prisma.StringFieldUpdateOperationsInput | string
   senderName?: Prisma.StringFieldUpdateOperationsInput | string
   senderEmail?: Prisma.StringFieldUpdateOperationsInput | string
-  serviceType?: Prisma.StringFieldUpdateOperationsInput | string
-  budget?: Prisma.StringFieldUpdateOperationsInput | string
+  reason?: Prisma.StringFieldUpdateOperationsInput | string
+  projectRef?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  budget?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   body?: Prisma.StringFieldUpdateOperationsInput | string
   isRead?: Prisma.BoolFieldUpdateOperationsInput | boolean
   emailStatus?: Prisma.StringFieldUpdateOperationsInput | string
@@ -328,8 +343,9 @@ export type MessageUncheckedUpdateInput = {
   id?: Prisma.StringFieldUpdateOperationsInput | string
   senderName?: Prisma.StringFieldUpdateOperationsInput | string
   senderEmail?: Prisma.StringFieldUpdateOperationsInput | string
-  serviceType?: Prisma.StringFieldUpdateOperationsInput | string
-  budget?: Prisma.StringFieldUpdateOperationsInput | string
+  reason?: Prisma.StringFieldUpdateOperationsInput | string
+  projectRef?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  budget?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   body?: Prisma.StringFieldUpdateOperationsInput | string
   isRead?: Prisma.BoolFieldUpdateOperationsInput | boolean
   emailStatus?: Prisma.StringFieldUpdateOperationsInput | string
@@ -341,8 +357,9 @@ export type MessageCreateManyInput = {
   id?: string
   senderName: string
   senderEmail: string
-  serviceType: string
-  budget: string
+  reason: string
+  projectRef?: string | null
+  budget?: string | null
   body: string
   isRead?: boolean
   emailStatus?: string
@@ -354,8 +371,9 @@ export type MessageUpdateManyMutationInput = {
   id?: Prisma.StringFieldUpdateOperationsInput | string
   senderName?: Prisma.StringFieldUpdateOperationsInput | string
   senderEmail?: Prisma.StringFieldUpdateOperationsInput | string
-  serviceType?: Prisma.StringFieldUpdateOperationsInput | string
-  budget?: Prisma.StringFieldUpdateOperationsInput | string
+  reason?: Prisma.StringFieldUpdateOperationsInput | string
+  projectRef?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  budget?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   body?: Prisma.StringFieldUpdateOperationsInput | string
   isRead?: Prisma.BoolFieldUpdateOperationsInput | boolean
   emailStatus?: Prisma.StringFieldUpdateOperationsInput | string
@@ -367,8 +385,9 @@ export type MessageUncheckedUpdateManyInput = {
   id?: Prisma.StringFieldUpdateOperationsInput | string
   senderName?: Prisma.StringFieldUpdateOperationsInput | string
   senderEmail?: Prisma.StringFieldUpdateOperationsInput | string
-  serviceType?: Prisma.StringFieldUpdateOperationsInput | string
-  budget?: Prisma.StringFieldUpdateOperationsInput | string
+  reason?: Prisma.StringFieldUpdateOperationsInput | string
+  projectRef?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  budget?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   body?: Prisma.StringFieldUpdateOperationsInput | string
   isRead?: Prisma.BoolFieldUpdateOperationsInput | boolean
   emailStatus?: Prisma.StringFieldUpdateOperationsInput | string
@@ -380,7 +399,8 @@ export type MessageCountOrderByAggregateInput = {
   id?: Prisma.SortOrder
   senderName?: Prisma.SortOrder
   senderEmail?: Prisma.SortOrder
-  serviceType?: Prisma.SortOrder
+  reason?: Prisma.SortOrder
+  projectRef?: Prisma.SortOrder
   budget?: Prisma.SortOrder
   body?: Prisma.SortOrder
   isRead?: Prisma.SortOrder
@@ -393,7 +413,8 @@ export type MessageMaxOrderByAggregateInput = {
   id?: Prisma.SortOrder
   senderName?: Prisma.SortOrder
   senderEmail?: Prisma.SortOrder
-  serviceType?: Prisma.SortOrder
+  reason?: Prisma.SortOrder
+  projectRef?: Prisma.SortOrder
   budget?: Prisma.SortOrder
   body?: Prisma.SortOrder
   isRead?: Prisma.SortOrder
@@ -406,7 +427,8 @@ export type MessageMinOrderByAggregateInput = {
   id?: Prisma.SortOrder
   senderName?: Prisma.SortOrder
   senderEmail?: Prisma.SortOrder
-  serviceType?: Prisma.SortOrder
+  reason?: Prisma.SortOrder
+  projectRef?: Prisma.SortOrder
   budget?: Prisma.SortOrder
   body?: Prisma.SortOrder
   isRead?: Prisma.SortOrder
@@ -421,7 +443,8 @@ export type MessageSelect<ExtArgs extends runtime.Types.Extensions.InternalArgs 
   id?: boolean
   senderName?: boolean
   senderEmail?: boolean
-  serviceType?: boolean
+  reason?: boolean
+  projectRef?: boolean
   budget?: boolean
   body?: boolean
   isRead?: boolean
@@ -434,7 +457,8 @@ export type MessageSelectCreateManyAndReturn<ExtArgs extends runtime.Types.Exten
   id?: boolean
   senderName?: boolean
   senderEmail?: boolean
-  serviceType?: boolean
+  reason?: boolean
+  projectRef?: boolean
   budget?: boolean
   body?: boolean
   isRead?: boolean
@@ -447,7 +471,8 @@ export type MessageSelectUpdateManyAndReturn<ExtArgs extends runtime.Types.Exten
   id?: boolean
   senderName?: boolean
   senderEmail?: boolean
-  serviceType?: boolean
+  reason?: boolean
+  projectRef?: boolean
   budget?: boolean
   body?: boolean
   isRead?: boolean
@@ -460,7 +485,8 @@ export type MessageSelectScalar = {
   id?: boolean
   senderName?: boolean
   senderEmail?: boolean
-  serviceType?: boolean
+  reason?: boolean
+  projectRef?: boolean
   budget?: boolean
   body?: boolean
   isRead?: boolean
@@ -469,7 +495,7 @@ export type MessageSelectScalar = {
   createdAt?: boolean
 }
 
-export type MessageOmit<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetOmit<"id" | "senderName" | "senderEmail" | "serviceType" | "budget" | "body" | "isRead" | "emailStatus" | "locale" | "createdAt", ExtArgs["result"]["message"]>
+export type MessageOmit<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetOmit<"id" | "senderName" | "senderEmail" | "reason" | "projectRef" | "budget" | "body" | "isRead" | "emailStatus" | "locale" | "createdAt", ExtArgs["result"]["message"]>
 
 export type $MessagePayload<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
   name: "Message"
@@ -478,8 +504,9 @@ export type $MessagePayload<ExtArgs extends runtime.Types.Extensions.InternalArg
     id: string
     senderName: string
     senderEmail: string
-    serviceType: string
-    budget: string
+    reason: string
+    projectRef: string | null
+    budget: string | null
     body: string
     isRead: boolean
     emailStatus: string
@@ -911,7 +938,8 @@ export interface MessageFieldRefs {
   readonly id: Prisma.FieldRef<"Message", 'String'>
   readonly senderName: Prisma.FieldRef<"Message", 'String'>
   readonly senderEmail: Prisma.FieldRef<"Message", 'String'>
-  readonly serviceType: Prisma.FieldRef<"Message", 'String'>
+  readonly reason: Prisma.FieldRef<"Message", 'String'>
+  readonly projectRef: Prisma.FieldRef<"Message", 'String'>
   readonly budget: Prisma.FieldRef<"Message", 'String'>
   readonly body: Prisma.FieldRef<"Message", 'String'>
   readonly isRead: Prisma.FieldRef<"Message", 'Boolean'>

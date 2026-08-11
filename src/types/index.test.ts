@@ -1,10 +1,8 @@
 import { describe, it, expect } from "vitest";
 import type {
     Locale,
-    ServiceType,
-    BudgetRange,
+    ContactReason,
     EmailStatus,
-    Theme,
     MessageInput,
     SurveySubmission,
     ApiResponse,
@@ -24,21 +22,10 @@ describe("Type Definitions", () => {
         });
     });
 
-    describe("ServiceType", () => {
-        it("should accept valid service types", () => {
-            const types: ServiceType[] = ["MVP", "SaaS", "AI Integration"];
-            expect(types).toHaveLength(3);
-        });
-    });
-
-    describe("BudgetRange", () => {
-        it("should accept valid budget ranges", () => {
-            const budgets: BudgetRange[] = [
-                "$150-$500",
-                "$500-$1000",
-                "+$1000",
-            ];
-            expect(budgets).toHaveLength(3);
+    describe("ContactReason", () => {
+        it("should accept all four contact reason values", () => {
+            const reasons: ContactReason[] = ["general", "bug-report", "academic", "collaboration"];
+            expect(reasons).toHaveLength(4);
         });
     });
 
@@ -49,27 +36,34 @@ describe("Type Definitions", () => {
         });
     });
 
-    describe("Theme", () => {
-        it("should accept valid theme values", () => {
-            const themes: Theme[] = ["dark", "light"];
-            expect(themes).toHaveLength(2);
-        });
-    });
 
     describe("MessageInput", () => {
         it("should create a valid message input object", () => {
             const message: MessageInput = {
-                senderName: "Test User",
+                senderName:  "Test User",
                 senderEmail: "test@example.com",
-                serviceType: "MVP",
-                budget: "$150-$500",
-                body: "Test message body",
-                locale: "ar",
+                reason:      "general",
+                body:        "Test message body",
+                locale:      "ar",
             };
 
             expect(message.senderName).toBe("Test User");
-            expect(message.serviceType).toBe("MVP");
+            expect(message.reason).toBe("general");
             expect(message.locale).toBe("ar");
+        });
+
+        it("should allow projectRef for bug-report reason", () => {
+            const message: MessageInput = {
+                senderName:  "Test User",
+                senderEmail: "test@example.com",
+                reason:      "bug-report",
+                projectRef:  "Portfolio Website",
+                body:        "Button is broken",
+                locale:      "en",
+            };
+
+            expect(message.reason).toBe("bug-report");
+            expect(message.projectRef).toBe("Portfolio Website");
         });
     });
 

@@ -65,6 +65,7 @@ export async function PUT(
                 bodyAr: body.bodyAr,
                 bodyEn: body.bodyEn,
                 previewUrl: body.previewUrl,
+                repoUrl: body.repoUrl,
                 skills: body.skills,
                 buildTime: body.buildTime,
                 order: body.order,

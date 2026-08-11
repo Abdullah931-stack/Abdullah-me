@@ -1,79 +1,95 @@
 @import "tailwindcss";
 
 @theme {
-  /* Enforce True Black Luxury style */
-  --color-background: #000000;
-  --color-foreground: #ffffff;
+  /* ═══════════════════════════════════════════════
+     v2.0 "Signal & Growth" — Dark-Only Palette (§2)
+     No pure black or pure white anywhere — §2.3
+     ═══════════════════════════════════════════════ */
 
-  --color-card: #09090b;
-  /* Zinc 950 */
-  --color-card-foreground: #ffffff;
+  /* Core Palette — §2.1 */
+  --color-bg: #050f0a;
+  --color-bg-radial-inner: #081a10;
+  --color-accent: #4ade80;
+  --color-accent-bright: #a7f3c4;
+  --color-text: #eafbf1;
+  --color-muted: #82a898;
+  --color-card-border: rgba(134, 239, 172, 0.16);
 
-  --color-popover: #09090b;
-  --color-popover-foreground: #ffffff;
+  /* Surface tokens — §2.3 glassmorphism */
+  --color-surface: rgba(255, 255, 255, 0.035);
+  --color-surface-hover: rgba(255, 255, 255, 0.055);
 
-  --color-primary: #ffffff;
-  --color-primary-foreground: #000000;
+  /* Background Blob Palette — §2.2 */
+  --color-blob-1a: #86efac;
+  --color-blob-1b: #22c55e;
+  --color-blob-2a: #4ade80;
+  --color-blob-2b: #16653b;
+  --color-blob-3a: #a7f3c4;
+  --color-blob-3b: #22c55e;
+  --color-blob-4a: #22c55e;
+  --color-blob-4b: #0f3d24;
+  --color-blob-5a: #86efac;
+  --color-blob-5b: #16653b;
+  --color-blob-6a: #4ade80;
+  --color-blob-6b: #22c55e;
 
-  --color-secondary: #18181b;
-  /* Zinc 900 */
-  --color-secondary-foreground: #ffffff;
-
-  --color-muted: #18181b;
-  --color-muted-foreground: #a1a1aa;
-  /* Zinc 400 */
-
-  --color-accent: #18181b;
-  --color-accent-foreground: #ffffff;
-
-  --color-destructive: #7f1d1d;
-  /* Red 900 */
-  --color-destructive-foreground: #ffffff;
-
-  --color-border: #27272a;
-  /* Zinc 800 */
-  --color-input: #27272a;
-  --color-ring: #ffffff;
+  /* Tailwind theme overrides for compatibility */
+  --color-background: #050f0a;
+  --color-foreground: #eafbf1;
+  --color-primary: #4ade80;
+  --color-primary-foreground: #050f0a;
+  --color-secondary: rgba(255, 255, 255, 0.035);
+  --color-secondary-foreground: #eafbf1;
+  --color-muted-foreground: #82a898;
+  --color-border: rgba(134, 239, 172, 0.16);
+  --color-input: rgba(134, 239, 172, 0.16);
+  --color-ring: #4ade80;
+  --color-destructive: #ef4444;
+  --color-destructive-foreground: #eafbf1;
 
   --radius: 0.5rem;
-  /* Sharper corners for professional look */
-
-  /* Custom animations */
-  @keyframes blob {
-    0% {
-      transform: translate(0px, 0px) scale(1);
-    }
-
-    33% {
-      transform: translate(30px, -50px) scale(1.1);
-    }
-
-    66% {
-      transform: translate(-20px, 20px) scale(0.9);
-    }
-
-    100% {
-      transform: translate(0px, 0px) scale(1);
-    }
-  }
 }
 
-/* Base Styles */
+/* ═══════════════════════════════════════════════
+   Base Styles — Dark-Only (§2 NOTE)
+   ═══════════════════════════════════════════════ */
 body {
-  @apply bg-background text-foreground antialiased;
+  background-color: var(--color-bg);
+  color: var(--color-text);
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
   font-feature-settings: "ss01", "ss02", "cv01", "cv02";
 }
 
-/* Glassmorphism Utilities */
+/* ═══════════════════════════════════════════════
+   Glassmorphism Utilities — §2.3
+   rgba(255,255,255,0.03–0.045) over dark bg
+   ═══════════════════════════════════════════════ */
 .glass-panel {
-  @apply bg-black/40 border border-white/5 backdrop-blur-xl;
+  background: rgba(255, 255, 255, 0.03);
+  border: 1px solid var(--color-card-border);
+  backdrop-filter: blur(24px);
+  -webkit-backdrop-filter: blur(24px);
 }
 
 .glass-card {
-  @apply relative overflow-hidden rounded-2xl border border-white/5 bg-zinc-900/30 p-6 transition-all duration-300 hover:bg-zinc-900/50 hover:border-white/10;
+  position: relative;
+  overflow: hidden;
+  border-radius: 1rem;
+  border: 1px solid var(--color-card-border);
+  background: rgba(255, 255, 255, 0.035);
+  padding: 1.5rem;
+  transition: all 300ms ease;
 }
 
-/* Scrollbar */
+.glass-card:hover {
+  background: rgba(255, 255, 255, 0.055);
+  border-color: var(--color-accent);
+}
+
+/* ═══════════════════════════════════════════════
+   Scrollbar — Green-tinted (§2.3)
+   ═══════════════════════════════════════════════ */
 ::-webkit-scrollbar {
   width: 6px;
 }
@@ -83,25 +99,79 @@ body {
 }
 
 ::-webkit-scrollbar-thumb {
-  background: rgba(255, 255, 255, 0.1);
+  background: rgba(74, 222, 128, 0.15);
   border-radius: 10px;
 }
 
 ::-webkit-scrollbar-thumb:hover {
-  background: rgba(255, 255, 255, 0.2);
+  background: rgba(74, 222, 128, 0.3);
 }
 
-/* 
-  Legacy Variable Support 
-  Mapping old CSS variables to new Tailwind theme values 
-  to prevent breaking components that still use var(--color-*) 
-*/
+/* ═══════════════════════════════════════════════
+   Legacy Variable Support
+   Mapping old references to new tokens
+   ═══════════════════════════════════════════════ */
 :root {
-  --color-bg: var(--color-background);
-  --color-bg-secondary: var(--color-muted);
-  --color-text: var(--color-foreground);
-  --color-text-secondary: var(--color-muted-foreground);
-  --color-text-muted: var(--color-muted-foreground);
-  --color-border: var(--color-border);
-  --color-surface: rgba(255, 255, 255, 0.05);
+  --color-bg-secondary: rgba(255, 255, 255, 0.035);
+  --color-text-secondary: var(--color-muted);
+  --color-text-muted: var(--color-muted);
+  --color-primary-hover: var(--color-accent-bright);
+  --color-overlay: rgba(5, 15, 10, 0.92);
+}
+
+/* ═══════════════════════════════════════════════
+   Lava Lamp Keyframes — §4.9
+   Position ONLY in rise (§4.8)
+   Shape ONLY in morph (§4.8)
+   ═══════════════════════════════════════════════ */
+@keyframes rise {
+  0% {
+    transform: translateY(0) translateX(0);
+  }
+
+  25% {
+    transform: translateY(-140vh) translateX(calc(var(--tilt) * 0.22 + var(--drift1)));
+  }
+
+  50% {
+    transform: translateY(-280vh) translateX(calc(var(--tilt) * 0.5));
+  }
+
+  75% {
+    transform: translateY(-420vh) translateX(calc(var(--tilt) * 0.78 + var(--drift2)));
+  }
+
+  100% {
+    transform: translateY(-560vh) translateX(var(--tilt));
+  }
+}
+
+@keyframes morph {
+
+  0%,
+  100% {
+    border-radius: 45% 55% 60% 40% / 60% 45% 55% 40%;
+  }
+
+  50% {
+    border-radius: 55% 45% 40% 60% / 45% 60% 40% 55%;
+  }
+}
+
+/* ═══════════════════════════════════════════════
+   prefers-reduced-motion — §10.5
+   Disable Tier-3 cinematic motion
+   ═══════════════════════════════════════════════ */
+@media (prefers-reduced-motion: reduce) {
+
+  .blob-field,
+  .lissajous-canvas {
+    display: none !important;
+  }
+
+  * {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+  }
 }
