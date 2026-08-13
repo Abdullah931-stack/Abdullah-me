@@ -2,6 +2,7 @@ import type { Metadata } from "next";
 import { NextIntlClientProvider } from "next-intl";
 import { getMessages, setRequestLocale } from "next-intl/server";
 import { routing } from "@/i18n/routing";
+import { spaceGrotesk, ibmPlexSansArabic, jetbrainsMono } from "@/app/fonts";
 import Navbar from "@/components/shared/Navbar";
 import Footer from "@/components/shared/Footer";
 import PageTransition from "@/components/shared/PageTransition";
@@ -58,26 +59,27 @@ export default async function LocaleLayout({
             : "var(--font-space-grotesk), sans-serif";
 
     return (
-        <>
-            {/* Set lang, dir, and font on the html/body from root layout */}
-            <script
-                dangerouslySetInnerHTML={{
-                    __html: `
-                        document.documentElement.lang="${locale}";
-                        document.documentElement.dir="${dir}";
-                        document.body.style.fontFamily="${fontFamily}";
-                    `,
-                }}
-            />
-            <NextIntlClientProvider messages={messages}>
-                <ScrollRestoration />
-                <Navbar />
-                <PageTransition>
-                    <main className="pt-[72px]">{children}</main>
-                </PageTransition>
-                <Footer />
-                <SurveyPopup />
-            </NextIntlClientProvider>
-        </>
+        <html
+            lang={locale}
+            dir={dir}
+            className={`${spaceGrotesk.variable} ${ibmPlexSansArabic.variable} ${jetbrainsMono.variable}`}
+            suppressHydrationWarning
+        >
+            <body
+                className="antialiased bg-[var(--color-bg)] text-[var(--color-text)] font-sans selection:bg-[var(--color-accent)]/20"
+                style={{ fontFamily }}
+                suppressHydrationWarning
+            >
+                <NextIntlClientProvider messages={messages}>
+                    <ScrollRestoration />
+                    <Navbar />
+                    <PageTransition>
+                        <main className="pt-[72px]">{children}</main>
+                    </PageTransition>
+                    <Footer />
+                    <SurveyPopup />
+                </NextIntlClientProvider>
+            </body>
+        </html>
     );
 }

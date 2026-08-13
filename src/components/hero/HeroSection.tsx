@@ -51,10 +51,7 @@ export default function HeroSection() {
 
       {/* Hero Container — §5.2.2 Two-column layout (Text & Curve, non-overlapping) */}
       <div className="relative z-10 max-w-7xl w-full mx-auto px-6 md:px-12 flex flex-col items-center justify-between gap-12 min-h-[80vh]">
-        <div
-          className={`w-full flex items-center justify-between gap-8 md:gap-12 my-auto ${isRtl ? "flex-col md:flex-row-reverse" : "flex-col md:flex-row"
-            }`}
-        >
+        <div className="w-full flex flex-col md:flex-row items-center justify-between gap-8 md:gap-12 my-auto">
           {/* Column 1: Text Content */}
           <div
             className={`flex-1 max-w-2xl text-center ${isRtl ? "md:text-right" : "md:text-left"
@@ -87,7 +84,9 @@ export default function HeroSection() {
 
             {/* §5.3 — Primary sentence: verb-based, no title nouns */}
             <p
-              className="text-lg md:text-xl leading-relaxed mb-10 max-w-xl mx-auto md:mx-0"
+              className={`text-lg md:text-xl leading-relaxed mb-10 max-w-xl ${
+                isRtl ? "mx-auto md:mr-0 md:ml-auto" : "mx-auto md:ml-0 md:mr-auto"
+              }`}
               style={{ color: "var(--color-muted)" }}
             >
               {t("bio")}
