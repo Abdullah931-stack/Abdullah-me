@@ -55,6 +55,7 @@
         "reason": "Reason for reaching out",
         "message": "Message",
         "submit": "Send",
+        "clearForm": "Clear form",
         "reasons": {
             "general": "General inquiry",
             "bug-report": "Report an issue in a project",

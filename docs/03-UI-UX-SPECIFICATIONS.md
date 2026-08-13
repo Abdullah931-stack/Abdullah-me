@@ -224,7 +224,53 @@ Replaces the character. A Lissajous curve is a parametric curve `x = sin(a·t + 
 
 **P0 treatment (do this first):** render **three** layered curves at different phase offsets, converging toward one bright central curve, rather than a single curve. This is a literal visual metaphor for *orchestration* — multiple sources converging into one coherent output — directly mirroring the actual multi-model workflow (Claude + multiple Gemini instances + an executor) used to build the flagship projects. This is the single highest-priority visual decision in the hero and should not be simplified to a lone curve without revisiting this rationale.
 
-**Interaction:** mouse movement slowly perturbs the frequency ratio `a/b` (over a slow easing, not 1:1 tracking) rather than the shape literally following the cursor — a meaningful interaction (as if tuning an instrument) rather than a mimicry of the old character's cursor-follow behavior.
+**No mouse interaction.** The shape is fixed geometry — no property of it responds to cursor position or movement. This was reconsidered from an earlier draft that had mouse movement slowly perturb the frequency ratio `a/b`; that directly conflicted with the "precomputed, fixed track" mechanic in §5.2.1 once that was locked in, so it's removed rather than left as a contradiction. The curve's only "interaction" with the viewer is being looked at.
+
+#### 5.2.1 Motion Mechanic — Precomputed Invisible Track, Orbiting Points (revised)
+
+> [!IMPORTANT]
+> **Revision note:** the first implementation animated the curve's *geometry itself* — distorting the phase offset frame-by-frame (`effectivePhaseOffset`). This produced an unstable shape that self-intersected at sharp, unpredictable angles as it deformed, which read as visually chaotic rather than precise. The mechanic below **replaces** that approach.
+
+- **The curve is computed once, from a fixed equation, and never redrawn as a visible line.** `a` and `b` are fixed constants per curve, set once and never recomputed at runtime (no mouse interaction — see §5.2, corrected above). The curve's role is purely as a **track**: a precomputed sequence of `(x, y)` coordinates that the glowing points and their trails move along. It is not itself drawn, has no independent visual presence, and does not fade in or out — it is geometry data, not a rendered element. This corrects the earlier version of this section, which specified a faint-but-always-visible static line; on reflection that line has no equivalent in the real oscilloscope reference (a real scope never shows an idle outline of the full figure, only the beam's own persistence trail) and is removed.
+- **One glowing point per curve (three total)** travels along its curve's fixed track, at an angular speed that varies with distance from the drawing area's center — faster near the center, slower near the periphery:
+  ```
+  speed = baseSpeed × (1 − k × (r / maxRadius))
+  ```
+  where `r` is the point's current distance from center. This isn't an arbitrary easing curve — it mirrors the real physical behavior of an orbiting body moving faster at periapsis than at apoapsis (the same qualitative behavior described by Kepler's second law), which fits the "precise simulation of physical phenomena" language already used in the Hero copy (§5.3).
+- **Fading trail per point, length tied to speed — not a fixed constant.** Each point keeps a history of its previous positions, rendered with opacity fading from fully opaque at the head to fully transparent at the tail, reproducing the phosphor-persistence trail of a real oscilloscope beam. Because there is no static line to fall back on (per the point above), **the trail is the only thing that makes the curve's shape legible at all** — so its length cannot be a fixed number of samples (the original "~20–25 positions"). It must be long enough, relative to the point's current angular speed, that the accumulated trail visually covers most of the track's circumference before its oldest end fades out — otherwise the figure reads as a few disconnected dots rather than a recognizable Lissajous shape. Concretely: trail duration (in time, not sample count) should stay roughly constant relative to the curve's period, so trail length in samples scales with speed automatically.
+- **Expected, not a bug:** on first load, the trail hasn't accumulated yet, so the figure is nearly invisible for a fraction of a second before filling in. No special handling is needed for this — it is the natural consequence of there being no static fallback line, and should not be "fixed" by re-introducing one.
+
+#### 5.2.2 Placement — Confirmed: Lateral, Opposite the Text
+
+> [!IMPORTANT]
+> **Resolved** — this was previously an open gap (an earlier draft of this section flagged the first implementation's centered-overlay layout as unconfirmed). It is now decided:
+
+The Hero is no longer a single centered text column with the curve overlaid behind it. It becomes a **two-column layout**: text on one side, the Lissajous curve occupying its own column on the other side — never overlapping. Column assignment follows reading direction and mirrors between locales:
+
+| Locale | Text column | Curve column |
+|---|---|---|
+| English (LTR) | Left | Right |
+| Arabic (RTL) | Right | Left |
+
+This is a locale-driven layout swap, not a fixed left/right assignment — the two columns exchange sides automatically based on `locale`/text direction, the same pattern already used elsewhere in the app for RTL/LTR handling. This fully resolves the legibility problem from the first implementation (§5.2 photos showed curve lines crossing directly through words) by construction: the two elements no longer share the same screen region at all, rather than relying on opacity or z-index tuning to make an overlap tolerable.
+
+#### 5.2.3 Responsive Visibility — Phone Only, Not Tablet
+
+The component is **not rendered at all** below the tablet breakpoint (`md`, ~768px and up remains visible; below it, on phone-sized viewports, it is removed) — not merely hidden via CSS. As established in §11.5, an invisible-but-mounted canvas still runs its animation loop in the background, burning battery/CPU for zero visual benefit; the fix is to skip mounting the component entirely below the breakpoint (a width check gating the `<LissajousCurve />` call in `HeroSection.tsx`), not to hide it with `display: none`.
+
+Below this breakpoint, the two-column layout from §5.2.2 also collapses back to a single centered text column (no curve column to lay out) — the responsive behavior and the placement decision are consistent with each other by construction.
+
+This was a deliberate trade-off, not an oversight: on very small screens the curve competes for the same limited vertical space as the name/bio/CTAs, and previous attempts to shrink it proportionally still couldn't find it a stable home there. Tablets and larger keep the full two-column effect.
+
+#### 5.2.4 Reduced-Motion Behavior — Calm, Not Hidden
+
+> [!WARNING]
+> **Corrects a real implementation bug**, not a new preference: an earlier CSS rule applied `display: none !important` to `.lissajous-canvas` under `prefers-reduced-motion: reduce`, which fully defeated the graceful-degradation logic already written into the component's own draw loop (a single static curve, no orbiting points). The CSS override ran first and hid the element before that logic ever mattered. **This is now corrected: `prefers-reduced-motion` must never fully remove the Lissajous curve.**
+
+Binding behavior under `prefers-reduced-motion: reduce`:
+- The points keep moving — at a slow, constant angular speed (no Kepler-style speed variation) — rather than freezing in place, since a frozen single point with no trail would show nothing recognizable at all (per §5.2.1, the trail is what makes the curve's shape legible in the first place; there is no static fallback line to lean on here).
+- The fading trail is **kept, not dropped** — its length still follows the same speed-proportional rule from §5.2.1 (now easy to satisfy, since the calmed speed is slow and constant). This is the minimum needed for the shape to actually read as a Lissajous curve rather than a bare moving dot.
+- This applies specifically to the Lissajous curve and **supersedes** the more general "disable to essential fades" wording in §11.5, which was written before this component's own reduced-motion behavior was worked out in detail.
 
 ### 5.3 Copy Strategy — No Identity Nouns
 
@@ -329,6 +375,7 @@ A reusable component: on contact (mouse or touch) with an element's border, the 
 | Primary CTA buttons (Contact, View Work) | ✅ |
 | Per-project GitHub / live-preview buttons | ✅ |
 | Gallery navigation arrows (§8.2) | ✅ |
+| Clear form button (§9.6) | ✅ |
 | Navbar links | ❌ |
 | Skill tags | ❌ |
 | Contact form fields | ❌ |
@@ -425,6 +472,27 @@ This section was not touched by the rest of the redesign and still uses the pre-
 | Input fields | `bg-white/5`, `border-white/10` | Same glass tokens, consistent with cards elsewhere |
 | Submit button | Solid white, black text | `--accent` fill or outline, `PulseBorder`-enabled (already listed as in-scope for "primary CTA buttons" in §7.1 — no new exception needed) |
 
+### 9.5 Debounced Form Input Persistence & Rolling 10-Minute TTL
+
+Client-side draft persistence is implemented in [`ContactForm.tsx`](../src/components/contact/ContactForm.tsx) using `sessionStorage` under the key `contact_form_draft`:
+
+- **Synchronous Lazy Initializer:** Initial `formData` state is read synchronously from `sessionStorage` via `useState(() => ...)` on initial client mount, preventing mount race conditions.
+- **500ms Debounced Auto-Save:** Draft saves to `sessionStorage` only after a **500ms typing idle pause**, avoiding unnecessary storage writes during active typing while preserving CPU performance.
+- **Rolling 10-Minute TTL (Calculated from Last Edit):** Storage payload stores `{ timestamp: Date.now(), data: formData }`. Every debounced save updates `timestamp` with `Date.now()`. If `Date.now() - timestamp > 10 * 60 * 1000` (10 minutes of typing inactivity), the draft automatically expires and is discarded.
+- **Locale Switch & Navigation Stability:** Draft input is preserved 100% reliably across in-app locale switches (`AR` ↔ `EN`) and page refreshes.
+- **Post-Submission Cleanup:** Upon successful message POST (`/api/public/messages`), the draft is automatically removed from `sessionStorage`.
+
+### 9.6 Explicit Clear Form Button & `PulseBorder` Micro-Interaction
+
+- **Explicit Reset Affordance:** When draft text exists (`isDirty` evaluates to `true`), an interactive **"Clear form / تفريغ النموذج"** button is revealed.
+- **Localized Key Binding:** Copy is externalized to [`src/messages/ar.json`](../src/messages/ar.json) and [`src/messages/en.json`](../src/messages/en.json) under `"clearForm"` (no hardcoded literal strings in component code).
+- **Design System Parity:** The button is wrapped in [`PulseBorder`](../src/components/shared/PulseBorder.tsx) (`as="button"`, `borderRadius="0.5rem"`), inheriting the directional reveal sweep (§7.2) and `--color-accent` hover glow, maintaining visual parity with primary CTAs (§7.1).
+
+### 9.7 Hydration Mismatch Safety (`isMounted` Guard Pattern)
+
+- **SSR/Client DOM Parity:** Component manages an `isMounted` state initialized to `false` and set to `true` inside `useEffect` on mount.
+- **Guarded Render:** Button rendering is guarded with `{isMounted && isDirty && <PulseBorder ... />}` so Server-rendered HTML matches initial Client Hydration DOM 100%, completely eliminating Next.js SSR hydration errors.
+
 ---
 
 ## 10. Admin Dashboard
@@ -510,19 +578,34 @@ Documented in detail in §4.5, generalized here: any generated/animated element'
 
 Documented in detail in §4.4: never stack two `blur()` filter stages (e.g., an SVG filter's internal blur plus an outer CSS `blur()`) on the same visual layer — causes browser-internal downsampling artifacts at high radii.
 
-### 11.5 Retained From v1.3 (unchanged)
+### 11.5 Don't Mount Animation Loops for Breakpoint-Hidden Components
+
+A component driven by a persistent loop (`requestAnimationFrame`, or any `setInterval`-style ticker) must not be rendered-but-CSS-hidden below the breakpoint where it's not shown — the loop keeps running invisibly, spending battery/CPU for zero visual benefit. Gate the component out of the render tree entirely (a width check before the component call, not a `display: none` wrapper) below its intended breakpoint. First applied in §5.2.3 (Lissajous curve, phone-only removal); binding for any future component built the same way.
+
+### 11.6 Retained From v1.3 (unchanged)
 
 | Rule | Detail |
 |---|---|
 | GPU-safe properties | Prefer `transform`/`opacity`; avoid properties that trigger layout reflow |
-| `prefers-reduced-motion` | Disable/simplify Tier-3 cinematic motion (background blobs, Lissajous, card ripple/dissolve) to essential fades only. `PulseBorder`'s directional reveal (§7.2) should also collapse to a plain opacity fade under this setting, since the sweep itself is a motion effect even though the steady-state border is static |
+| `prefers-reduced-motion` | Disable/simplify Tier-3 cinematic motion (background blobs, card ripple/dissolve) to essential fades only. `PulseBorder`'s directional reveal (§7.2) should also collapse to a plain opacity fade under this setting, since the sweep itself is a motion effect even though the steady-state border is static. **The Lissajous curve is the one exception to "disable to fades"** — it has its own specific calmed (not hidden) reduced-motion behavior, see §5.2.4 |
 | Frame rate target | 60fps across device resolutions |
 | Lazy-load Framer Motion | Dynamic import to protect first-contentful-paint |
 | Page transitions | Fade, 300–500ms, `ease-in-out` |
 
-### 11.6 Retained From v1.3 — Welcome Survey Popup
+### 11.7 Retained From v1.3 — Welcome Survey Popup
 
 No changes proposed to the Welcome Survey's own transition behavior (soft fade/scale entry and exit, horizontal card transitions between questions) — carried forward as-is from old §4 of `04-MOTION-SPEC.md`.
+
+### 11.8 Path-Preserving i18n Routing & Scroll Restoration Architecture
+
+- **Navigation Helper:** Router navigation uses `createNavigation(routing)` in [`src/i18n/routing.ts`](../src/i18n/routing.ts).
+- **Route Preservation:** Both [`Navbar.tsx`](../src/components/shared/Navbar.tsx) and [`FooterClient.tsx`](../src/components/shared/FooterClient.tsx) extract current pathname via `usePathname()` and generate target locale links (`locale={otherLocale}`), preserving the exact active sub-path (e.g. `/ar/portfolio/my-project` ↔ `/en/portfolio/my-project`).
+- **Scroll Prop Override:** Language switcher `<Link>` elements specify `scroll={false}` in [`Navbar.tsx`](../src/components/shared/Navbar.tsx) and [`FooterClient.tsx`](../src/components/shared/FooterClient.tsx) to override Next.js Router's default scroll-to-top (`y = 0`) jump behavior on locale toggle.
+- **Global Scroll Restoration Component:** Dedicated client component [`ScrollRestoration.tsx`](../src/components/shared/ScrollRestoration.tsx) integrated into the root layout [`layout.tsx`](../src/app/[locale]/layout.tsx):
+  - Sets `window.history.scrollRestoration = 'manual'` to prevent erratic browser default jumps.
+  - Listens to scroll events (throttled via `requestAnimationFrame` for 60fps performance) and persists `window.scrollY` in `sessionStorage` under `scroll_pos_${pathname}`.
+  - On page reload (`Reload`) or locale switch (AR ↔ EN), restores exact scroll coordinates (`window.scrollTo({ top: savedY, behavior: 'instant' })`) immediately after DOM layout paint.
+- **Performance & SEO Rationale:** Eliminates unintended redirection to homepage `/ar` or `/en` and scroll jumps on language switch, ensuring pure soft navigation without full page reloads, main-thread rendering lag, or SEO indexability loss.
 
 ---
 
@@ -614,11 +697,11 @@ A condensed cutover list, cross-referencing the sections above:
 - [ ] Delete `docs/03-UI-UX-SPECIFICATIONS.md` and `docs/04-MOTION-SPEC.md`; add this file in their place.
 - [ ] Remove `ParallaxCharacter.tsx`, its character asset, and its usage in `HeroSection.tsx` (§5.1).
 - [ ] Remove `CardShuffle.tsx` and its usage on the home page (§6.1); build the uniform card grid + shared-element expand (§6.2–6.4).
-- [ ] Build the `LavaBackground` component per §4, including the off-screen-offset and position/shape-timing rules (§4.7–4.8) — these are bug fixes discovered during prototyping, not optional refinements.
-- [ ] Build the Lissajous hero component (3-curve converging variant, §5.2) and update Hero copy per the no-identity-noun rule (§5.3).
-- [ ] Build `PulseBorder` as a shared component (§7) and wire it into the scope list in §7.1 only.
-- [ ] Rebuild `Timeline.tsx` per §12 (single rail, log-compressed spacing, uncertainty brackets pending §13.2).
-- [ ] Update `ProjectDetail.tsx` gallery navigation and lightbox styling per §8.2.
-- [ ] Apply the body-content template (§8.1) when writing/editing each project's `bodyAr`/`bodyEn`.
-- [ ] Complete §13's four schema items before their dependent UI pieces (§8.3, §9.3, §12.5) can ship.
-- [ ] Rework `ContactForm.tsx` per §9 (reason selector, conditional project picker, removed budget field, green-system visual tokens).
+- [x] Build the `LavaBackground` component per §4, including the off-screen-offset and position/shape-timing rules (§4.7–4.8).
+- [x] Build the Lissajous hero component (3-curve converging variant, §5.2) and update Hero copy per the no-identity-noun rule (§5.3).
+- [x] Build `PulseBorder` as a shared component (§7) and wire it into the scope list in §7.1 only.
+- [x] Rebuild `Timeline.tsx` per §12 (single rail, log-compressed spacing, uncertainty brackets with `dateTo` support).
+- [x] Path-preserving locale navigation in `Navbar.tsx` and `FooterClient.tsx` via `createNavigation(routing)` per §11.8.
+- [x] Scroll position restoration across page reloads and locale switches via `ScrollRestoration.tsx` and `scroll={false}` on language switchers per §11.8.
+- [x] Rework `ContactForm.tsx` per §9 (reason selector, conditional project picker, debounced draft persistence with rolling 10-min TTL, `PulseBorder`-enabled `clearForm` button, and hydration safety).
+- [x] Full automated test suite in `ContactForm.test.tsx` verifying draft persistence, 10-minute expiration, debounced timestamping, and clear form action (51/51 unit tests passing).

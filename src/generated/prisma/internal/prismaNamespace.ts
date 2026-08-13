@@ -1022,6 +1022,7 @@ export const TimelineEntryScalarFieldEnum = {
   id: 'id',
   date: 'date',
   dateTo: 'dateTo',
+  projectSlug: 'projectSlug',
   age: 'age',
   titleAr: 'titleAr',
   titleEn: 'titleEn',

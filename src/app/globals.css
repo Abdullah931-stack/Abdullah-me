@@ -120,10 +120,35 @@ body {
 }
 
 /* ═══════════════════════════════════════════════
-   Lava Lamp Keyframes — §4.9
+   Lava Lamp Container & Blobs — §4.9
    Position ONLY in rise (§4.8)
    Shape ONLY in morph (§4.8)
    ═══════════════════════════════════════════════ */
+.blob-field {
+  position: absolute;
+  inset: -20% -20%;
+  filter: blur(145px);
+  overflow: hidden;
+  pointer-events: none;
+  z-index: 0;
+  transform: translateZ(0);
+}
+
+.blob {
+  position: absolute;
+  left: var(--x);
+  width: var(--w);
+  height: var(--h);
+  background: radial-gradient(ellipse at 40% 30%, var(--c1), var(--c2) 55%, transparent 85%);
+  border-radius: 45% 55% 60% 40% / 60% 45% 55% 40%;
+  bottom: calc(-1 * var(--h) - 20vh);
+  will-change: transform;
+  animation:
+    rise var(--dur) linear infinite,
+    morph var(--mdur) ease-in-out infinite;
+  animation-delay: var(--delay), 0s;
+}
+
 @keyframes rise {
   0% {
     transform: translateY(0) translateX(0);

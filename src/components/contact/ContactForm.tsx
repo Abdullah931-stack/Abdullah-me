@@ -4,6 +4,7 @@ import { useState, useEffect } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import { useLocale, useTranslations } from "next-intl";
 import type { ContactReason } from "@/types";
+import PulseBorder from "@/components/shared/PulseBorder";
 
 /**
  * ContactForm — v2.0 §9 "Signal & Growth"
@@ -36,19 +37,101 @@ export default function ContactForm() {
     const locale = useLocale();
     const isRtl = locale === "ar";
 
-    const [formData, setFormData] = useState({
+    const DRAFT_KEY = "contact_form_draft";
+    const MAX_DRAFT_AGE = 10 * 60 * 1000; // 10 minutes TTL from last edit
+
+    const defaultState = {
         senderName:   "",
         senderEmail:  "",
         reason:       "general" as ContactReason,
         projectRef:   "",     // Used when reason = "bug-report"
         projectOther: "",     // Used when project picker = "other"
         body:         "",
+    };
+
+    // Synchronously initialize form data from sessionStorage draft on mount
+    const [formData, setFormData] = useState(() => {
+        if (typeof window === "undefined") return defaultState;
+
+        try {
+            const saved = sessionStorage.getItem(DRAFT_KEY);
+            if (saved) {
+                const parsed = JSON.parse(saved);
+                if (parsed && typeof parsed === "object") {
+                    const timestamp = typeof parsed.timestamp === "number" ? parsed.timestamp : 0;
+                    const isExpired = Date.now() - timestamp > MAX_DRAFT_AGE;
+
+                    if (isExpired) {
+                        sessionStorage.removeItem(DRAFT_KEY);
+                        return defaultState;
+                    }
+
+                    const data = parsed.data || parsed;
+                    return {
+                        ...defaultState,
+                        ...data,
+                    };
+                }
+            }
+        } catch {
+            // Ignore storage parse errors
+        }
+
+        return defaultState;
     });
 
     const [errors, setErrors]           = useState<Record<string, string>>({});
     const [isSubmitting, setIsSubmitting] = useState(false);
     const [isSuccess, setIsSuccess]     = useState(false);
     const [submitError, setSubmitError] = useState("");
+    const [isMounted, setIsMounted]     = useState(false);
+
+    // Track client hydration completion to prevent SSR/client mismatch warnings
+    useEffect(() => {
+        setIsMounted(true);
+    }, []);
+
+    // Debounced auto-save (500ms idle pause) to update sessionStorage and last-edited timestamp
+    useEffect(() => {
+        if (typeof window === "undefined") return;
+
+        const timer = setTimeout(() => {
+            try {
+                const payload = {
+                    timestamp: Date.now(), // Updated after 500ms idle pause from last edit
+                    data: formData,
+                };
+                sessionStorage.setItem(DRAFT_KEY, JSON.stringify(payload));
+            } catch {
+                // Ignore storage errors
+            }
+        }, 500);
+
+        return () => clearTimeout(timer);
+    }, [formData]);
+
+    // Check if form has any user draft input to display reset button
+    const isDirty = Boolean(
+        formData.senderName.trim() ||
+        formData.senderEmail.trim() ||
+        formData.body.trim() ||
+        formData.projectRef ||
+        formData.projectOther.trim() ||
+        formData.reason !== "general"
+    );
+
+    function handleReset() {
+        setFormData(defaultState);
+        setErrors({});
+        setSubmitError("");
+        if (typeof window !== "undefined") {
+            try {
+                sessionStorage.removeItem(DRAFT_KEY);
+            } catch {
+                // Ignore storage errors
+            }
+        }
+    }
 
     // §9.3 — project list for the bug-report picker
     const [projects, setProjects]     = useState<ProjectOption[]>([]);
@@ -122,6 +205,13 @@ export default function ContactForm() {
                 return;
             }
 
+            if (typeof window !== "undefined") {
+                try {
+                    sessionStorage.removeItem(DRAFT_KEY);
+                } catch {
+                    // Ignore storage errors
+                }
+            }
             setIsSuccess(true);
         } catch {
             setSubmitError(t("errors.generic"));
@@ -173,14 +263,28 @@ export default function ContactForm() {
                 backdropFilter: "blur(24px)",
             }}
         >
-            {/* §9.1 — Neutral heading, no emoji or "Project" language */}
-            <div className={isRtl ? "text-right" : "text-left"}>
-                <h2 className="text-2xl font-semibold" style={{ color: "var(--color-text)" }}>
-                    {t("title")}
-                </h2>
-                <p className="mt-1 text-sm" style={{ color: "var(--color-muted)" }}>
-                    {t("subtitle")}
-                </p>
+            {/* §9.1 — Neutral heading with optional clear form button */}
+            <div className="flex items-start justify-between gap-4">
+                <div className={isRtl ? "text-right" : "text-left"}>
+                    <h2 className="text-2xl font-semibold" style={{ color: "var(--color-text)" }}>
+                        {t("title")}
+                    </h2>
+                    <p className="mt-1 text-sm" style={{ color: "var(--color-muted)" }}>
+                        {t("subtitle")}
+                    </p>
+                </div>
+                {isMounted && isDirty && (
+                    <PulseBorder
+                        as="button"
+                        borderRadius="0.5rem"
+                        onClick={handleReset}
+                        className="text-xs font-medium px-3 py-1.5 transition-all"
+                    >
+                        <span style={{ color: "var(--color-muted)" }}>
+                            {t("clearForm")}
+                        </span>
+                    </PulseBorder>
+                )}
             </div>
 
             {/* Name */}

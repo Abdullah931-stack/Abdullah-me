@@ -41,6 +41,7 @@ export async function POST(request: NextRequest) {
             data: {
                 date: new Date(body.date),
                 dateTo: body.dateTo ? new Date(body.dateTo) : null,
+                projectSlug: body.projectSlug || null,
                 age: body.age,
                 titleAr: body.titleAr,
                 titleEn: body.titleEn,

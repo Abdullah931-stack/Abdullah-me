@@ -65,6 +65,7 @@ export interface TimelineEntry {
     id: string;
     date: Date;
     dateTo: Date | null;
+    projectSlug?: string | null;
     age: number;
     titleAr: string;
     titleEn: string;
@@ -167,6 +168,7 @@ export interface TimelineRow {
     id: string;
     date: string;
     dateTo: string | null;
+    projectSlug?: string | null;
     age: number;
     titleAr: string;
     titleEn: string;

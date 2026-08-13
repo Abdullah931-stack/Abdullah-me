@@ -78,16 +78,17 @@ model ProjectImage {
 // Timeline — Journey / The Story
 // ─────────────────────────────────────────────
 model TimelineEntry {
-  id       String    @id @default(cuid())
-  date     DateTime
-  dateTo   DateTime? @map("date_to")
-  age      Int
-  titleAr  String    @map("title_ar")
-  titleEn  String    @map("title_en")
-  storyAr  String    @map("story_ar") @db.Text
-  storyEn  String    @map("story_en") @db.Text
-  imageUrl String?   @map("image_url")
-  order    Int       @default(0)
+  id          String    @id @default(cuid())
+  date        DateTime
+  dateTo      DateTime? @map("date_to")
+  projectSlug String?   @map("project_slug")
+  age         Int
+  titleAr     String    @map("title_ar")
+  titleEn     String    @map("title_en")
+  storyAr     String    @map("story_ar") @db.Text
+  storyEn     String    @map("story_en") @db.Text
+  imageUrl    String?   @map("image_url")
+  order       Int       @default(0)
 
   createdAt DateTime @default(now()) @map("created_at")
   updatedAt DateTime @updatedAt @map("updated_at")

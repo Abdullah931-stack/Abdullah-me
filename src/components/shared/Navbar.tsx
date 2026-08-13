@@ -1,7 +1,7 @@
 "use client";
 
-import Link from "next/link";
 import { useTranslations, useLocale } from "next-intl";
+import { Link, usePathname } from "@/i18n/routing";
 import { motion, AnimatePresence } from "framer-motion";
 import { useState } from "react";
 
@@ -18,15 +18,16 @@ export default function Navbar() {
   const t = useTranslations("nav");
   const tLang = useTranslations("language");
   const locale = useLocale();
+  const pathname = usePathname();
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
 
   const otherLocale = locale === "ar" ? "en" : "ar";
 
   const navLinks = [
-    { href: `/${locale}`, label: t("home") },
-    { href: `/${locale}/portfolio`, label: t("portfolio") },
-    { href: `/${locale}/journey`, label: t("journey") },
-    { href: `/${locale}/contact`, label: t("contact") },
+    { href: "/", label: t("home") },
+    { href: "/portfolio", label: t("portfolio") },
+    { href: "/journey", label: t("journey") },
+    { href: "/contact", label: t("contact") },
   ];
 
   return (
@@ -42,7 +43,7 @@ export default function Navbar() {
       <div className="mx-auto flex max-w-7xl items-center justify-between px-6 py-4">
         {/* Logo / Name */}
         <Link
-          href={`/${locale}`}
+          href="/"
           className="text-xl font-bold transition-colors"
           style={{
             color: "var(--color-text)",
@@ -68,9 +69,11 @@ export default function Navbar() {
 
         {/* Actions: Language + Mobile Menu — no theme toggle (§2 dark-only) */}
         <div className="flex items-center gap-3">
-          {/* Language Switcher */}
+          {/* Language Switcher — preserves exact current pathname and scroll position */}
           <Link
-            href={`/${otherLocale}`}
+            href={pathname}
+            locale={otherLocale}
+            scroll={false}
             className="group flex items-center gap-2 px-3 py-2 text-sm font-medium transition-colors hover:text-[var(--color-accent)]"
             style={{ color: "var(--color-muted)" }}
             title={tLang("switch")}

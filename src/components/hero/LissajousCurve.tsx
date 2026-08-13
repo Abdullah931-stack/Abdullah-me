@@ -1,52 +1,33 @@
 "use client";
 
-import { useRef, useEffect, useCallback } from "react";
+import { useRef, useEffect } from "react";
+import {
+  CURVES,
+  BASE_A,
+  BASE_B,
+  computeLissajousPoint,
+  computeKeplerSpeed,
+  generateTrailPoints,
+  Point2D,
+} from "./lissajousMath";
 
 /**
- * LissajousCurve — Three-Curve Converging Hero Visual Anchor
+ * LissajousCurve — Three-Curve Converging Hero Visual Anchor (Revised §5.2)
  *
  * Implements §5.2 of UI/UX Spec v2.0:
- * - Parametric Lissajous curve: x = sin(a·t + δ), y = sin(b·t)
- * - P0 treatment: THREE layered curves at different phase offsets,
- *   converging toward one bright central curve (orchestration metaphor)
- * - Interaction: mouse movement slowly perturbs frequency ratio a/b
- *   over slow easing (§5.2), NOT 1:1 tracking
- * - Colors: --accent / --accent-bright (§7.3)
- * - Uses same composed-sine-wave mathematics as background (§4.2)
- * - prefers-reduced-motion: static single curve (§10.5)
+ * - Precomputed invisible tracks: NO static continuous curve line rendered (§5.2.1)
+ * - Fixed static geometry: Completely deterministic, fixed a/b ratio with zero mouse perturbation
+ * - Extended Phosphor Persistence Trail: ~75 points depth (~double length) for long visible trail
+ * - Three layered curves at phase offsets (0, 0.6, -0.6) for AI orchestration metaphor (§5.2 P0)
+ * - One glowing point per curve (3 total) traveling along its track
+ * - Keplerian speed variation: faster near center, slower near periphery (§5.2.1)
+ * - prefers-reduced-motion: slow constant angular speed, fading trail retained (§5.2.4)
  */
-
-// Curve configuration — three curves per §5.2 P0
-const CURVES = [
-  { phaseOffset: 0, opacity: 1.0, lineWidth: 2.0, color: "#a7f3c4" },   // Central bright curve (--accent-bright)
-  { phaseOffset: 0.6, opacity: 0.35, lineWidth: 1.2, color: "#4ade80" }, // Flanking curve 1 (--accent)
-  { phaseOffset: -0.6, opacity: 0.35, lineWidth: 1.2, color: "#4ade80" }, // Flanking curve 2 (--accent)
-];
-
-// Base Lissajous parameters
-const BASE_A = 3;
-const BASE_B = 2;
-const SAMPLE_COUNT = 600;
-
 export default function LissajousCurve() {
   const canvasRef = useRef<HTMLCanvasElement>(null);
   const animRef = useRef<number>(0);
-  const mouseInfluenceRef = useRef({ targetRatio: 0, currentRatio: 0 });
-  const timeRef = useRef(0);
-
-  // §5.2 — mouse slowly perturbs frequency ratio a/b (slow easing)
-  const handleMouseMove = useCallback((e: MouseEvent) => {
-    const canvas = canvasRef.current;
-    if (!canvas) return;
-    const rect = canvas.getBoundingClientRect();
-    const normalizedX = (e.clientX - rect.left) / rect.width - 0.5;
-    // Map to a small perturbation range — NOT 1:1 tracking
-    mouseInfluenceRef.current.targetRatio = normalizedX * 0.3;
-  }, []);
-
-  const handleMouseLeave = useCallback(() => {
-    mouseInfluenceRef.current.targetRatio = 0;
-  }, []);
+  const timeRefs = useRef<number[]>([0, 0, 0]);
+  const historyRefs = useRef<Point2D[][]>([[], [], []]);
 
   useEffect(() => {
     const canvas = canvasRef.current;
@@ -54,7 +35,7 @@ export default function LissajousCurve() {
     const ctx = canvas.getContext("2d");
     if (!ctx) return;
 
-    // Resize handling
+    // Canvas DPR resize handling
     const resizeCanvas = () => {
       const dpr = window.devicePixelRatio || 1;
       const rect = canvas.getBoundingClientRect();
@@ -65,96 +46,96 @@ export default function LissajousCurve() {
     resizeCanvas();
     window.addEventListener("resize", resizeCanvas);
 
-    // Mouse events for §5.2 interaction
-    canvas.addEventListener("mousemove", handleMouseMove);
-    canvas.addEventListener("mouseleave", handleMouseLeave);
+    const prefersReducedMotion =
+      typeof window !== "undefined" && typeof window.matchMedia === "function"
+        ? window.matchMedia("(prefers-reduced-motion: reduce)").matches
+        : false;
 
-    // Check reduced motion preference (§10.5)
-    const prefersReducedMotion = window.matchMedia(
-      "(prefers-reduced-motion: reduce)"
-    ).matches;
+    const baseSpeed = 0.015;
+    const keplerK = 0.55; // Speed reduction factor at apoapsis (periphery)
+    const maxTrailLength = 700; // Extended phosphor trail depth (120 points)
 
     const draw = () => {
       const rect = canvas.getBoundingClientRect();
       const width = rect.width;
       const height = rect.height;
 
-      // Slow easing for mouse influence — §5.2 "over a slow easing"
-      const mouse = mouseInfluenceRef.current;
-      mouse.currentRatio += (mouse.targetRatio - mouse.currentRatio) * 0.02;
-
-      // Time progression (slow oscillation for organic feel)
-      if (!prefersReducedMotion) {
-        timeRef.current += 0.003;
-      }
-      const t = timeRef.current;
-
       ctx.clearRect(0, 0, width, height);
 
-      // Compute frequency ratio with mouse perturbation
-      const a = BASE_A + mouse.currentRatio;
+      // Fixed static geometry ratios
+      const a = BASE_A;
       const b = BASE_B;
 
-      // Drawing area with padding
       const padX = width * 0.15;
       const padY = height * 0.15;
       const drawW = width - padX * 2;
       const drawH = height - padY * 2;
+      const centerX = width / 2;
+      const centerY = height / 2;
+      const maxRadius = Math.sqrt((drawW / 2) ** 2 + (drawH / 2) ** 2);
 
-      // §5.2 P0 — render three curves at different phase offsets
-      const curvesToRender = prefersReducedMotion ? [CURVES[0]] : CURVES;
+      // Render 3 orbiting points and fading trails (§5.2 P0 & §5.2.1)
+      CURVES.forEach((curveConfig, index) => {
+        let t = timeRefs.current[index];
 
-      for (const curve of curvesToRender) {
-        ctx.beginPath();
-        ctx.strokeStyle = curve.color;
-        ctx.lineWidth = curve.lineWidth;
-        ctx.globalAlpha = curve.opacity;
+        // 1. Calculate current Lissajous track position
+        const { x, y, r } = computeLissajousPoint(
+          t,
+          a,
+          b,
+          curveConfig.phaseOffset,
+          drawW,
+          drawH,
+          centerX,
+          centerY
+        );
 
-        // Phase convergence animation — curves slowly converge and diverge
-        const convergenceFactor = prefersReducedMotion
-          ? 0
-          : Math.sin(t * 0.5) * 0.3;
-        const effectivePhaseOffset =
-          curve.phaseOffset * (1 - convergenceFactor * 0.5);
+        // 2. Compute Keplerian speed variation or constant speed (§5.2.1 & §5.2.4)
+        const currentSpeed = prefersReducedMotion
+          ? baseSpeed * 0.5
+          : computeKeplerSpeed(baseSpeed, keplerK, r, maxRadius);
 
-        for (let i = 0; i <= SAMPLE_COUNT; i++) {
-          const param = (i / SAMPLE_COUNT) * Math.PI * 2;
-          // Lissajous: x = sin(a·param + δ + phaseOffset), y = sin(b·param)
-          const x =
-            Math.sin(a * param + t + effectivePhaseOffset) * (drawW / 2) +
-            width / 2;
-          const y =
-            Math.sin(b * param + effectivePhaseOffset * 0.7) * (drawH / 2) +
-            height / 2;
+        // Advance angle parameter t
+        t += currentSpeed;
+        timeRefs.current[index] = t;
 
-          if (i === 0) {
-            ctx.moveTo(x, y);
-          } else {
-            ctx.lineTo(x, y);
+        // 3. Record point history for phosphor trail
+        const history = historyRefs.current[index];
+        history.unshift({ x, y, speed: currentSpeed });
+        if (history.length > maxTrailLength) {
+          history.pop();
+        }
+
+        // 4. Draw fading phosphor-persistence trail (§5.2.1)
+        const trail = generateTrailPoints(history);
+        if (trail.length > 1) {
+          for (let i = 0; i < trail.length - 1; i++) {
+            const p1 = trail[i];
+            const p2 = trail[i + 1];
+            const alpha = p1.alpha * curveConfig.opacity;
+
+            ctx.beginPath();
+            ctx.strokeStyle = curveConfig.color;
+            ctx.lineWidth = (1 - i / trail.length) * 2.5 + 0.5;
+            ctx.globalAlpha = alpha;
+            ctx.moveTo(p1.x, p1.y);
+            ctx.lineTo(p2.x, p2.y);
+            ctx.stroke();
           }
         }
 
-        ctx.stroke();
-        ctx.globalAlpha = 1;
-      }
+        // 5. Draw glowing head orbiting point (§5.2.1)
+        ctx.globalAlpha = 1.0;
+        ctx.shadowBlur = index === 0 ? 14 : 8;
+        ctx.shadowColor = curveConfig.color;
 
-      // Add subtle glow to central curve
-      if (!prefersReducedMotion) {
-        ctx.shadowBlur = 12;
-        ctx.shadowColor = "#a7f3c4";
         ctx.beginPath();
-        ctx.strokeStyle = "rgba(167, 243, 196, 0.15)";
-        ctx.lineWidth = 6;
-        for (let i = 0; i <= SAMPLE_COUNT; i++) {
-          const param = (i / SAMPLE_COUNT) * Math.PI * 2;
-          const x = Math.sin(a * param + t) * (drawW / 2) + width / 2;
-          const y = Math.sin(b * param) * (drawH / 2) + height / 2;
-          if (i === 0) ctx.moveTo(x, y);
-          else ctx.lineTo(x, y);
-        }
-        ctx.stroke();
+        ctx.fillStyle = curveConfig.headColor;
+        ctx.arc(x, y, curveConfig.pointRadius, 0, Math.PI * 2);
+        ctx.fill();
+
         ctx.shadowBlur = 0;
-      }
+      });
 
       animRef.current = requestAnimationFrame(draw);
     };
@@ -164,10 +145,8 @@ export default function LissajousCurve() {
     return () => {
       cancelAnimationFrame(animRef.current);
       window.removeEventListener("resize", resizeCanvas);
-      canvas.removeEventListener("mousemove", handleMouseMove);
-      canvas.removeEventListener("mouseleave", handleMouseLeave);
     };
-  }, [handleMouseMove, handleMouseLeave]);
+  }, []);
 
   return (
     <canvas
@@ -179,7 +158,7 @@ export default function LissajousCurve() {
         position: "absolute",
         inset: 0,
         zIndex: 1,
-        pointerEvents: "auto",
+        pointerEvents: "none",
       }}
       aria-hidden="true"
     />

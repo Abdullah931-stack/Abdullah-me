@@ -1,7 +1,7 @@
 "use client";
 
-import Link from "next/link";
 import { useTranslations, useLocale } from "next-intl";
+import { Link, usePathname } from "@/i18n/routing";
 import type { SocialLink } from "@/types";
 
 /**
@@ -139,6 +139,7 @@ function PlatformIcon({ platform }: { platform: string }) {
 export default function FooterClient({ socialLinks }: FooterClientProps) {
     const t = useTranslations("footer");
     const locale = useLocale();
+    const pathname = usePathname();
     const currentYear = new Date().getFullYear();
     const otherLocale = locale === "ar" ? "en" : "ar";
 
@@ -176,7 +177,9 @@ export default function FooterClient({ socialLinks }: FooterClientProps) {
                         <span>{t("madeWith")} Abdullah</span>
                         <span className="h-3 w-px" style={{ background: 'var(--color-card-border)' }}></span>
                         <Link
-                            href={`/${otherLocale}`}
+                            href={pathname}
+                            locale={otherLocale}
+                            scroll={false}
                             className="font-medium hover:text-[var(--color-accent)] transition-colors"
                         >
                             {locale === "ar" ? "English" : "AR"}

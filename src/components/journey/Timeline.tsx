@@ -3,58 +3,34 @@
 import { useState, useMemo } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import { useLocale, useTranslations } from "next-intl";
+import Link from "next/link";
 import type { TimelineEntry } from "@/types";
+import {
+  computeGap,
+  daysBetween,
+  getEffectiveDate,
+  getRangeDurationDays,
+  computeRangeBracketHeight,
+  computeRailExtensions,
+  isProjectLinked,
+} from "./timelineMath";
 
 /**
- * Timeline — v2.0 "Signal & Growth" Journey Page
+ * Timeline — v2.0 "Lab Notebook / Signal & Growth" Journey Page
  *
- * Implements §11 of UI/UX Spec:
- * - §11.1: Removed alternating zigzag layout
- * - §11.2: No code/git metaphors — lab notebook register
- * - §11.3: Single rail, reading-direction-leading side (RTL right, LTR left)
- * - §11.4: Spacing algorithm — log-compressed by real elapsed time
- * - §11.5: Uncertainty brackets for ranged dates (dateTo field, §12.2)
- * - §11.6: Per-entry expand — accordion in-place, NOT card-grid pattern
- * - §11.7: Content-duplication rule (brief for projects, full for standalone)
- * - §11.8: Imagery — small 24-32px non-interactive badge
- * - §7.1: NO PulseBorder on timeline entries (explicitly excluded)
- *
- * Timestamps in JetBrains Mono (§11.2, §3)
+ * Implements §12 of UI/UX Spec:
+ * - §12.1: Single rail layout (removed alternating zigzag)
+ * - §12.2: Lab notebook measurement log register with JetBrains Mono timestamps
+ * - §12.3: Single rail on reading-direction-leading side (RTL right, LTR left) using CSS Logical Properties
+ * - §12.4: Logarithmic spacing formula gap(Δt) = base + k · ln(1 + Δt_days / τ)
+ * - §12.5: Translucent SVG curly bracket '{' / '}' on outer margin edge, log-scaled height, centered on node
+ * - §12.6: Per-entry accordion expand in-place (no PulseBorder)
+ * - §12.7: Content-duplication rule (brief context + "Full details →" for projects)
+ * - §12.8: Small 28px non-interactive logo/badge beside measurement point
  */
 
 interface TimelineProps {
   entries: TimelineEntry[];
-}
-
-/**
- * §11.4 — Logarithmic spacing algorithm
- * gap(Δt) = base + k · ln(1 + Δt_days / τ)
- */
-const SPACING_BASE = 40;  // Minimum readable spacing floor (px)
-const SPACING_K = 30;     // Scale factor
-const SPACING_TAU = 30;   // Calibration constant (days)
-
-function computeGap(daysDiff: number): number {
-  return SPACING_BASE + SPACING_K * Math.log(1 + daysDiff / SPACING_TAU);
-}
-
-function daysBetween(d1: Date, d2: Date): number {
-  return Math.abs(
-    (new Date(d2).getTime() - new Date(d1).getTime()) / (1000 * 60 * 60 * 24)
-  );
-}
-
-/**
- * §11.5 — For uncertain entries with dateTo, compute effective position
- * as the midpoint of the range
- */
-function getEffectiveDate(entry: TimelineEntry): Date {
-  if (entry.dateTo) {
-    const start = new Date(entry.date).getTime();
-    const end = new Date(entry.dateTo).getTime();
-    return new Date((start + end) / 2);
-  }
-  return new Date(entry.date);
 }
 
 export default function Timeline({ entries }: TimelineProps) {
@@ -63,7 +39,7 @@ export default function Timeline({ entries }: TimelineProps) {
   const [expandedId, setExpandedId] = useState<string | null>(null);
   const isRTL = locale === "ar";
 
-  // Sort entries chronologically and compute spacing
+  // Sort entries chronologically by effective date (midpoint for ranged dates)
   const sortedEntries = useMemo(() => {
     return [...entries].sort(
       (a, b) =>
@@ -71,7 +47,7 @@ export default function Timeline({ entries }: TimelineProps) {
     );
   }, [entries]);
 
-  // Compute gap for each entry pair (§11.4)
+  // Compute log-compressed gap for each entry pair (§12.4)
   const gaps = useMemo(() => {
     return sortedEntries.map((entry, i) => {
       if (i === 0) return 0;
@@ -79,6 +55,11 @@ export default function Timeline({ entries }: TimelineProps) {
       const curr = getEffectiveDate(entry);
       return computeGap(daysBetween(prev, curr));
     });
+  }, [sortedEntries]);
+
+  // Compute virtual rail launching extensions to encompass first/last range intervals (§12.5)
+  const { topExtension, bottomExtension } = useMemo(() => {
+    return computeRailExtensions(sortedEntries);
   }, [sortedEntries]);
 
   if (entries.length === 0) {
@@ -92,16 +73,33 @@ export default function Timeline({ entries }: TimelineProps) {
   }
 
   return (
-    <div className="relative mx-auto max-w-3xl">
-      {/* §11.3 — Single rail line, reading-direction-leading side */}
+    <div
+      dir={isRTL ? "rtl" : "ltr"}
+      className="relative mx-auto max-w-3xl px-4 sm:px-6"
+    >
+      {/* §12.3 — Single measurement rail line with virtual epoch top-down glowing ray using CSS Logical Properties */}
       <div
-        className="absolute top-0 h-full"
+        className="absolute"
         style={{
+          top: `-${topExtension}px`,
+          height: `calc(100% + ${topExtension + bottomExtension}px)`,
           width: "2px",
-          background: `linear-gradient(to bottom, transparent, var(--color-card-border) 5%, var(--color-card-border) 95%, transparent)`,
-          [isRTL ? "right" : "left"]: "20px",
+          background: `linear-gradient(to bottom, var(--color-accent) 0%, rgba(74, 222, 128, 0.6) 20%, var(--color-card-border) 70%, rgba(255, 255, 255, 0.05) 100%)`,
+          insetInlineStart: "var(--rail-offset, 1.5rem)",
         }}
-      />
+      >
+        {/* Topmost Virtual Rail Launching Node (virtual epoch start date) */}
+        <div
+          className="absolute -top-1 -left-[3px] rounded-full"
+          style={{
+            width: "8px",
+            height: "8px",
+            background: "var(--color-accent)",
+            boxShadow:
+              "0 0 12px var(--color-accent), 0 0 20px rgba(74, 222, 128, 0.8)",
+          }}
+        />
+      </div>
 
       {/* Timeline Entries */}
       <div className="flex flex-col">
@@ -114,6 +112,9 @@ export default function Timeline({ entries }: TimelineProps) {
           );
           const isExpanded = expandedId === entry.id;
           const hasRange = !!entry.dateTo;
+          const rangeDays = getRangeDurationDays(entry);
+          const bracketHeight = computeRangeBracketHeight(rangeDays);
+          const hasProjectLink = isProjectLinked(entry);
 
           return (
             <motion.div
@@ -122,49 +123,90 @@ export default function Timeline({ entries }: TimelineProps) {
               whileInView={{ opacity: 1, y: 0 }}
               viewport={{ once: true, margin: "-50px" }}
               transition={{ duration: 0.5, delay: index * 0.05 }}
-              // §11.4 — Log-compressed spacing
+              // §12.4 — Log-compressed spacing
               style={{ marginTop: index === 0 ? 0 : `${gaps[index]}px` }}
               className="relative"
             >
-              {/* Rail point marker */}
+              {/* Rail measurement marker (§12.5) */}
               <div
-                className="absolute top-3 z-10"
+                className="absolute top-3 z-10 flex flex-col items-center justify-center"
                 style={{
-                  [isRTL ? "right" : "left"]: "14px",
+                  insetInlineStart:
+                    "calc(var(--rail-offset, 1.5rem) - 0.3125rem)",
+                  width: "12px",
                 }}
               >
-                {hasRange ? (
-                  // §11.5 — Uncertainty bracket indicator
-                  <div
-                    style={{
-                      width: "14px",
-                      height: "14px",
-                      borderRadius: "2px",
-                      border: "2px solid var(--color-accent)",
-                      background: "transparent",
-                      opacity: 0.7,
-                    }}
-                  />
-                ) : (
-                  // Precise point
-                  <div
-                    style={{
-                      width: "12px",
-                      height: "12px",
-                      borderRadius: "50%",
-                      background: "var(--color-accent)",
-                      boxShadow: "0 0 8px rgba(74, 222, 128, 0.3)",
-                    }}
-                  />
-                )}
+                {/* Precise Measurement Node on the rail line */}
+                <div
+                  style={{
+                    width: "10px",
+                    height: "10px",
+                    borderRadius: "50%",
+                    background: "var(--color-accent)",
+                    boxShadow: "0 0 10px rgba(74, 222, 128, 0.5)",
+                  }}
+                />
               </div>
 
-              {/* §11.8 — Optional image badge (24-32px) */}
+              {/* §12.5 — Uncertainty Curly Bracket '{' / '}' centered on measurement node, on outer margin edge */}
+              {hasRange && (
+                <div
+                  className="absolute z-10 flex items-center justify-center pointer-events-none"
+                  style={{
+                    top: "17px",
+                    transform: "translateY(-50%)",
+                    // Dynamic outer margin edge using CSS Logical Property
+                    insetInlineStart:
+                      "calc(var(--rail-offset, 1.5rem) - 1.125rem)",
+                    height: `${bracketHeight}px`,
+                  }}
+                  title={
+                    locale === "ar"
+                      ? `نطاق زمني مقدر (${Math.round(rangeDays)} يوم)`
+                      : `Estimated range interval (${Math.round(rangeDays)} days)`
+                  }
+                >
+                  <svg
+                    viewBox="0 0 16 100"
+                    preserveAspectRatio="none"
+                    style={{
+                      height: `${bracketHeight}px`,
+                      width: "14px",
+                      filter: "drop-shadow(0 0 4px rgba(74, 222, 128, 0.5))",
+                    }}
+                  >
+                    {isRTL ? (
+                      // RTL: Bracket at outer right edge, curved back at x=14, tips pointing left towards rail & text card
+                      <path
+                        d="M 14 2 C 4 2, 4 25, 4 45 C 4 48, 1 50, 1 50 C 1 50, 4 52, 4 55 C 4 75, 4 98, 14 98"
+                        fill="none"
+                        stroke="var(--color-accent)"
+                        strokeWidth="2.5"
+                        strokeLinecap="round"
+                        opacity="0.85"
+                      />
+                    ) : (
+                      // LTR: Bracket at outer left edge, curved back at x=2, tips pointing right towards rail & text card
+                      <path
+                        d="M 2 2 C 12 2, 12 25, 12 45 C 12 48, 15 50, 15 50 C 15 50, 12 52, 12 55 C 12 75, 12 98, 2 98"
+                        fill="none"
+                        stroke="var(--color-accent)"
+                        strokeWidth="2.5"
+                        strokeLinecap="round"
+                        opacity="0.85"
+                      />
+                    )}
+                  </svg>
+                </div>
+              )}
+
+              {/* §12.8 — Small non-interactive logo/badge (28px) */}
               {entry.imageUrl && (
                 <div
                   className="absolute top-2"
                   style={{
-                    [isRTL ? "right" : "left"]: "38px",
+                    insetInlineStart:
+                      "calc(var(--rail-offset, 1.5rem) + 1rem)",
                   }}
                 >
                   <img
@@ -175,28 +217,29 @@ export default function Timeline({ entries }: TimelineProps) {
                       height: "28px",
                       borderRadius: "6px",
                       objectFit: "cover",
+                      border: "1px solid var(--color-card-border)",
                     }}
                   />
                 </div>
               )}
 
-              {/* Entry Content — §11.6: accordion in-place expand */}
+              {/* Entry Content Card — §12.6: in-place accordion expand using dynamic CSS Logical Property */}
               <div
                 className="cursor-pointer rounded-xl p-5 transition-all duration-300"
                 style={{
-                  [isRTL ? "marginRight" : "marginLeft"]: entry.imageUrl
-                    ? "76px"
-                    : "48px",
+                  marginInlineStart: entry.imageUrl
+                    ? "calc(var(--rail-offset, 1.5rem) + 3.25rem)"
+                    : "calc(var(--rail-offset, 1.5rem) + 1.75rem)",
                   background: isExpanded
                     ? "rgba(255, 255, 255, 0.04)"
-                    : "transparent",
+                    : "rgba(255, 255, 255, 0.015)",
+                  border: "1px solid var(--color-card-border)",
+                  textAlign: "start",
                 }}
-                onClick={() =>
-                  setExpandedId(isExpanded ? null : entry.id)
-                }
+                onClick={() => setExpandedId(isExpanded ? null : entry.id)}
               >
-                {/* Date & Age — §11.2: JetBrains Mono timestamps */}
-                <div className="flex items-center gap-3 mb-2">
+                {/* Date & Age — §12.2: JetBrains Mono timestamps */}
+                <div className="flex flex-wrap items-center gap-3 mb-2">
                   <span
                     className="text-sm font-medium"
                     style={{
@@ -213,10 +256,11 @@ export default function Timeline({ entries }: TimelineProps) {
                       )}`}
                   </span>
                   <span
-                    className="rounded-full px-2 py-0.5 text-xs"
+                    className="rounded-full px-2.5 py-0.5 text-xs font-mono"
                     style={{
                       background: "var(--color-surface)",
                       color: "var(--color-muted)",
+                      border: "1px solid var(--color-card-border)",
                       fontFamily: "var(--font-jetbrains-mono), monospace",
                     }}
                   >
@@ -232,7 +276,7 @@ export default function Timeline({ entries }: TimelineProps) {
                   {title}
                 </h3>
 
-                {/* §11.6 — Accordion expand */}
+                {/* §12.6 & §12.7 — Accordion expand with Content Duplication Rule */}
                 <AnimatePresence>
                   {isExpanded && (
                     <motion.div
@@ -248,6 +292,26 @@ export default function Timeline({ entries }: TimelineProps) {
                       >
                         {story}
                       </p>
+
+                      {/* §12.7 — Project link when timeline entry corresponds to portfolio project */}
+                      {hasProjectLink && entry.projectSlug && (
+                        <div className="mt-4 pt-3 border-t border-[var(--color-card-border)]">
+                          <Link
+                            href={`/${locale}/projects/${entry.projectSlug}`}
+                            className="inline-flex items-center text-xs font-medium transition-colors"
+                            style={{
+                              color: "var(--color-accent)",
+                              fontFamily:
+                                "var(--font-jetbrains-mono), monospace",
+                            }}
+                            onClick={(e) => e.stopPropagation()}
+                          >
+                            {locale === "ar"
+                              ? "التفاصيل الكاملة للمشروع ←"
+                              : "Full project details →"}
+                          </Link>
+                        </div>
+                      )}
                     </motion.div>
                   )}
                 </AnimatePresence>
@@ -255,7 +319,7 @@ export default function Timeline({ entries }: TimelineProps) {
                 {/* Collapsed preview — first line only */}
                 {!isExpanded && (
                   <p
-                    className="line-clamp-1 text-sm"
+                    className="line-clamp-1 text-sm mt-1"
                     style={{ color: "var(--color-muted)", opacity: 0.7 }}
                   >
                     {story}

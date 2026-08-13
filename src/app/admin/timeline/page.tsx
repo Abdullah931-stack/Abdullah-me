@@ -18,6 +18,7 @@ export default function AdminTimelinePage() {
     const [form, setForm] = useState({
         date: "",
         dateTo: "",
+        projectSlug: "",
         age: 0,
         titleAr: "",
         titleEn: "",
@@ -83,6 +84,7 @@ export default function AdminTimelinePage() {
         setForm({
             date: entry.date.split("T")[0],
             dateTo: entry.dateTo ? entry.dateTo.split("T")[0] : "",
+            projectSlug: entry.projectSlug || "",
             age: entry.age,
             titleAr: entry.titleAr,
             titleEn: entry.titleEn,
@@ -98,6 +100,7 @@ export default function AdminTimelinePage() {
         setForm({
             date: "",
             dateTo: "",
+            projectSlug: "",
             age: 0,
             titleAr: "",
             titleEn: "",
@@ -176,6 +179,23 @@ export default function AdminTimelinePage() {
                             }
                             className="rounded-lg border border-gray-700 bg-gray-800 px-4 py-2.5 text-white focus:border-teal-500 focus:outline-none"
                         />
+                    </div>
+                    {/* §12.7 — Related Project Slug (optional) */}
+                    <div>
+                        <label className="block text-xs mb-1" style={{ color: 'var(--color-muted)', fontFamily: 'var(--font-jetbrains-mono), monospace' }}>
+                            Related Project Slug (optional — §12.7)
+                        </label>
+                        <input
+                            type="text"
+                            placeholder="e.g. quantum-sim"
+                            value={form.projectSlug}
+                            onChange={(e) => setForm({ ...form, projectSlug: e.target.value })}
+                            className="w-full rounded-lg px-4 py-2.5 focus:outline-none transition-all"
+                            style={{ border: '1px solid var(--color-card-border)', background: 'rgba(255,255,255,0.04)', color: 'var(--color-text)' }}
+                        />
+                        <p className="text-xs mt-1" style={{ color: 'var(--color-muted)', opacity: 0.7 }}>
+                            If provided, expanding this milestone will show 1–2 lines of personal context and a link to the project detail page.
+                        </p>
                     </div>
                     <div className="grid grid-cols-1 gap-4 md:grid-cols-2">
                         <input

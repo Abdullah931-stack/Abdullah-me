@@ -5,6 +5,7 @@ import { routing } from "@/i18n/routing";
 import Navbar from "@/components/shared/Navbar";
 import Footer from "@/components/shared/Footer";
 import PageTransition from "@/components/shared/PageTransition";
+import ScrollRestoration from "@/components/shared/ScrollRestoration";
 import SurveyPopup from "@/components/survey/SurveyPopup";
 
 // ─────────────────────────────────────────────
@@ -69,6 +70,7 @@ export default async function LocaleLayout({
                 }}
             />
             <NextIntlClientProvider messages={messages}>
+                <ScrollRestoration />
                 <Navbar />
                 <PageTransition>
                     <main className="pt-[72px]">{children}</main>

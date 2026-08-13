@@ -26,6 +26,7 @@ export async function PUT(
             data: {
                 date: body.date ? new Date(body.date) : undefined,
                 dateTo: body.dateTo ? new Date(body.dateTo) : null,
+                projectSlug: body.projectSlug !== undefined ? body.projectSlug || null : undefined,
                 age: body.age,
                 titleAr: body.titleAr,
                 titleEn: body.titleEn,

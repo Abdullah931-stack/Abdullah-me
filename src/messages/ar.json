@@ -45,7 +45,7 @@
   "journey": {
     "title": "رحلتي",
     "subtitle": "قصة شغف بدأت من الصفر",
-    "age": "العمر آنذاك"
+    "age": "عمري آنذاك"
   },
   "contact": {
     "title": "تواصل معي",
@@ -55,6 +55,7 @@
     "reason": "سبب التواصل",
     "message": "الرسالة",
     "submit": "إرسال",
+    "clearForm": "تفريغ النموذج",
     "reasons": {
       "general": "استفسار عام",
       "bug-report": "الإبلاغ عن مشكلة في مشروع",
@@ -62,7 +63,7 @@
       "collaboration": "فرصة تعاون أو توظيف"
     },
     "projectPicker": "اختر المشروع",
-    "projectPickerOther": "أخرى (غير مدرجة)",
+    "projectPickerOther": "أخرى (غير مدرج)",
     "projectPickerOtherInput": "اذكر اسم المشروع",
     "success": {
       "title": "تم إرسال رسالتك",
