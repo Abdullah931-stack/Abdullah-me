@@ -270,7 +270,7 @@ model ProjectImage {
 }
 
 // ─────────────────────────────────────────────
-// Timeline Entries (Journey)
+//  Timeline Entries (Journey)
 // ─────────────────────────────────────────────
 model TimelineEntry {
   id          String   @id @default(cuid())

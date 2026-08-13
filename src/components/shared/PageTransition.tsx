@@ -7,12 +7,13 @@ import type { ReactNode } from "react";
 /**
  * Page Transition — Quiet Luxury
  * Wraps page content with a smooth fade transition on route changes.
+ * Uses initial={false} to ensure instant first-page render without initial opacity delay.
  */
 export default function PageTransition({ children }: { children: ReactNode }) {
     const pathname = usePathname();
 
     return (
-        <AnimatePresence mode="wait">
+        <AnimatePresence mode="wait" initial={false}>
             <motion.div
                 key={pathname}
                 initial={{ opacity: 0 }}
