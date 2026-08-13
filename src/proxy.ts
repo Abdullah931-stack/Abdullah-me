@@ -2,7 +2,7 @@ import createMiddleware from "next-intl/middleware";
 import { routing } from "./i18n/routing";
 
 /**
- * Middleware for:
+ * Proxy (formerly Middleware) for Next.js 16:
  * 1. i18n — Detects locale from Accept-Language header (NOT navigator.language)
  *    to prevent Hydration Mismatch.
  * 2. Redirects to /{locale}/... paths automatically.
@@ -10,7 +10,8 @@ import { routing } from "./i18n/routing";
  * Note: Admin routes (/admin/*) are excluded from i18n
  * and handled separately with Supabase Auth protection.
  */
-export default createMiddleware(routing);
+export const proxy = createMiddleware(routing);
+export default proxy;
 
 export const config = {
     // Match all pathnames except:

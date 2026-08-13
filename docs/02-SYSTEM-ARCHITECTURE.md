@@ -69,7 +69,7 @@ sequenceDiagram
 
     Note over V,FE: --- Automatic Locale Detection ---
     V->>FE: Initial Visit
-    FE->>FE: middleware.ts detects Accept-Language → Set Locale (AR/EN)
+    FE->>FE: proxy.ts detects Accept-Language → Set Locale (AR/EN)
     FE->>FE: Display Survey Popup if no tracker Cookie exists
 
     Note over V,SB: --- Survey Flow ---
@@ -722,7 +722,7 @@ Designed to satisfy **NFR-01** (Minimizing loading durations):
 | Metric | Configuration |
 |---|---|
 | **Supported Locales** | Arabic (ar) + English (en) |
-| **Locale Resolution** | 🆕 Parse `Accept-Language` headers in **`middleware.ts`** (prevents client hydration mismatches) |
+| **Locale Resolution** | 🆕 Parse `Accept-Language` headers in **`proxy.ts`** (prevents client hydration mismatches) |
 | **Manual Switching** | Interactive locale toggling within the Navigation bar |
 | **Visual Direction** | Dynamic CSS styling: RTL for Arabic, LTR for English |
 | **URI Patterns** | Routing prefixes `/{locale}/page` (e.g. `/ar/portfolio`, `/en/portfolio`) |
@@ -730,7 +730,7 @@ Designed to satisfy **NFR-01** (Minimizing loading durations):
 | **CMS Entities** | Database entries require localized field pairs (`title_ar`, `title_en`, etc.) |
 
 > [!WARNING]
-> **Hydration Warning:** Do not read `navigator.language` directly in Client Components to resolve default locales. This leads to Hydration Mismatches between server renders and client instances. Always resolve locales on edge routes (middleware.ts).
+> **Hydration Warning:** Do not read `navigator.language` directly in Client Components to resolve default locales. This leads to Hydration Mismatches between server renders and client instances. Always resolve locales on edge routes (proxy.ts).
 
 ---
 

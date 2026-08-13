@@ -1,9 +1,11 @@
 import type { Metadata } from "next";
 import "@/app/globals.css";
+import { spaceGrotesk, ibmPlexSansArabic, jetbrainsMono } from "@/app/fonts";
 
 /**
  * Root Layout — v2.0 "Signal & Growth"
- * Delegated to [locale]/layout.tsx for native SSR lang and dir attributes.
+ * Provides root <html> and <body> tags required by Next.js 16 App Router.
+ * Locale-specific attributes (lang/dir) are applied in [locale]/layout.tsx wrapper.
  */
 export const metadata: Metadata = {
   title: {
@@ -19,5 +21,18 @@ export default function RootLayout({
 }: {
   children: React.ReactNode;
 }) {
-  return children;
+  return (
+    <html
+      suppressHydrationWarning
+      className={`${spaceGrotesk.variable} ${ibmPlexSansArabic.variable} ${jetbrainsMono.variable}`}
+    >
+      <body
+        className="antialiased bg-[var(--color-bg)] text-[var(--color-text)] font-sans selection:bg-[var(--color-accent)]/20"
+        suppressHydrationWarning
+      >
+        {children}
+      </body>
+    </html>
+  );
 }
+
