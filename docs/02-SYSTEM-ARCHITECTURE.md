@@ -767,3 +767,37 @@ Designed to satisfy **NFR-01** (Minimizing loading durations):
 | **Engagement Logs** | PostgreSQL entries stored via welcome survey APIs |
 | **Privacy Standards** | IP addresses and personal identifiers are omitted from database metrics |
 | **Motivation** | Prevent write bottlenecks on landing queries and satisfy GDPR regulations |
+
+---
+
+## 12. Client-Side Animation & Routing Architecture
+
+### 12.1 App Router Context Preservation (`FrozenRouter`)
+
+When combining Framer Motion's `<AnimatePresence mode="wait">` with Next.js App Router and `next-intl` localization, client-side navigation (`<Link>` transitions) can suffer from **Router Context Tearing**.
+
+#### The Problem:
+- Upon clicking a navigation link, Next.js instantly updates the internal `LayoutRouterContext` and locale dictionary context.
+- However, `<AnimatePresence mode="wait">` holds onto the unmounting page component for the duration of the exit animation (e.g. `250ms`).
+- During this exit window, the unmounting Client Component re-renders against the newly updated router context, causing translation hooks (`useTranslations()`) and component props to evaluate to empty values (`""`), resulting in blank text, empty DOM cards, and flashing layout boxes between header and footer.
+
+#### The Solution:
+The `FrozenRouter` pattern is implemented in [`src/components/shared/PageTransition.tsx`](file:///d:/Projects/abdullah-div/src/components/shared/PageTransition.tsx):
+- Captures the initial `LayoutRouterContext` via `useContext` and holds a frozen reference in `useRef(context).current`.
+- Wraps exiting children inside `<LayoutRouterContext.Provider value={frozen}>` during the exit transition.
+- Guarantees that unmounting page trees preserve their original route context, server props, and translation messages without context tearing.
+
+> [!WARNING]
+> **Internal Next.js API Maintenance Note:**
+> `FrozenRouter` imports `LayoutRouterContext` from `next/dist/shared/lib/app-router-context.shared-runtime`. This is an internal Next.js import path. An explicit warning comment is maintained above the import. Re-verify this import path whenever upgrading Next.js versions.
+
+---
+
+### 12.2 Shared-Element Expansion & Backdrop Overlay Isolation
+
+In [`src/components/portfolio/PortfolioList.tsx`](file:///d:/Projects/abdullah-div/src/components/portfolio/PortfolioList.tsx), shared-element card expansions (`layoutId`) and modal backdrops are architected with strict isolation:
+
+- **Single Encapsulation:** Backdrop overlay (`fixed inset-0 z-40`) and modal card container are encapsulated within a single `<AnimatePresence>` block to prevent orphan backdrop layers.
+- **Route & Unmount Cleanup:** A `useEffect` hook listening to `pathname` automatically resets `selectedId` to `null` on route changes or component unmounting.
+- **Isolated LayoutGroup:** Grid items are wrapped in `<LayoutGroup id={`portfolio-grid-${locale}`}>` to prevent Framer Motion from registering layout projection nodes globally across route boundaries.
+
