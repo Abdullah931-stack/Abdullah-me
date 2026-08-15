@@ -4,7 +4,6 @@ import type {
     ContactReason,
     EmailStatus,
     MessageInput,
-    SurveySubmission,
     ApiResponse,
 } from "@/types";
 
@@ -64,22 +63,6 @@ describe("Type Definitions", () => {
 
             expect(message.reason).toBe("bug-report");
             expect(message.projectRef).toBe("Portfolio Website");
-        });
-    });
-
-    describe("SurveySubmission", () => {
-        it("should create a valid survey submission", () => {
-            const submission: SurveySubmission = {
-                visitorId: "test-uuid",
-                locale: "en",
-                responses: [
-                    { questionId: "q1", answer: "LinkedIn" },
-                    { questionId: "q2", answer: "Free text answer" },
-                ],
-            };
-
-            expect(submission.responses).toHaveLength(2);
-            expect(submission.locale).toBe("en");
         });
     });
 

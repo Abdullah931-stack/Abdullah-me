@@ -17,9 +17,9 @@ export default async function HomePage({ params }: HomePageProps) {
   const { locale } = await params;
   setRequestLocale(locale);
 
-  // Fetch featured published projects
-  const featuredProjects = await prisma.project.findMany({
-    where: { isPublished: true, isFeatured: true },
+  // Fetch published projects
+  const projects = await prisma.project.findMany({
+    where: { isPublished: true },
     include: {
       images: { orderBy: { order: "asc" } },
     },
@@ -32,10 +32,10 @@ export default async function HomePage({ params }: HomePageProps) {
       <HeroSection />
 
       {/* §6 — Project Grid: Uniform grid with shared-element expand */}
-      {featuredProjects.length > 0 && (
+      {projects.length > 0 && (
         <section id="projects" className="py-24">
           <div className="mx-auto max-w-7xl px-6">
-            <PortfolioList projects={featuredProjects} />
+            <PortfolioList projects={projects} />
           </div>
         </section>
       )}

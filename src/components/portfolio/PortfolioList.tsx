@@ -7,6 +7,7 @@ import { usePathname } from "next/navigation";
 import type { Project } from "@/types";
 import PulseBorder from "@/components/shared/PulseBorder";
 import ProjectDetail from "@/components/portfolio/ProjectDetail";
+import MarkdownRenderer from "@/components/shared/MarkdownRenderer";
 
 /**
  * PortfolioList — Uniform Grid with Shared-Element Expand Panel
@@ -34,11 +35,10 @@ export default function PortfolioList({ projects }: PortfolioListProps) {
   const pathname = usePathname();
   const [selectedId, setSelectedId] = useState<string | null>(null);
 
-  // Reset selected state on route change or component unmount to prevent stuck overlays
+  // Reset selected state on component unmount to prevent stuck overlays
   useEffect(() => {
-    setSelectedId(null);
     return () => setSelectedId(null);
-  }, [pathname]);
+  }, []);
 
   // Lock body scroll when modal is expanded
   useEffect(() => {
@@ -81,7 +81,7 @@ export default function PortfolioList({ projects }: PortfolioListProps) {
       const selectedPos = getGridPos(selectedIndex);
       const distance = Math.sqrt(
         Math.pow(cardPos.row - selectedPos.row, 2) +
-          Math.pow(cardPos.col - selectedPos.col, 2)
+        Math.pow(cardPos.col - selectedPos.col, 2)
       );
       return distance * 0.06; // §6.3 — unitDelay ≈ 60ms
     },
@@ -115,7 +115,9 @@ export default function PortfolioList({ projects }: PortfolioListProps) {
             const title = locale === "ar" ? project.titleAr : project.titleEn;
             const summary =
               locale === "ar" ? project.summaryAr : project.summaryEn;
-            const coverImage = project.images?.[0];
+            const coverImage =
+              project.images?.find((img) => img.isCover) ||
+              project.images?.[0];
             const isSelected = project.id === selectedId;
 
             return (
@@ -146,9 +148,9 @@ export default function PortfolioList({ projects }: PortfolioListProps) {
                       background: "rgba(255, 255, 255, 0.035)",
                     }}
                   >
-                    {/* Cover Image */}
+                    {/* Cover Image — Full uncropped aspect ratio */}
                     {coverImage && (
-                      <div className="aspect-video overflow-hidden">
+                      <div className="w-full overflow-hidden flex items-center justify-center bg-black/30 p-2 min-h-[180px] max-h-[300px]">
                         <img
                           src={coverImage.url}
                           alt={
@@ -156,7 +158,7 @@ export default function PortfolioList({ projects }: PortfolioListProps) {
                               ? coverImage.altAr || title
                               : coverImage.altEn || title
                           }
-                          className="h-full w-full object-cover transition-transform duration-500 hover:scale-105"
+                          className="max-h-[280px] w-auto max-w-full object-contain transition-transform duration-500 hover:scale-105"
                           loading="lazy"
                         />
                       </div>
@@ -171,30 +173,37 @@ export default function PortfolioList({ projects }: PortfolioListProps) {
                         {title}
                       </h3>
 
-                      <p
-                        className="mb-4 line-clamp-2 text-sm"
-                        style={{ color: "var(--color-muted)" }}
-                      >
-                        {summary}
-                      </p>
+                      <div className="mb-4 line-clamp-2 text-sm">
+                        <MarkdownRenderer content={summary} />
+                      </div>
 
-                      {/* Skills */}
+                      {/* Skills — Render logo icon image instead of raw URL string */}
                       <div className="flex flex-wrap gap-1.5">
-                        {project.skills.slice(0, 4).map((skill) => (
-                          <span
-                            key={skill}
-                            className="rounded-full px-2.5 py-0.5 text-xs"
-                            style={{
-                              background: "var(--color-surface)",
-                              color: "var(--color-muted)",
-                            }}
-                          >
-                            {skill}
-                          </span>
-                        ))}
+                        {project.skills.slice(0, 4).map((skillStr) => {
+                          const [skillName, skillIcon] = skillStr.split("|");
+                          return (
+                            <span
+                              key={skillStr}
+                              className="inline-flex items-center gap-1.5 rounded-full px-2.5 py-0.5 text-xs font-medium"
+                              style={{
+                                background: "var(--color-surface)",
+                                color: "var(--color-muted)",
+                              }}
+                            >
+                              {skillIcon && (
+                                <img
+                                  src={skillIcon}
+                                  alt={skillName}
+                                  className="h-3.5 w-3.5 rounded-full object-cover"
+                                />
+                              )}
+                              <span>{skillName}</span>
+                            </span>
+                          );
+                        })}
                         {project.skills.length > 4 && (
                           <span
-                            className="text-xs"
+                            className="text-xs self-center"
                             style={{ color: "var(--color-muted)" }}
                           >
                             +{project.skills.length - 4}
@@ -214,7 +223,7 @@ export default function PortfolioList({ projects }: PortfolioListProps) {
           {selectedProject && (
             <div
               key="portfolio-modal-wrapper"
-              className="fixed inset-0 z-40 flex items-center justify-center p-4 md:p-8 lg:p-16"
+              className="fixed inset-0 z-[100] flex items-center justify-center p-3 sm:p-5 md:p-8"
             >
               {/* Single Shared Backdrop Overlay */}
               <motion.div
@@ -223,24 +232,20 @@ export default function PortfolioList({ projects }: PortfolioListProps) {
                 animate={{ opacity: 1 }}
                 exit={{ opacity: 0 }}
                 transition={{ duration: 0.25 }}
-                className="absolute inset-0 z-0"
+                className="fixed inset-0 z-0"
                 style={{
-                  background: "rgba(5, 15, 10, 0.85)",
-                  backdropFilter: "blur(4px)",
-                  WebkitBackdropFilter: "blur(4px)",
+                  background: "rgba(5, 15, 10, 0.88)",
+                  backdropFilter: "blur(8px)",
+                  WebkitBackdropFilter: "blur(8px)",
                 }}
                 onClick={() => setSelectedId(null)}
               />
 
-              {/* Expanded Project Detail Panel */}
+              {/* Expanded Project Detail Panel — Standalone Responsive Closed Rectangle */}
               <motion.div
                 key={`expanded-${selectedProject.id}`}
                 layoutId={`card-${selectedProject.id}`}
-                className="relative z-10 w-full h-full max-w-5xl overflow-y-auto rounded-2xl"
-                style={{
-                  background: "var(--color-bg)",
-                  border: "1px solid var(--color-card-border)",
-                }}
+                className="relative z-10 w-full max-w-[92vw] xl:max-w-6xl max-h-[90vh] overflow-y-auto rounded-2xl shadow-2xl my-auto border border-[var(--color-card-border)] bg-[var(--color-bg)]"
                 initial={{ opacity: 0, scale: 0.96 }}
                 animate={{ opacity: 1, scale: 1 }}
                 exit={{ opacity: 0, scale: 0.96 }}

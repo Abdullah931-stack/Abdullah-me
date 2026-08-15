@@ -3,7 +3,7 @@
 
 > **File status:** This document is a **full replacement** for both `docs/03-UI-UX-SPECIFICATIONS.md` and `docs/04-MOTION-SPEC.md`. Delete both source files and replace them with this one before beginning implementation. Visual and motion specifications are merged into a single document because, in this redesign, they are not separable: several components (the background system, the card-grid transition, the border-pulse interaction) are defined by their motion behavior as much as by their static appearance.
 >
-> **Status legend used throughout:** ✅ Decided & final · 🧩 Decided, but blocked on a database/schema change (tracked in §13) · 🔭 Documented future upgrade path, explicitly out of v1 scope.
+> **Status legend used throughout:** ✅ Decided & final · 🔭 Documented future upgrade path, explicitly out of v1 scope. (Database schema specifications are centrally maintained in `docs/02-SYSTEM-ARCHITECTURE.md`).
 
 ---
 
@@ -338,22 +338,18 @@ Computed once, on click, over ≤ ~15 cards — negligible cost regardless of th
 
 **Why a single shared overlay, not per-card blur:** `filter: blur()` recalculated per element every frame is expensive on the GPU; animating it across 5–15 cards simultaneously risks visible jank. A single overlay animating only `opacity` achieves the same focal effect at effectively zero cost, since `opacity`/`transform` are the two properties browsers can composite without triggering repaint.
 
-### 6.4 Closing-Card Dissolve Effect
+### 6.4 Standalone Responsive Closed Rectangle Modal Geometry & Layering
 
-The card being closed (not the whole grid) uses a directional "dissolve" derived from the **same** distance/angle data already computed for the ripple — no separate calculation:
+When a project card expands into detail view (`PortfolioList.tsx` or in-place modal overlay in `Timeline.tsx`), the container geometry is strictly bounded to form a standalone floating rectangle:
 
-```
-angle(i) = atan2(dy, dx)   // dx, dy already computed for distance(i) above
-```
-
-**Implementation:** one shared SVG filter (`feTurbulence` + `feDisplacementMap`), defined once in the document and referenced via `filter: url(#dissolve)` from any card — never duplicated per instance. Directionality comes from a `mask-image: linear-gradient(...)` rotated per-card via a CSS custom property `--wave-angle` (set to `angle(i)`), animated via `--progress` sweeping from the edge nearest the clicked card outward to the farthest edge.
-
-**Rejected alternatives** (heavier, evaluated and declined):
-
-| Approach | Why rejected |
-|---|---|
-| Full particle system (`html2canvas` → physics-simulated particles) | DOM→canvas conversion breaks Arabic/RTL text and diacritic rendering; adds ~200KB dependency; unjustified for a portfolio site |
-| Tile-grid pseudo-particle dissolve (~36 sub-divs per card, staggered fade) | 30+ extra DOM nodes generated per open/close cycle; looks synthetic up close |
+| Parameter | Specification | Purpose |
+|---|---|---|
+| **Layering (`z-index`)** | `z-[100]` | Overlays fixed top navbar (`z-50`), ensuring backdrop blur (`rgba(5,15,10,0.88)`, `backdrop-blur-md`) covers 100% of viewport |
+| **Horizontal Width** | Fully fluid responsive `w-full max-w-[92vw] xl:max-w-6xl` | Scales dynamically & fluidly across all screen sizes without fixed pixel restrictions |
+| **Vertical Limit** | Relative `max-h-[90vh]` | Bounds the card vertically relative to viewport height, leaving a 5vh margin above and below |
+| **Viewport Centering** | `my-auto`, `flex items-center justify-center` | Centers the rectangle vertically and horizontally in the viewport so it never touches or attaches to viewport edges |
+| **Outer Padding** | Responsive `p-3 sm:p-5 md:p-8` | Guarantees clear 360° spacing around the floating card on all device sizes |
+| **Top Safe Padding** | `pt-10 sm:pt-6` (inside `ProjectDetail.tsx`) | Ensures close button `✕` and `<h1>` title have ample breathing room with zero top clipping |
 
 ---
 
@@ -404,6 +400,15 @@ This keeps the reference video's core property — **a stable lit state with no 
 | Pulse count | `n(t) = n₀ + ⌊log₂(t/t₀)⌋`, capped at `n_max = 6` | No longer needed — nothing repeats, so there is nothing to count or cap |
 | Real-world cost flagged during review | Hovering quickly across a grid of 10–15 cards during normal browsing would fire pulses on every card in rapid succession, reading as a field of flickering flashes — directly against the precision/luxury mandate this whole document is built around |
 
+### 7.5 Primary Action Button Theme & Glass Contrast
+
+To ensure `PulseBorder`'s sweeping directional border reveal is visually distinct on clickable primary action buttons (e.g. Project Transition Button in Journey, Preview/Repo buttons in Project Detail):
+
+- **Element Component:** `PulseBorder as="button"` wrapper.
+- **Button Face Background:** Dark emerald glass contrast `background: rgba(74, 222, 128, 0.08)` with a subtle static border `1px solid rgba(74, 222, 128, 0.2)`.
+- **Text & Icon Styling:** Vivid `--color-accent-bright` (`#4ade80`) text and SVG icon (`var(--font-jetbrains-mono)`).
+- **Contrast Rationale:** Avoids solid green button fills (`var(--color-accent)`) which obscure the green `PulseBorder` sweep. The dark emerald glass fill creates sharp contrast, making the sweeping conic-gradient border reveal immediately visible on hover.
+
 ---
 
 ## 8. Project Detail Page
@@ -429,9 +434,9 @@ This keeps the reference video's core property — **a stable lit state with no 
 | Numeric counter (`2/5`) | Row of small connected node-indicators below the main image (dots joined by a thin line, echoing the §5.4 node/line motif); the active node pulses gently in `--accent-bright` |
 | Neutral/black lightbox scrim | Dark-green-tinted scrim, e.g. `rgba(5, 15, 10, 0.92)`, consistent with the palette instead of a generic neutral black |
 
-### 8.3 Repository Link 🧩
+### 8.3 Repository Link
 
-A second button, visually distinct from the existing live-preview button, must be added for the project's source repository. **Blocked on §13.1** — `Project` currently has no `repoUrl` field. Both buttons render conditionally on their respective field being present (no broken/empty-state buttons).
+A second button, visually distinct from the existing live-preview button, is added for the project's source repository (`repoUrl`). Both buttons render conditionally on their respective field being present (no broken/empty-state buttons). Database schema details are specified in `docs/02-SYSTEM-ARCHITECTURE.md §5`.
 
 ---
 
@@ -521,7 +526,7 @@ Applies only to primary action buttons (**Save**, **Publish**, **Delete confirma
 
 ### 10.3 New Field Descriptions
 
-Two fields are added to admin forms as a **direct consequence of decisions made elsewhere in this document** — both are blocked on the schema work tracked in §13, listed here only so the corresponding form UI is specified once the fields exist.
+Two fields are implemented in admin forms as a direct consequence of decisions made elsewhere in this document (with data models specified in `docs/02-SYSTEM-ARCHITECTURE.md §5`):
 
 #### `Project` — Repository URL
 
@@ -549,7 +554,7 @@ Two fields are added to admin forms as a **direct consequence of decisions made 
 
 ### 10.4 Explicitly Not Addressed Here
 
-Per the framing at the top of this section, the following are left to the implementer's judgment and are not specified further: exact spacing/grid of the existing panels (Projects, Timeline, Social Links, Survey, Messages), table pagination behavior, and any admin-only convenience features not already present in v1.3. None of these were part of the redesign conversation this document consolidates.
+Per the framing at the top of this section, the following are left to the implementer's judgment and are not specified further: exact spacing/grid of the existing panels (Projects, Timeline, Social Links, Messages), table pagination behavior, and any admin-only convenience features not already present in v1.3.
 
 ---
 
@@ -592,9 +597,9 @@ A component driven by a persistent loop (`requestAnimationFrame`, or any `setInt
 | Lazy-load Framer Motion | Dynamic import to protect first-contentful-paint |
 | Page transitions | Fade, 300–500ms, `ease-in-out` |
 
-### 11.7 Retained From v1.3 — Welcome Survey Popup
+### 11.7 Privacy-First Edge Analytics Integration (`@vercel/analytics`)
 
-No changes proposed to the Welcome Survey's own transition behavior (soft fade/scale entry and exit, horizontal card transitions between questions) — carried forward as-is from old §4 of `04-MOTION-SPEC.md`.
+Legacy visitor survey popups have been retired in favor of high-performance, cookieless, GDPR-compliant edge analytics via `@vercel/analytics/next` embedded directly into [`layout.tsx`](../src/app/[locale]/layout.tsx), providing real-time Web Vitals and visitor traffic intelligence with zero database write load or runtime interruption.
 
 ### 11.8 Path-Preserving i18n Routing & Scroll Restoration Architecture
 
@@ -645,28 +650,23 @@ gap(Δt) = base + k · ln(1 + Δt_days / τ)
 Some entries are known only as "sometime after X, before Y," not a precise date. Fabricating a false precise date for the spacing algorithm was rejected — the visual solution:
 
 - Render as a thin translucent **bracket/arc** spanning the estimated interval on the rail, instead of a solid point — an intentionally honest representation of uncertainty, and consistent with the lab-notebook register from §12.2 (error bars / uncertainty ranges are a standard measurement-report convention).
-- For the spacing algorithm, an uncertain entry's effective position defaults to the **midpoint** of its range.
-- Multiple uncertain entries sharing the same approximate window are **not** stacked identically — they distribute evenly across the shared window using the entry's existing `order` field (no new randomness introduced):
-  ```
-  position = interval_start + (order_index / (count + 1)) × interval_width
-  ```
+- For the spacing algorithm, an uncertain entry's effective position defaults to the **midpoint** of its range. Supported via `TimelineEntry.dateTo` (documented in `docs/02-SYSTEM-ARCHITECTURE.md §5`).
 
-**Blocked on §13.2** — `TimelineEntry` currently has only a single required `date: DateTime` field; a second optional date field is needed to represent the range end before this can render.
+### 12.6 Per-Entry Expand & Accordion Substitution Rules
 
-### 12.6 Per-Entry Expand — In-Place, Not the Card-Grid Pattern
+Expanding a Journey entry grows it **vertically in place on the rail** (accordion-style). Both entry summaries and full stories support rich Markdown rendering (`MarkdownRenderer`):
 
-Expanding a Journey entry grows it **vertically in place on the rail** (accordion-style) — explicitly **not** the card-grid's fade/ripple/dissolve treatment from §6.3–6.4. Reason: Journey is a continuous vertical reading flow, and a full-screen takeover here would break the reading continuity the single rail (§12.3) is specifically designed to preserve. This is also why `PulseBorder` does not apply to Journey entries (§7.1) — they are not bordered "gateway" containers by design, and forcing a border onto one just to reuse the interaction would be a regression, not a feature.
+- **Normal State:** Displays entry `summary` (formatted via `MarkdownRenderer.tsx`).
+- **Expanded State:** The summary disappears (`isExpanded`), and is replaced seamlessly by the entry `fullStory` (formatted via `MarkdownRenderer.tsx`).
+- **Conditional Expansion:** If an entry has no `fullStory` content provided by Admin, expansion is disabled (`isExpandable = false`). If linked to a project, the Project Transition button renders directly on the unexpanded card without accordion toggling.
 
-### 12.7 Content-Duplication Rule
+### 12.7 Linked Project Button & In-Place Modal Overlay (`100% Scroll Position Retention`)
 
-Determines what text appears when an entry expands:
+When a `TimelineEntry` is linked to a project (`projectSlug`):
 
-| Entry type | Expand shows |
-|---|---|
-| Corresponds to a project with its own Portfolio detail page | **Only** 1–2 lines of personal/temporal context ("why this moment mattered") + a small "Full details →" link to the project page. The technical narrative (§8.1's template) lives exclusively on the project page and must not be duplicated here. |
-| No corresponding project page (e.g., "learned C++ at age 12") | Full expansion — motivation, decision, reflection — since this Journey entry is the *only* place this story will ever be told. |
-
-This distinction requires the UI layer to know whether a `TimelineEntry` relates to a `Project`. This is resolved as a simple, manually-set UI-level reference — **not** a formal relational foreign key between the two tables.
+1. **Button Interaction:** Clicking the Project Transition button fetches project data and opens `<ProjectDetail project={selectedProject} isInline={true} />` inside a fixed modal overlay (`z-[100]`).
+2. **Scroll Position Retention:** The modal opens in-place over the timeline viewport without changing routes or navigating away. Closing the modal returns the visitor to the exact same scroll position in the Journey timeline without displacement.
+3. **Button Styling:** Built using `PulseBorder as="button"` with a dark emerald glass background (`rgba(74, 222, 128, 0.08)`), vivid text/icon (`var(--color-accent-bright)`), and a conic-gradient glowing border sweep.
 
 ### 12.8 Imagery
 
@@ -674,29 +674,13 @@ This distinction requires the UI layer to know whether a `TimelineEntry` relates
 
 ---
 
-## 13. Outstanding Database/Schema Work
-
-> [!IMPORTANT]
-> This section covers schema/migration work, not visual design — listed here so implementation isn't blocked by an undocumented dependency. Each item below is a **prerequisite**, not an optional enhancement, for the section it's tied to.
-
-| # | Field needed | Model | Required by | Notes |
-|---|---|---|---|---|
-| 13.1 | `repoUrl` (optional `String`) | `Project` | §8.3 — GitHub button | `previewUrl` already exists and works; this is a second, separate field |
-| 13.2 | A second optional date field (e.g. `dateTo`) | `TimelineEntry` | §12.5 — uncertainty bracket rendering | Currently `TimelineEntry.date` is a single required `DateTime`; confirmed absent from the schema as of this review |
-| 13.3 | Matching admin form inputs | `admin/projects`, `admin/timeline` | Both of the above | Needed once the fields above are added, so they're actually editable |
-| 13.4 | Repurpose `serviceType` into a `reason` field with new values (`general`, `bug-report`, `academic`, `collaboration`); remove reliance on `budget` | `Message` | §9.2 — contact-reason selector | `budget` is dropped from the form entirely (§9.1); `serviceType`'s current freelance-service values no longer apply |
-
-**Explicitly NOT required:** no relational foreign key between `Project` and `TimelineEntry` (§12.7) — any "related project" reference is resolved at the UI level only.
-
----
-
-## 14. Implementation Checklist
+## 13. Implementation Checklist
 
 A condensed cutover list, cross-referencing the sections above:
 
-- [ ] Delete `docs/03-UI-UX-SPECIFICATIONS.md` and `docs/04-MOTION-SPEC.md`; add this file in their place.
-- [ ] Remove `ParallaxCharacter.tsx`, its character asset, and its usage in `HeroSection.tsx` (§5.1).
-- [ ] Remove `CardShuffle.tsx` and its usage on the home page (§6.1); build the uniform card grid + shared-element expand (§6.2–6.4).
+- [x] Consolidate UI/UX and motion specifications into `docs/03-UI-UX-SPECIFICATIONS.md`.
+- [x] Remove `ParallaxCharacter.tsx`, its character asset, and its usage in `HeroSection.tsx` (§5.1).
+- [x] Remove `CardShuffle.tsx` and its usage on the home page (§6.1); build the uniform card grid + shared-element expand (§6.2–6.4).
 - [x] Build the `LavaBackground` component per §4, including the off-screen-offset and position/shape-timing rules (§4.7–4.8).
 - [x] Build the Lissajous hero component (3-curve converging variant, §5.2) and update Hero copy per the no-identity-noun rule (§5.3).
 - [x] Build `PulseBorder` as a shared component (§7) and wire it into the scope list in §7.1 only.
@@ -704,4 +688,4 @@ A condensed cutover list, cross-referencing the sections above:
 - [x] Path-preserving locale navigation in `Navbar.tsx` and `FooterClient.tsx` via `createNavigation(routing)` per §11.8.
 - [x] Scroll position restoration across page reloads and locale switches via `ScrollRestoration.tsx` and `scroll={false}` on language switchers per §11.8.
 - [x] Rework `ContactForm.tsx` per §9 (reason selector, conditional project picker, debounced draft persistence with rolling 10-min TTL, `PulseBorder`-enabled `clearForm` button, and hydration safety).
-- [x] Full automated test suite in `ContactForm.test.tsx` verifying draft persistence, 10-minute expiration, debounced timestamping, and clear form action (51/51 unit tests passing).
+- [x] Full automated test suite in Vitest verifying math models, draft persistence, media storage lifecycle cleanup, and API routes (82 unit tests passing across all 13 test suites).

@@ -504,7 +504,7 @@ export default function ContactForm() {
                             <circle cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="3" className="opacity-25" />
                             <path d="M4 12a8 8 0 018-8V0" fill="currentColor" className="opacity-75" />
                         </svg>
-                        {isRtl ? "جاري الإرسال..." : "Sending..."}
+                        {t("sending")}
                     </span>
                 ) : (
                     t("submit")

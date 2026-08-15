@@ -1,12 +1,15 @@
 "use client";
 
 import { useState, useEffect } from "react";
-import ImageUpload from "@/components/admin/ImageUpload";
-import type { ProjectRow } from "@/types";
+import ProjectImagesManager from "@/components/admin/ProjectImagesManager";
+import SkillsManager from "@/components/admin/SkillsManager";
+import type { ProjectRow, ProjectImage } from "@/types";
 import { motion, AnimatePresence } from "framer-motion";
+import { parseBuildTime, serializeBuildTime, TimeUnit } from "@/lib/format-build-time";
 
 /**
- * Admin Projects CMS Page (Quiet Luxury)
+ * Admin Projects CMS Page
+ * Fixed: Preserves all project fields during edit, integrates ProjectImagesManager and SkillsManager.
  */
 
 export default function AdminProjectsPage() {
@@ -14,6 +17,7 @@ export default function AdminProjectsPage() {
     const [isLoading, setIsLoading] = useState(true);
     const [showForm, setShowForm] = useState(false);
     const [editing, setEditing] = useState<ProjectRow | null>(null);
+
     const [form, setForm] = useState({
         titleAr: "",
         titleEn: "",
@@ -23,12 +27,11 @@ export default function AdminProjectsPage() {
         bodyEn: "",
         previewUrl: "",
         repoUrl: "",
-        skills: "",
+        skills: [] as string[],
         buildTime: "",
         order: 0,
         isPublished: false,
-        isFeatured: false,
-        coverImage: "",
+        images: [] as ProjectImage[],
     });
 
     useEffect(() => {
@@ -41,7 +44,7 @@ export default function AdminProjectsPage() {
             const data = await res.json();
             if (data.success) setProjects(data.data);
         } catch {
-            // Handle error
+            // Handle error silently
         } finally {
             setIsLoading(false);
         }
@@ -58,14 +61,7 @@ export default function AdminProjectsPage() {
             const res = await fetch(url, {
                 method,
                 headers: { "Content-Type": "application/json" },
-                body: JSON.stringify({
-                    ...form,
-                    skills: form.skills
-                        .split(",")
-                        .map((s) => s.trim())
-                        .filter(Boolean),
-                    coverImage: form.coverImage || undefined,
-                }),
+                body: JSON.stringify(form),
             });
 
             if (res.ok) {
@@ -75,7 +71,7 @@ export default function AdminProjectsPage() {
                 fetchProjects();
             }
         } catch {
-            // Handle error
+            // Handle error silently
         }
     }
 
@@ -86,7 +82,7 @@ export default function AdminProjectsPage() {
             await fetch(`/api/admin/projects/${id}`, { method: "DELETE" });
             fetchProjects();
         } catch {
-            // Handle error
+            // Handle error silently
         }
     }
 
@@ -95,31 +91,34 @@ export default function AdminProjectsPage() {
             await fetch(`/api/admin/projects/${project.id}`, {
                 method: "PUT",
                 headers: { "Content-Type": "application/json" },
-                body: JSON.stringify({ isPublished: !project.isPublished }),
+                body: JSON.stringify({
+                    ...project,
+                    isPublished: !project.isPublished,
+                }),
             });
             fetchProjects();
         } catch {
-            // Handle error
+            // Handle error silently
         }
     }
 
+    // FIX: Populate ALL fields when editing project so no data is reset/wiped
     function editProject(project: ProjectRow) {
         setEditing(project);
         setForm({
             titleAr: project.titleAr || "",
             titleEn: project.titleEn || "",
-            summaryAr: "",
-            summaryEn: "",
-            bodyAr: "",
-            bodyEn: "",
-            previewUrl: "",
-            repoUrl: "",
-            skills: "",
-            buildTime: "",
-            order: project.order,
-            isPublished: project.isPublished,
-            isFeatured: project.isFeatured,
-            coverImage: "",
+            summaryAr: project.summaryAr || "",
+            summaryEn: project.summaryEn || "",
+            bodyAr: project.bodyAr || "",
+            bodyEn: project.bodyEn || "",
+            previewUrl: project.previewUrl || "",
+            repoUrl: project.repoUrl || "",
+            skills: Array.isArray(project.skills) ? project.skills : [],
+            buildTime: project.buildTime || "",
+            order: project.order ?? 0,
+            isPublished: project.isPublished ?? false,
+            images: project.images || [],
         });
         setShowForm(true);
     }
@@ -134,12 +133,11 @@ export default function AdminProjectsPage() {
             bodyEn: "",
             previewUrl: "",
             repoUrl: "",
-            skills: "",
+            skills: [],
             buildTime: "",
             order: 0,
             isPublished: false,
-            isFeatured: false,
-            coverImage: "",
+            images: [],
         });
     }
 
@@ -148,7 +146,7 @@ export default function AdminProjectsPage() {
             <div className="mb-8 flex items-center justify-between">
                 <div>
                     <h2 className="text-3xl font-bold tracking-tight text-white">Projects</h2>
-                    <p className="text-zinc-400 mt-1">Manage your portfolio showcase.</p>
+                    <p className="text-zinc-400 mt-1">Manage portfolio projects, cover images, and skills.</p>
                 </div>
                 <button
                     onClick={() => {
@@ -227,36 +225,56 @@ export default function AdminProjectsPage() {
                                 onChange={(e) => setForm({ ...form, previewUrl: e.target.value })}
                                 className="rounded-xl border border-white/10 bg-black/20 px-4 py-3 text-white placeholder-zinc-500 focus:border-white/20 focus:outline-none focus:bg-black/40 transition-all"
                             />
-                            {/* §9.3 — Repository URL field, adjacent to Preview URL */}
                             <input
                                 placeholder="Repository URL"
                                 value={form.repoUrl}
                                 onChange={(e) => setForm({ ...form, repoUrl: e.target.value })}
                                 className="rounded-xl border border-white/10 bg-black/20 px-4 py-3 text-white placeholder-zinc-500 focus:border-white/20 focus:outline-none focus:bg-black/40 transition-all"
                             />
-                            <input
-                                placeholder="Skills (comma separated)"
-                                value={form.skills}
-                                onChange={(e) => setForm({ ...form, skills: e.target.value })}
-                                className="rounded-xl border border-white/10 bg-black/20 px-4 py-3 text-white placeholder-zinc-500 focus:border-white/20 focus:outline-none focus:bg-black/40 transition-all"
-                            />
-                            <input
-                                placeholder="Build Time"
-                                value={form.buildTime}
-                                onChange={(e) => setForm({ ...form, buildTime: e.target.value })}
-                                className="rounded-xl border border-white/10 bg-black/20 px-4 py-3 text-white placeholder-zinc-500 focus:border-white/20 focus:outline-none focus:bg-black/40 transition-all"
-                            />
+                            <div className="flex items-center gap-2">
+                                <div className="flex-1 flex items-center gap-2 rounded-xl border border-white/10 bg-black/20 px-3 py-2">
+                                    <span className="text-xs text-zinc-400 font-medium whitespace-nowrap">Build Time:</span>
+                                    <input
+                                        type="number"
+                                        min="1"
+                                        placeholder="10"
+                                        value={parseBuildTime(form.buildTime).amount}
+                                        onChange={(e) => {
+                                            const val = parseInt(e.target.value, 10);
+                                            const newAmount = isNaN(val) || val < 1 ? 1 : val;
+                                            const currentUnit = parseBuildTime(form.buildTime).unit;
+                                            setForm({ ...form, buildTime: serializeBuildTime(newAmount, currentUnit) });
+                                        }}
+                                        className="w-20 rounded-lg border border-white/10 bg-black/40 px-3 py-1 text-white text-sm font-bold text-center focus:outline-none focus:border-white/30"
+                                    />
+                                    <select
+                                        value={parseBuildTime(form.buildTime).unit}
+                                        onChange={(e) => {
+                                            const currentAmount = parseBuildTime(form.buildTime).amount;
+                                            setForm({ ...form, buildTime: serializeBuildTime(currentAmount, e.target.value as TimeUnit) });
+                                        }}
+                                        className="rounded-lg border border-white/10 bg-black/40 px-3 py-1 text-white text-sm cursor-pointer focus:outline-none focus:border-white/30"
+                                    >
+                                        <option value="days" className="bg-zinc-900 text-white">Days</option>
+                                        <option value="weeks" className="bg-zinc-900 text-white">Weeks</option>
+                                        <option value="months" className="bg-zinc-900 text-white">Months</option>
+                                        <option value="years" className="bg-zinc-900 text-white">Years</option>
+                                    </select>
+                                </div>
+                            </div>
                         </div>
 
-                        {/* Project Cover Image Upload */}
-                        <div className="rounded-xl border border-white/10 bg-black/20 p-4">
-                            <ImageUpload
-                                value={form.coverImage}
-                                onChange={(url) => setForm({ ...form, coverImage: url })}
-                                folder="projects"
-                                label="Project Cover Image"
-                            />
-                        </div>
+                        {/* Enhanced Skills Manager Component */}
+                        <SkillsManager
+                            skills={form.skills}
+                            onChange={(skills) => setForm({ ...form, skills })}
+                        />
+
+                        {/* Enhanced Project Images Manager Component */}
+                        <ProjectImagesManager
+                            images={form.images}
+                            onChange={(images) => setForm({ ...form, images })}
+                        />
 
                         <div className="flex items-center gap-6">
                             <label className="flex items-center gap-2 text-sm text-zinc-300 font-medium cursor-pointer">
@@ -269,17 +287,6 @@ export default function AdminProjectsPage() {
                                     className="rounded border-white/20 bg-white/5 text-white focus:ring-0 checked:bg-white checked:border-white"
                                 />
                                 Published
-                            </label>
-                            <label className="flex items-center gap-2 text-sm text-zinc-300 font-medium cursor-pointer">
-                                <input
-                                    type="checkbox"
-                                    checked={form.isFeatured}
-                                    onChange={(e) =>
-                                        setForm({ ...form, isFeatured: e.target.checked })
-                                    }
-                                    className="rounded border-white/20 bg-white/5 text-white focus:ring-0 checked:bg-white checked:border-white"
-                                />
-                                Featured
                             </label>
                         </div>
 

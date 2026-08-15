@@ -40,6 +40,7 @@ export type ProjectImageMinAggregateOutputType = {
   altAr: string | null
   altEn: string | null
   order: number | null
+  isCover: boolean | null
   projectId: string | null
 }
 
@@ -49,6 +50,7 @@ export type ProjectImageMaxAggregateOutputType = {
   altAr: string | null
   altEn: string | null
   order: number | null
+  isCover: boolean | null
   projectId: string | null
 }
 
@@ -58,6 +60,7 @@ export type ProjectImageCountAggregateOutputType = {
   altAr: number
   altEn: number
   order: number
+  isCover: number
   projectId: number
   _all: number
 }
@@ -77,6 +80,7 @@ export type ProjectImageMinAggregateInputType = {
   altAr?: true
   altEn?: true
   order?: true
+  isCover?: true
   projectId?: true
 }
 
@@ -86,6 +90,7 @@ export type ProjectImageMaxAggregateInputType = {
   altAr?: true
   altEn?: true
   order?: true
+  isCover?: true
   projectId?: true
 }
 
@@ -95,6 +100,7 @@ export type ProjectImageCountAggregateInputType = {
   altAr?: true
   altEn?: true
   order?: true
+  isCover?: true
   projectId?: true
   _all?: true
 }
@@ -191,6 +197,7 @@ export type ProjectImageGroupByOutputType = {
   altAr: string | null
   altEn: string | null
   order: number
+  isCover: boolean
   projectId: string
   _count: ProjectImageCountAggregateOutputType | null
   _avg: ProjectImageAvgAggregateOutputType | null
@@ -223,6 +230,7 @@ export type ProjectImageWhereInput = {
   altAr?: Prisma.StringNullableFilter<"ProjectImage"> | string | null
   altEn?: Prisma.StringNullableFilter<"ProjectImage"> | string | null
   order?: Prisma.IntFilter<"ProjectImage"> | number
+  isCover?: Prisma.BoolFilter<"ProjectImage"> | boolean
   projectId?: Prisma.StringFilter<"ProjectImage"> | string
   project?: Prisma.XOR<Prisma.ProjectScalarRelationFilter, Prisma.ProjectWhereInput>
 }
@@ -233,6 +241,7 @@ export type ProjectImageOrderByWithRelationInput = {
   altAr?: Prisma.SortOrderInput | Prisma.SortOrder
   altEn?: Prisma.SortOrderInput | Prisma.SortOrder
   order?: Prisma.SortOrder
+  isCover?: Prisma.SortOrder
   projectId?: Prisma.SortOrder
   project?: Prisma.ProjectOrderByWithRelationInput
 }
@@ -246,6 +255,7 @@ export type ProjectImageWhereUniqueInput = Prisma.AtLeast<{
   altAr?: Prisma.StringNullableFilter<"ProjectImage"> | string | null
   altEn?: Prisma.StringNullableFilter<"ProjectImage"> | string | null
   order?: Prisma.IntFilter<"ProjectImage"> | number
+  isCover?: Prisma.BoolFilter<"ProjectImage"> | boolean
   projectId?: Prisma.StringFilter<"ProjectImage"> | string
   project?: Prisma.XOR<Prisma.ProjectScalarRelationFilter, Prisma.ProjectWhereInput>
 }, "id">
@@ -256,6 +266,7 @@ export type ProjectImageOrderByWithAggregationInput = {
   altAr?: Prisma.SortOrderInput | Prisma.SortOrder
   altEn?: Prisma.SortOrderInput | Prisma.SortOrder
   order?: Prisma.SortOrder
+  isCover?: Prisma.SortOrder
   projectId?: Prisma.SortOrder
   _count?: Prisma.ProjectImageCountOrderByAggregateInput
   _avg?: Prisma.ProjectImageAvgOrderByAggregateInput
@@ -273,6 +284,7 @@ export type ProjectImageScalarWhereWithAggregatesInput = {
   altAr?: Prisma.StringNullableWithAggregatesFilter<"ProjectImage"> | string | null
   altEn?: Prisma.StringNullableWithAggregatesFilter<"ProjectImage"> | string | null
   order?: Prisma.IntWithAggregatesFilter<"ProjectImage"> | number
+  isCover?: Prisma.BoolWithAggregatesFilter<"ProjectImage"> | boolean
   projectId?: Prisma.StringWithAggregatesFilter<"ProjectImage"> | string
 }
 
@@ -282,6 +294,7 @@ export type ProjectImageCreateInput = {
   altAr?: string | null
   altEn?: string | null
   order?: number
+  isCover?: boolean
   project: Prisma.ProjectCreateNestedOneWithoutImagesInput
 }
 
@@ -291,6 +304,7 @@ export type ProjectImageUncheckedCreateInput = {
   altAr?: string | null
   altEn?: string | null
   order?: number
+  isCover?: boolean
   projectId: string
 }
 
@@ -300,6 +314,7 @@ export type ProjectImageUpdateInput = {
   altAr?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   altEn?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   order?: Prisma.IntFieldUpdateOperationsInput | number
+  isCover?: Prisma.BoolFieldUpdateOperationsInput | boolean
   project?: Prisma.ProjectUpdateOneRequiredWithoutImagesNestedInput
 }
 
@@ -309,6 +324,7 @@ export type ProjectImageUncheckedUpdateInput = {
   altAr?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   altEn?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   order?: Prisma.IntFieldUpdateOperationsInput | number
+  isCover?: Prisma.BoolFieldUpdateOperationsInput | boolean
   projectId?: Prisma.StringFieldUpdateOperationsInput | string
 }
 
@@ -318,6 +334,7 @@ export type ProjectImageCreateManyInput = {
   altAr?: string | null
   altEn?: string | null
   order?: number
+  isCover?: boolean
   projectId: string
 }
 
@@ -327,6 +344,7 @@ export type ProjectImageUpdateManyMutationInput = {
   altAr?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   altEn?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   order?: Prisma.IntFieldUpdateOperationsInput | number
+  isCover?: Prisma.BoolFieldUpdateOperationsInput | boolean
 }
 
 export type ProjectImageUncheckedUpdateManyInput = {
@@ -335,6 +353,7 @@ export type ProjectImageUncheckedUpdateManyInput = {
   altAr?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   altEn?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   order?: Prisma.IntFieldUpdateOperationsInput | number
+  isCover?: Prisma.BoolFieldUpdateOperationsInput | boolean
   projectId?: Prisma.StringFieldUpdateOperationsInput | string
 }
 
@@ -354,6 +373,7 @@ export type ProjectImageCountOrderByAggregateInput = {
   altAr?: Prisma.SortOrder
   altEn?: Prisma.SortOrder
   order?: Prisma.SortOrder
+  isCover?: Prisma.SortOrder
   projectId?: Prisma.SortOrder
 }
 
@@ -367,6 +387,7 @@ export type ProjectImageMaxOrderByAggregateInput = {
   altAr?: Prisma.SortOrder
   altEn?: Prisma.SortOrder
   order?: Prisma.SortOrder
+  isCover?: Prisma.SortOrder
   projectId?: Prisma.SortOrder
 }
 
@@ -376,6 +397,7 @@ export type ProjectImageMinOrderByAggregateInput = {
   altAr?: Prisma.SortOrder
   altEn?: Prisma.SortOrder
   order?: Prisma.SortOrder
+  isCover?: Prisma.SortOrder
   projectId?: Prisma.SortOrder
 }
 
@@ -431,6 +453,7 @@ export type ProjectImageCreateWithoutProjectInput = {
   altAr?: string | null
   altEn?: string | null
   order?: number
+  isCover?: boolean
 }
 
 export type ProjectImageUncheckedCreateWithoutProjectInput = {
@@ -439,6 +462,7 @@ export type ProjectImageUncheckedCreateWithoutProjectInput = {
   altAr?: string | null
   altEn?: string | null
   order?: number
+  isCover?: boolean
 }
 
 export type ProjectImageCreateOrConnectWithoutProjectInput = {
@@ -476,6 +500,7 @@ export type ProjectImageScalarWhereInput = {
   altAr?: Prisma.StringNullableFilter<"ProjectImage"> | string | null
   altEn?: Prisma.StringNullableFilter<"ProjectImage"> | string | null
   order?: Prisma.IntFilter<"ProjectImage"> | number
+  isCover?: Prisma.BoolFilter<"ProjectImage"> | boolean
   projectId?: Prisma.StringFilter<"ProjectImage"> | string
 }
 
@@ -485,6 +510,7 @@ export type ProjectImageCreateManyProjectInput = {
   altAr?: string | null
   altEn?: string | null
   order?: number
+  isCover?: boolean
 }
 
 export type ProjectImageUpdateWithoutProjectInput = {
@@ -493,6 +519,7 @@ export type ProjectImageUpdateWithoutProjectInput = {
   altAr?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   altEn?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   order?: Prisma.IntFieldUpdateOperationsInput | number
+  isCover?: Prisma.BoolFieldUpdateOperationsInput | boolean
 }
 
 export type ProjectImageUncheckedUpdateWithoutProjectInput = {
@@ -501,6 +528,7 @@ export type ProjectImageUncheckedUpdateWithoutProjectInput = {
   altAr?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   altEn?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   order?: Prisma.IntFieldUpdateOperationsInput | number
+  isCover?: Prisma.BoolFieldUpdateOperationsInput | boolean
 }
 
 export type ProjectImageUncheckedUpdateManyWithoutProjectInput = {
@@ -509,6 +537,7 @@ export type ProjectImageUncheckedUpdateManyWithoutProjectInput = {
   altAr?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   altEn?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   order?: Prisma.IntFieldUpdateOperationsInput | number
+  isCover?: Prisma.BoolFieldUpdateOperationsInput | boolean
 }
 
 
@@ -519,6 +548,7 @@ export type ProjectImageSelect<ExtArgs extends runtime.Types.Extensions.Internal
   altAr?: boolean
   altEn?: boolean
   order?: boolean
+  isCover?: boolean
   projectId?: boolean
   project?: boolean | Prisma.ProjectDefaultArgs<ExtArgs>
 }, ExtArgs["result"]["projectImage"]>
@@ -529,6 +559,7 @@ export type ProjectImageSelectCreateManyAndReturn<ExtArgs extends runtime.Types.
   altAr?: boolean
   altEn?: boolean
   order?: boolean
+  isCover?: boolean
   projectId?: boolean
   project?: boolean | Prisma.ProjectDefaultArgs<ExtArgs>
 }, ExtArgs["result"]["projectImage"]>
@@ -539,6 +570,7 @@ export type ProjectImageSelectUpdateManyAndReturn<ExtArgs extends runtime.Types.
   altAr?: boolean
   altEn?: boolean
   order?: boolean
+  isCover?: boolean
   projectId?: boolean
   project?: boolean | Prisma.ProjectDefaultArgs<ExtArgs>
 }, ExtArgs["result"]["projectImage"]>
@@ -549,10 +581,11 @@ export type ProjectImageSelectScalar = {
   altAr?: boolean
   altEn?: boolean
   order?: boolean
+  isCover?: boolean
   projectId?: boolean
 }
 
-export type ProjectImageOmit<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetOmit<"id" | "url" | "altAr" | "altEn" | "order" | "projectId", ExtArgs["result"]["projectImage"]>
+export type ProjectImageOmit<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetOmit<"id" | "url" | "altAr" | "altEn" | "order" | "isCover" | "projectId", ExtArgs["result"]["projectImage"]>
 export type ProjectImageInclude<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
   project?: boolean | Prisma.ProjectDefaultArgs<ExtArgs>
 }
@@ -574,6 +607,7 @@ export type $ProjectImagePayload<ExtArgs extends runtime.Types.Extensions.Intern
     altAr: string | null
     altEn: string | null
     order: number
+    isCover: boolean
     projectId: string
   }, ExtArgs["result"]["projectImage"]>
   composites: {}
@@ -1004,6 +1038,7 @@ export interface ProjectImageFieldRefs {
   readonly altAr: Prisma.FieldRef<"ProjectImage", 'String'>
   readonly altEn: Prisma.FieldRef<"ProjectImage", 'String'>
   readonly order: Prisma.FieldRef<"ProjectImage", 'Int'>
+  readonly isCover: Prisma.FieldRef<"ProjectImage", 'Boolean'>
   readonly projectId: Prisma.FieldRef<"ProjectImage", 'String'>
 }
     

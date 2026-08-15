@@ -1,12 +1,12 @@
 import type { Metadata } from "next";
 import { NextIntlClientProvider } from "next-intl";
-import { getMessages, setRequestLocale } from "next-intl/server";
+import { getMessages, getTranslations, setRequestLocale } from "next-intl/server";
 import { routing } from "@/i18n/routing";
 import Navbar from "@/components/shared/Navbar";
 import Footer from "@/components/shared/Footer";
 import PageTransition from "@/components/shared/PageTransition";
 import ScrollRestoration from "@/components/shared/ScrollRestoration";
-import SurveyPopup from "@/components/survey/SurveyPopup";
+import { Analytics } from "@vercel/analytics/next";
 
 // ─────────────────────────────────────────────
 // Static Params — SSG for all locales
@@ -16,16 +16,24 @@ export function generateStaticParams() {
 }
 
 // ─────────────────────────────────────────────
-// Metadata
+// Dynamic Metadata using Next-Intl "common" namespace
 // ─────────────────────────────────────────────
-export const metadata: Metadata = {
-    title: {
-        template: "%s | Abdullah",
-        default: "Abdullah — Advanced Personal Page",
-    },
-    description:
-        "A professional digital identity showcasing projects, career journey, and visitor engagement",
-};
+export async function generateMetadata({
+    params,
+}: {
+    params: Promise<{ locale: string }>;
+}): Promise<Metadata> {
+    const { locale } = await params;
+    const t = await getTranslations({ locale, namespace: "common" });
+
+    return {
+        title: {
+            template: locale === "ar" ? "%s | عبدالله" : "%s | Abdullah",
+            default: t("siteTitle"),
+        },
+        description: t("siteDescription"),
+    };
+}
 
 // ─────────────────────────────────────────────
 // Layout — v2.0 "Signal & Growth"
@@ -71,7 +79,7 @@ export default async function LocaleLayout({
                     <main className="pt-[72px]">{children}</main>
                 </PageTransition>
                 <Footer />
-                <SurveyPopup />
+                <Analytics />
             </NextIntlClientProvider>
         </div>
     );

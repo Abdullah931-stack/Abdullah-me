@@ -4,10 +4,11 @@ import ProjectDetail from "@/components/portfolio/ProjectDetail";
 import { prisma } from "@/lib/prisma";
 
 /**
- * Project Detail Page — Individual Project View
- * Per 04-PAGE-SPECIFICATIONS.md:
- * - Full project info: title, body, images gallery, skills, build time
- * - Story-driven layout
+ * Project Detail Page — Standalone Project Route
+ * Implements §8 of UI/UX Specifications v2.0:
+ * - Evidence-grounded narrative template (Problem → Decision → Measurable Outcome)
+ * - Multi-image gallery with node indicators and dark-green scrim (§8.2)
+ * - Structured build duration badge and independent repo/preview CTAs (§8.3)
  */
 interface ProjectPageProps {
     params: Promise<{ locale: string; slug: string }>;

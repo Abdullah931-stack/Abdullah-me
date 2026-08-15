@@ -4,11 +4,11 @@ import PortfolioList from "@/components/portfolio/PortfolioList";
 import { prisma } from "@/lib/prisma";
 
 /**
- * Portfolio Page — Projects List
- * Per 04-PAGE-SPECIFICATIONS.md:
- * - Grid of project cards
- * - Hover effects with subtle scale
- * - Links to individual project detail pages
+ * Portfolio Page — Projects Catalog
+ * Implements §6 of UI/UX Specifications v2.0:
+ * - Uniform symmetrical card grid (replaces legacy Card Shuffle)
+ * - In-place shared-element expansion via Framer Motion layoutId
+ * - Distance-based ripple stagger transition
  */
 interface PortfolioPageProps {
     params: Promise<{ locale: string }>;

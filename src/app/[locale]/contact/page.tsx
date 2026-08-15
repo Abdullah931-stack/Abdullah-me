@@ -3,11 +3,12 @@ import { getTranslations } from "next-intl/server";
 import ContactForm from "@/components/contact/ContactForm";
 
 /**
- * Contact Page — "Start Your Project"
- * Per 04-PAGE-SPECIFICATIONS.md:
- * - Smart Contact Form with Glassmorphism design
- * - Fields: Name, Email, Service Type, Budget, Details
- * - "Start Project 🚀" button
+ * Contact Page — Multi-Intent Smart Contact Form
+ * Implements §9 of UI/UX Specifications v2.0:
+ * - Neutral framing with 4 structured intent pathways (General, Issue Report, Academic, Collaboration)
+ * - Dynamic project issue picker with custom text fallback
+ * - Client-side draft persistence with 500ms debounce and 10-minute TTL
+ * - PulseBorder-wrapped primary action and clear form button
  */
 interface ContactPageProps {
     params: Promise<{ locale: string }>;

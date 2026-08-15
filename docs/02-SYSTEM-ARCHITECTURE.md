@@ -1,5 +1,5 @@
 # 🏗️ System Architecture & Data Model
-## Advanced Personal Page — v1.3
+## Abdullah.div — v2.0 "Signal & Growth"
 
 ---
 
@@ -8,51 +8,54 @@
 ```mermaid
 graph TB
     subgraph Client["🖥️ Client Layer"]
-        Browser["Browser"]
-        Mobile["📱 Mobile Browser"]
+        Browser["Desktop Browser (Space Grotesk / IBM Plex Sans)"]
+        Mobile["📱 Mobile Browser (Responsive Layout)"]
     end
 
-    subgraph Frontend["⚛️ Frontend — Next.js"]
-        Pages["Pages / App Router"]
-        Components["React Components"]
-        AnimationEngine["Animation Engine<br/>(Framer Motion)"]
-        I18n["i18n Layer<br/>(next-intl)"]
-        ThemeEngine["Theme Engine<br/>(Dark/Light)"]
+    subgraph Frontend["⚛️ Frontend — Next.js 16 (App Router)"]
+        Pages["Pages / App Router ([locale] & admin)"]
+        Components["React 19 Components"]
+        PhysicsEngine["Physics & Animation Engine<br/>(Lissajous 2D Canvas + Framer Motion)"]
+        I18nLayer["i18n & Context Guard<br/>(next-intl + FrozenRouter)"]
+        ThemeEngine["Theme System<br/>(Dark-Only #050f0a Emerald Tokens)"]
+        ScrollEngine["Scroll Restoration Engine<br/>(60fps RAF Throttled)"]
     end
 
     subgraph Backend["🔧 Backend — Next.js API Routes"]
-        AuthAPI["Supabase Auth"]
-        SurveyAPI["Survey API"]
-        MessagesAPI["Messages API"]
-        AdminAPI["Admin / CMS API"]
-        ContentAPI["Content API"]
+        PublicAPI["Public API Routes<br/>(/api/public/*)"]
+        AdminAPI["Admin CMS API Routes<br/>(/api/admin/*)"]
+        AuthAPI["Supabase Auth SSR Routes<br/>(/api/auth/*)"]
+        RateLimiter["Upstash Redis Rate Limiter<br/>(Sliding Window)"]
     end
 
-    subgraph Supabase["🗄️ Supabase"]
-        DB[("PostgreSQL")]
-        Auth["Auth Service"]
-        Storage["File Storage"]
+    subgraph Supabase["🗄️ Supabase Infrastructure"]
+        DB[("PostgreSQL Database (RLS Enforced)")]
+        Auth["Supabase Auth Service"]
+        Storage["Supabase Storage (uploads bucket)"]
     end
 
     subgraph External["🌐 External Services"]
-        Resend["Resend<br/>(Email)"]
-        Vercel["Vercel<br/>(Hosting + CDN)"]
+        Resend["Resend Gateway<br/>(Email Forwarding)"]
+        Vercel["Vercel Platform<br/>(Edge Network + Analytics)"]
     end
 
     Browser --> Pages
     Mobile --> Pages
     Pages --> Components
-    Components --> AnimationEngine
-    Components --> I18n
+    Components --> PhysicsEngine
+    Components --> I18nLayer
     Components --> ThemeEngine
-    Pages --> Backend
+    Components --> ScrollEngine
+    Pages --> PublicAPI
+    Pages --> AdminAPI
+    PublicAPI --> RateLimiter
+    RateLimiter --> DB
+    PublicAPI --> DB
+    PublicAPI --> Resend
+    AdminAPI --> AuthAPI
     AuthAPI --> Auth
-    SurveyAPI --> DB
-    MessagesAPI --> DB
-    MessagesAPI --> Resend
     AdminAPI --> DB
     AdminAPI --> Storage
-    ContentAPI --> DB
 ```
 
 ---
@@ -61,36 +64,43 @@ graph TB
 
 ```mermaid
 sequenceDiagram
-    participant V as Visitor
-    participant FE as Frontend (Next.js)
+    participant V as Visitor / User
+    participant FE as Frontend (Next.js 16)
+    participant FR as FrozenRouter / i18n
     participant API as API Routes
-    participant SB as Supabase (DB)
-    participant RS as Resend
+    participant RL as Upstash Rate Limiter
+    participant SB as Supabase (PostgreSQL & Storage)
+    participant RS as Resend Gateway
 
-    Note over V,FE: --- Automatic Locale Detection ---
-    V->>FE: Initial Visit
-    FE->>FE: proxy.ts detects Accept-Language → Set Locale (AR/EN)
-    FE->>FE: Display Survey Popup if no tracker Cookie exists
+    Note over V,FE: --- 1. Initial Page Load & Route Resolution ---
+    V->>FE: Initial Visit (e.g. /ar or /en)
+    FE->>FE: proxy.ts detects Accept-Language headers
+    FE->>FR: Mount FrozenRouter to preserve layout context
+    FE->>SB: Fetch Server Components Data (Prisma 7)
+    SB-->>FE: Stream Hydrated Server Payload
 
-    Note over V,SB: --- Survey Flow ---
-    V->>FE: Submits Survey
-    FE->>API: POST /api/survey
-    API->>SB: Store Survey Responses
-    FE->>FE: Set Cookie to prevent re-appearance
+    Note over V,RS: --- 2. Smart Contact Form Submission ---
+    V->>FE: Types message (Auto-saved to sessionStorage draft with 500ms debounce)
+    V->>FE: Submits Contact Form (reason, projectRef, body)
+    FE->>API: POST /api/public/messages
+    API->>RL: Check IP rate limit (max 5 req/hour)
+    alt Rate Limit Exceeded
+        RL-->>FE: HTTP 429 Too Many Requests
+    else Rate Limit OK
+        API->>SB: INSERT INTO messages (reason, projectRef, body, locale)
+        API->>RS: Dispatch Email Forwarding asynchronously
+        API-->>FE: HTTP 201 Created
+        FE->>FE: Clear sessionStorage draft & display Success State
+    end
 
-    Note over V,RS: --- Smart Contact Flow ---
-    V->>FE: Submits Smart Contact Form
-    FE->>API: POST /api/messages
-    API->>SB: Store Message in Database
-    API->>RS: Forward Email Notification via Resend
-    API-->>FE: ✅ Celebration Modal
-
-    Note over V,SB: --- Admin Dashboard (CMS) ---
-    V->>FE: Logs in
-    FE->>SB: Supabase Auth (signInWithPassword)
-    SB-->>FE: Session Token
-    FE->>API: CRUD /api/projects
-    API->>SB: Perform database operations
+    Note over V,SB: --- 3. Admin CMS Authentication & CRUD ---
+    V->>FE: Logs into /admin/login
+    FE->>SB: signInWithPassword (Supabase Auth SSR)
+    SB-->>FE: Session Cookies & JWT
+    FE->>API: POST /api/admin/projects (with media files)
+    API->>SB: Validate session -> Upload media to Supabase Storage -> Prisma INSERT
+    SB-->>API: Project Record Created
+    API-->>FE: HTTP 201 Created (Auto revalidate ISR)
 ```
 
 ---
@@ -98,296 +108,349 @@ sequenceDiagram
 ## 3. Project Structure
 
 ```
-advanced-personal-page/
+abdullah-div/
+├── docs/                               # 📚 Technical system documentation
+│   ├── 01-PRD.md                       # Product Requirements Document (v2.0)
+│   ├── 02-SYSTEM-ARCHITECTURE.md       # Architecture & Data Model (v2.0)
+│   ├── 03-UI-UX-SPECIFICATIONS.md      # Design System, Motion Specs & Math Models (v2.0)
+│   └── 04-CHANGELOG.md                 # Architecture Decision Records & Change History
+├── prisma/
+│   ├── schema.prisma                   # Active Prisma 7 schema (PostgreSQL)
+│   └── migrations/                     # PostgreSQL SQL migrations
 ├── public/
-│   ├── images/
-│   │   ├── character/          # Transparent character PNG for 2.5D parallax
-│   │   └── static/             # General static assets
-│   └── locales/                # Fallback localization files
+│   └── favicon.ico                     # Branding favicon
 ├── src/
 │   ├── app/
-│   │   ├── [locale]/           # 🌐 i18n — Dynamic locale routing
-│   │   │   ├── layout.tsx
-│   │   │   ├── page.tsx        # Home Page (The Hook)
-│   │   │   ├── journey/
-│   │   │   │   └── page.tsx    # Journey (The Story)
-│   │   │   ├── portfolio/
-│   │   │   │   ├── page.tsx    # Portfolio listing page
-│   │   │   │   └── [slug]/
-│   │   │   │       └── page.tsx # Project Details page
-│   │   │   └── contact/
-│   │   │       └── page.tsx    # Contact Page (Smart Contact Form)
-│   │   ├── admin/              # Protected admin dashboard (outside localization routing)
-│   │   │   ├── layout.tsx      # Protected layout using Supabase Auth
-│   │   │   ├── page.tsx        # Dashboard home page
-│   │   │   ├── projects/       # 🆕 CMS — Project management
-│   │   │   ├── analytics/
-│   │   │   ├── messages/
-│   │   │   └── settings/
-│   │   └── api/
-│   │       ├── auth/
-│   │       ├── survey/
-│   │       ├── messages/
-│   │       ├── projects/       # 🆕 CRUD API for projects
-│   │       └── admin/
+│   │   ├── [locale]/                   # 🌐 Dynamic i18n routing (next-intl)
+│   │   │   ├── page.tsx                # Home (Lissajous Hero + Uniform Projects Grid)
+│   │   │   ├── portfolio/              # Full Portfolio listing + Project details
+│   │   │   ├── journey/                # Single-Rail Journey Timeline
+│   │   │   ├── contact/                # Multi-Intent Smart Contact Form
+│   │   │   └── layout.tsx              # Root Locale Layout with FrozenRouter & Analytics
+│   │   ├── admin/                      # 🔐 Protected Admin CMS Dashboard
+│   │   │   ├── projects/               # Project CRUD & Image Management
+│   │   │   ├── timeline/               # Milestone Management
+│   │   │   ├── social-links/           # Social Links Management
+│   │   │   ├── messages/               # Contact Submissions Inbox
+│   │   │   ├── login/                  # Admin Auth Login
+│   │   │   └── layout.tsx              # Admin Shell & Auth Guard
+│   │   ├── api/
+│   │   │   ├── admin/                  # Protected Admin Endpoints
+│   │   │   ├── auth/                   # Authentication API Endpoints
+│   │   │   └── public/                 # Public Endpoints (/api/public/*)
+│   │   ├── globals.css                 # Dark-only design tokens & global styles
+│   │   └── fonts.ts                    # Google Fonts (Space Grotesk, IBM Plex Sans, JetBrains)
 │   ├── components/
-│   │   ├── shared/             # Footer, Navbar, LanguageSwitcher, ThemeSwitcher
-│   │   ├── home/               # Hero, CharacterParallax, CardShuffle
-│   │   ├── journey/            # Timeline cards
-│   │   ├── portfolio/          # Project cards, Gallery
-│   │   ├── contact/            # SmartContactForm, SurveyPopup
-│   │   └── admin/              # CMS forms, Analytics charts
-│   ├── hooks/
+│   │   ├── hero/                       # LissajousCurve, FloatingText, HeroSection
+│   │   ├── portfolio/                  # PortfolioList, ProjectDetail, ProjectLightbox
+│   │   ├── journey/                    # Timeline, timelineMath
+│   │   ├── contact/                    # ContactForm
+│   │   ├── admin/                      # ImageUpload, ProjectImagesManager, SkillsManager
+│   │   └── shared/                     # LavaBackground, PulseBorder, MarkdownRenderer,
+│   │                                   # PageTransition, ScrollRestoration, Navbar, Footer
+│   ├── generated/
+│   │   └── prisma/                     # Custom Prisma Client output directory
+│   ├── i18n/                           # Routing configuration & navigation helpers
 │   ├── lib/
-│   │   ├── supabase/           # 🆕 Supabase client configuration
-│   │   ├── resend/             # 🆕 Resend API initialization
-│   │   └── i18n/               # 🆕 i18n setup
-│   ├── messages/               # 🆕 Localized dictionary assets (ar.json, en.json)
-│   ├── types/
-│   └── styles/
-│       ├── themes/             # 🆕 dark.css, light.css stylesheets
-│       └── globals.css
-├── prisma/
-│   └── schema.prisma
-├── next.config.js
-└── .env.local                  # Environment variables (Supabase secrets, Resend key)
+│   │   ├── auth/                       # require-admin middleware & session validation
+│   │   ├── prisma.ts                   # Prisma client singleton instance
+│   │   ├── rate-limit.ts               # Upstash Redis rate limiter
+│   │   ├── format-build-time.ts        # Structured duration parser & pluralization engine
+│   │   ├── supabase/                   # Server, Client & Admin Supabase wrappers
+│   │   └── resend/                     # Resend client & email templates
+│   ├── messages/                       # Localized dictionaries (ar.json, en.json)
+│   ├── proxy.ts                        # Edge locale negotiation helper
+│   ├── tests/                          # Vitest test setup and mocks
+│   └── types/                          # Shared TypeScript interfaces & API schemas
+├── package.json                        # Scripts & dependencies
+├── vitest.config.ts                    # Vitest configuration
+├── tsconfig.json                       # TypeScript compiler options
+└── next.config.ts                      # Next.js configuration
 ```
 
 ---
 
 ## 4. Confirmed Tech Stack
 
-> [!IMPORTANT]
-> All technolgies listed below are **confirmed** for implementation.
+### Frontend & Rendering Layer
 
-### Frontend
+| Component | Technology | Version | Purpose / Rationale |
+|---|---|---|---|
+| **Framework** | **Next.js (App Router)** | 16.1.6 | Hybrid Server/Client components, dynamic routing, Edge proxy |
+| **Core UI Engine** | **React** | 19.2.3 | Modern concurrent rendering, Server Actions compatibility |
+| **Language** | **TypeScript** | 5.x | Strict end-to-end type safety |
+| **Styling** | **Tailwind CSS** | 4.x | PostCSS-driven dark-only styling, CSS custom property tokens |
+| **Latin Display Font** | **Space Grotesk** | Google Fonts | Technical, geometric character for display headings |
+| **Arabic Text Font** | **IBM Plex Sans Arabic** | Google Fonts | Crisp Arabic typography across all weights |
+| **Technical Mono Font** | **JetBrains Mono** | Google Fonts | High-precision code blocks, numerical timestamps, and tags |
+| **Motion & Transitions** | **Framer Motion** | 12.34.0 | Shared-element `layoutId` expansion, distance-stagger ripple |
+| **Physics Simulation** | **HTML5 Canvas 2D** | Native | 60fps Lissajous parametric curves & Kepler orbit dynamics |
 
-| Component | Technology | Status |
-|---|---|---|
-| **Framework** | Next.js (App Router) | ✅ Confirmed |
-| **Motion Engine** | Framer Motion (`useSpring`, `useTransform`) | ✅ Confirmed |
-| **2.5D Parallax Library** | Atropos.js or Vanilla Tilt.js | ✅ Confirmed as fallback |
-| **Language** | TypeScript | ✅ Confirmed (A-01) |
-| **Styling** | CSS Modules or Tailwind CSS | Inferred |
-| **Localization (i18n)** | `next-intl` or `next-i18next` | Inferred (Dual Language Support) |
-| **Arabic Typography** | **Readex Pro** (Google Fonts) | ✅ Confirmed |
-| **Latin Typography** | **Plus Jakarta Sans** (Google Fonts) | ✅ Confirmed |
+### Backend, Data & Security Layer
 
-### Backend & Infrastructure
-
-| Component | Technology | Status |
-|---|---|---|
-| **Hosting** | **Vercel** | ✅ Confirmed |
-| **Database** | **Supabase (PostgreSQL)** | ✅ Confirmed |
-| **Identity / Auth** | **Supabase Auth** | ✅ Confirmed |
-| **ORM** | Prisma (Client integration with Supabase PostgreSQL) | ✅ Confirmed (A-03) |
-| **API** | Next.js API Routes / Server Actions | Integrated |
-| **Object Storage** | Supabase Storage (Project media upload) | Inferred |
-
-### External Services
-
-| Service | Technology | Status |
-|---|---|---|
-| **Email Gateway** | **Resend** | ✅ Confirmed |
-| **Behavioral Analytics** | 🆕 **Vercel Analytics** (Non-blocking analytics) | ✅ Confirmed |
-| **API Protection** | 🆕 **Upstash Rate Limit** (Redis-backed serverless rate limiter) | ✅ Confirmed |
-| **Content Delivery Network** | Vercel Edge Network | Native |
-| **Image Optimization** | Next.js `next/image` + Vercel Image Optimization | Native |
+| Component | Technology | Version | Purpose / Rationale |
+|---|---|---|---|
+| **Database** | **Supabase (PostgreSQL)** | Cloud | Managed relational database with pgBouncer pooling |
+| **ORM** | **Prisma** | 7.3.0 | `@prisma/adapter-pg`, custom output `@/generated/prisma` |
+| **Identity & Auth** | **Supabase Auth SSR** | 0.8.0 | Cookie-based session verification; public signup disabled |
+| **Media Storage** | **Supabase Storage** | Cloud | Project assets hosting in public `uploads` bucket |
+| **Rate Limiter** | **Upstash Redis** | 2.0.8 | Serverless sliding-window rate limiting on transactional routes |
+| **Email Gateway** | **Resend** | 6.9.2 | Asynchronous email dispatch with transactional fail-safes |
+| **Internationalization** | **next-intl** | 4.8.2 | Dynamic dual-locale routing (`/ar` & `/en`) with dictionary keys |
+| **Markdown Pipeline** | **react-markdown** | 10.1.0 | Rich-text parsing with `remark-gfm` and `remark-breaks` |
+| **Testing Suite** | **Vitest** | 4.0.18 | 78 automated unit tests with `@testing-library/react` and `jsdom` |
 
 ---
 
-## 5. Data Model
+## 5. Data Model & Prisma 7 Schema
 
-### 5.1 Prisma Schema
+### 5.1 Active Prisma Schema
 
 ```prisma
 // ==============================================
-// Advanced Personal Page — Prisma Schema v1.3
+// Abdullah.div — Prisma Schema v2.0
 // Database: Supabase (PostgreSQL)
-// Auth: Supabase Auth (Managed by Supabase Auth service)
+// Auth: Supabase Auth (Managed externally)
 // ==============================================
 
 generator client {
-  provider = "prisma-client-js"
+  provider = "prisma-client"
+  output   = "../src/generated/prisma"
 }
 
 datasource db {
-  provider  = "postgresql"
-  url       = env("DATABASE_URL")     // Supabase connection string
-  directUrl = env("DIRECT_URL")       // Supabase direct connection (for migrations)
+  provider = "postgresql"
 }
 
 // ─────────────────────────────────────────────
-// Social Media Links
+// Social Links — Navigation Shortcuts
 // ─────────────────────────────────────────────
 model SocialLink {
-  id        String   @id @default(cuid())
-  platform  String                              // whatsapp, linkedin, mostaql, etc.
-  url       String
-  label_ar  String                              // 🆕 Arabic translation text
-  label_en  String                              // 🆕 English translation text
-  icon      String?                             // Icon key identifier
-  order     Int      @default(0)                // Sorting weight
-  isActive  Boolean  @default(true)
+  id       String  @id @default(cuid())
+  platform String  // whatsapp, linkedin, mostaql, github, etc.
+  url      String
+  labelAr  String  @map("label_ar")
+  labelEn  String  @map("label_en")
+  icon     String?
+  order    Int     @default(0)
+  isActive Boolean @default(true) @map("is_active")
 
-  createdAt DateTime @default(now())
-  updatedAt DateTime @updatedAt
+  createdAt DateTime @default(now()) @map("created_at")
+  updatedAt DateTime @updatedAt @map("updated_at")
+
+  @@map("social_links")
 }
 
 // ─────────────────────────────────────────────
-// Portfolio Projects (Managed via Admin CMS)
+// Projects — Portfolio CMS
 // ─────────────────────────────────────────────
 model Project {
-  id          String   @id @default(cuid())
-  slug        String   @unique                   // URL parameter: /portfolio/{slug}
-  title_ar    String                              // 🆕 Arabic title text
-  title_en    String                              // 🆕 English title text
-  summary_ar  String                              // 🆕 Arabic summary translation
-  summary_en  String                              // 🆕 English summary translation
-  body_ar     String   @db.Text                   // 🆕 Detailed Arabic description
-  body_en     String   @db.Text                   // 🆕 Detailed English description
-  previewUrl  String?                             // Live preview link
-  skills      String[]                            // Tech stack array tags
-  buildTime   String?                             // Duration (e.g. "أسبوعان")
-  order       Int      @default(0)                // Display priority weight
-  isPublished Boolean  @default(false)
-  isFeatured  Boolean  @default(false)             // 🆕 Display on Home landing page
+  id         String   @id @default(cuid())
+  slug       String   @unique
+  titleAr    String   @map("title_ar")
+  titleEn    String   @map("title_en")
+  summaryAr  String   @map("summary_ar") @db.Text
+  summaryEn  String   @map("summary_en") @db.Text
+  bodyAr     String   @map("body_ar") @db.Text
+  bodyEn     String   @map("body_en") @db.Text
+  previewUrl String?  @map("preview_url")
+  repoUrl    String?  @map("repo_url")
+  skills     String[]
+  buildTime  String?  @map("build_time") // Format: "{amount}:{unit}"
+  order      Int      @default(0)
 
-  images      ProjectImage[]
+  isPublished Boolean @default(false) @map("is_published")
+  isFeatured  Boolean @default(false) @map("is_featured")
 
-  createdAt   DateTime @default(now())
-  updatedAt   DateTime @updatedAt
+  images ProjectImage[]
+
+  createdAt DateTime @default(now()) @map("created_at")
+  updatedAt DateTime @updatedAt @map("updated_at")
+
+  @@map("projects")
 }
 
 model ProjectImage {
-  id        String  @id @default(cuid())
-  url       String                                // Resource URL (Supabase Storage)
-  alt_ar    String?                               // 🆕 Arabic accessibility text
-  alt_en    String?                               // 🆕 English accessibility text
-  order     Int     @default(0)
-  projectId String
+  id      String  @id @default(cuid())
+  url     String
+  altAr   String? @map("alt_ar")
+  altEn   String? @map("alt_en")
+  order   Int     @default(0)
+  isCover Boolean @default(false) @map("is_cover")
+
+  projectId String  @map("project_id")
   project   Project @relation(fields: [projectId], references: [id], onDelete: Cascade)
+
+  @@map("project_images")
 }
 
 // ─────────────────────────────────────────────
-//  Timeline Entries (Journey)
+// Timeline Entries — Scientific Journey Log
 // ─────────────────────────────────────────────
 model TimelineEntry {
-  id          String   @id @default(cuid())
+  id          String    @id @default(cuid())
   date        DateTime
-  age         Int                                  // Age at the time of achievement
-  title_ar    String                               // 🆕 Arabic title text
-  title_en    String                               // 🆕 English title text
-  story_ar    String   @db.Text                    // 🆕 Detailed Arabic story
-  story_en    String   @db.Text                    // 🆕 Detailed English story
-  imageUrl    String?
-  order       Int      @default(0)
+  dateTo      DateTime? @map("date_to")      // Optional uncertainty range end
+  projectSlug String?   @map("project_slug") // Linked project for in-place modal
+  age         Int
+  titleAr     String    @map("title_ar")
+  titleEn     String    @map("title_en")
+  summaryAr   String?   @map("summary_ar") @db.Text
+  summaryEn   String?   @map("summary_en") @db.Text
+  storyAr     String?   @map("story_ar") @db.Text
+  storyEn     String?   @map("story_en") @db.Text
+  imageUrl    String?   @map("image_url")
+  order       Int       @default(0)
 
-  createdAt   DateTime @default(now())
-  updatedAt   DateTime @updatedAt
+  createdAt DateTime @default(now()) @map("created_at")
+  updatedAt DateTime @updatedAt @map("updated_at")
+
+  @@map("timeline_entries")
 }
 
 // ─────────────────────────────────────────────
 // Survey Questions
 // ─────────────────────────────────────────────
 model SurveyQuestion {
-  id           String   @id @default(cuid())
-  text_ar      String                              // 🆕 Arabic question text
-  text_en      String                              // 🆕 English question text
-  type         String                              // multiple_choice | free_text
-  options_ar   String[]                            // 🆕 Arabic options
-  options_en   String[]                            // 🆕 English options
-  order        Int      @default(0)
-  isRequired   Boolean  @default(false)
-  isActive     Boolean  @default(true)
+  id        String   @id @default(cuid())
+  textAr    String   @map("text_ar")
+  textEn    String   @map("text_en")
+  type      String   // multiple_choice | free_text
+  optionsAr String[] @map("options_ar")
+  optionsEn String[] @map("options_en")
+  order     Int      @default(0)
 
-  responses    SurveyResponse[]
+  isRequired Boolean @default(false) @map("is_required")
+  isActive   Boolean @default(true) @map("is_active")
 
-  createdAt    DateTime @default(now())
-  updatedAt    DateTime @updatedAt
+  responses SurveyResponse[]
+
+  createdAt DateTime @default(now()) @map("created_at")
+  updatedAt DateTime @updatedAt @map("updated_at")
+
+  @@map("survey_questions")
 }
 
 // ─────────────────────────────────────────────
 // Survey Responses
 // ─────────────────────────────────────────────
 model SurveyResponse {
-  id           String   @id @default(cuid())
-  visitorId    String                              // Anonymous tracker UUID
-  questionId   String
-  question     SurveyQuestion @relation(fields: [questionId], references: [id])
-  answer       String                              // Value of choice or free text
-  locale       String   @default("ar")             // 🆕 Visitor locale at the time of submission
+  id        String @id @default(cuid())
+  visitorId String @map("visitor_id")
 
-  createdAt    DateTime @default(now())
+  questionId String         @map("question_id")
+  question   SurveyQuestion @relation(fields: [questionId], references: [id])
+
+  answer String
+  locale String @default("ar")
+
+  createdAt DateTime @default(now()) @map("created_at")
+
+  @@map("survey_responses")
 }
 
 // ─────────────────────────────────────────────
-// User Messages (Smart Contact Form)
+// Messages — Multi-Intent Contact Form (v2.0)
 // ─────────────────────────────────────────────
 model Message {
   id          String   @id @default(cuid())
-  senderName  String
-  senderEmail String
-  serviceType String                               // MVP | SaaS | AI Integration
-  budget      String                               // Budget range tier
+  senderName  String   @map("sender_name")
+  senderEmail String   @map("sender_email")
+  reason      String   @map("reason")       // general | bug-report | academic | collaboration
+  projectRef  String?  @map("project_ref")  // Associated project title or slug
+  budget      String?  @map("budget")       // Optional legacy compatibility
   body        String   @db.Text
-  isRead      Boolean  @default(false)
-  emailStatus String   @default("pending")         // 🆕 Delivery status: pending | sent | failed
-  locale      String   @default("ar")              // 🆕 Locale of the sender
 
-  createdAt   DateTime @default(now())
+  isRead      Boolean  @default(false) @map("is_read")
+  emailStatus String   @default("pending") @map("email_status") // pending | sent | failed
+  locale      String   @default("ar")
+
+  createdAt DateTime @default(now()) @map("created_at")
+
+  @@map("messages")
 }
 ```
 
-### 5.2 ER Diagram (Entity-Relationship)
+### 5.2 Mermaid Entity-Relationship Diagram
 
 ```mermaid
 erDiagram
-    Project ||--o{ ProjectImage : has
-    SurveyQuestion ||--o{ SurveyResponse : receives
+    Project ||--o{ ProjectImage : "has many (cascade delete)"
+    SurveyQuestion ||--o{ SurveyResponse : "receives many"
 
     Project {
         string id PK
         string slug UK
-        string title_ar
-        string title_en
-        string summary_ar
-        string summary_en
-        text body_ar
-        text body_en
+        string titleAr
+        string titleEn
+        text summaryAr
+        text summaryEn
+        text bodyAr
+        text bodyEn
         string previewUrl
+        string repoUrl
         string[] skills
+        string buildTime
+        int order
         boolean isPublished
         boolean isFeatured
+        datetime createdAt
+        datetime updatedAt
     }
 
     ProjectImage {
         string id PK
         string url
-        string alt_ar
-        string alt_en
+        string altAr
+        string altEn
         int order
+        boolean isCover
         string projectId FK
     }
 
     TimelineEntry {
         string id PK
         datetime date
+        datetime dateTo
+        string projectSlug
         int age
-        string title_ar
-        string title_en
-        text story_ar
-        text story_en
+        string titleAr
+        string titleEn
+        text summaryAr
+        text summaryEn
+        text storyAr
+        text storyEn
         string imageUrl
+        int order
+        datetime createdAt
+        datetime updatedAt
+    }
+
+    SocialLink {
+        string id PK
+        string platform
+        string url
+        string labelAr
+        string labelEn
+        string icon
+        int order
+        boolean isActive
+        datetime createdAt
+        datetime updatedAt
     }
 
     SurveyQuestion {
         string id PK
-        string text_ar
-        string text_en
+        string textAr
+        string textEn
         string type
-        string[] options_ar
-        string[] options_en
+        string[] optionsAr
+        string[] optionsEn
+        int order
+        boolean isRequired
+        boolean isActive
+        datetime createdAt
+        datetime updatedAt
     }
 
     SurveyResponse {
@@ -396,26 +459,21 @@ erDiagram
         string questionId FK
         string answer
         string locale
+        datetime createdAt
     }
 
     Message {
         string id PK
         string senderName
         string senderEmail
-        string serviceType
+        string reason
+        string projectRef
         string budget
         text body
         boolean isRead
+        string emailStatus
         string locale
-    }
-
-    SocialLink {
-        string id PK
-        string platform
-        string url
-        string label_ar
-        string label_en
-        boolean isActive
+        datetime createdAt
     }
 ```
 
@@ -423,356 +481,103 @@ erDiagram
 
 ## 6. API Specifications
 
-### 6.1 Authentication
+### 6.1 Authentication & Row Level Security (RLS)
 
-> **Core Engine: Supabase Auth**
-> Authentication flow is delegated entirely to the Supabase client wrapper:
-> - `signInWithPassword` — Authenticates credentials
-> - `signOut` — Terminates server sessions
-> - Session storage and tokens are handled natively.
+- **Authentication Engine:** Supabase Auth SSR via `@supabase/ssr`.
+- **Registration Policy:** Public sign-up is **strictly disabled** in Supabase Auth settings to safeguard CMS routes.
+- **Row-Level Security (RLS) Matrix:**
 
-> [!CAUTION]
-> **Disable Registration (Sign-up):** The sign-up capability must be disabled within the Supabase Auth Settings panel to prevent unauthorized administrative accounts. A single user profile is initialized directly via the Supabase database dashboard, with backend integrations allowing only sign-in requests.
-
-| Request / Action | Method / Service |
-|---|---|
-| Administrative Log In | `supabase.auth.signInWithPassword({ email, password })` |
-| Administrative Log Out | `supabase.auth.signOut()` |
-| Session Validation | `supabase.auth.getSession()` |
-| API Route Protection | Middleware checks matching Supabase session headers |
-| Account Creation | **Disabled** — Invite-Only / Direct initialization only |
-
-### 6.2 Row Level Security (RLS) Policies
-
-> [!WARNING]
-> Restricting route validation solely via Next.js Middleware is insufficient. **Row-Level Security (RLS) policies must be explicitly enabled on all database relations.**
-
-| Entity / Table | SELECT (Read) | INSERT (Write) | UPDATE / DELETE |
+| Relation / Table | SELECT (Read) | INSERT (Write) | UPDATE / DELETE |
 |---|---|---|---|
-| `Project` | ✅ Public (anon) | 🔒 authenticated only | 🔒 authenticated only |
-| `ProjectImage` | ✅ Public (anon) | 🔒 authenticated only | 🔒 authenticated only |
-| `TimelineEntry` | ✅ Public (anon) | 🔒 authenticated only | 🔒 authenticated only |
-| `SocialLink` | ✅ Public (anon) | 🔒 authenticated only | 🔒 authenticated only |
-| `SurveyQuestion` | ✅ Public (anon) | 🔒 authenticated only | 🔒 authenticated only |
-| `SurveyResponse` | 🔒 authenticated only | ✅ Public (anon) | ❌ Restricted |
-| `Message` | 🔒 authenticated only | ✅ Public (anon) | 🔒 authenticated only |
+| `Project` | ✅ Public (where `isPublished = true`) | 🔒 Authenticated Only | 🔒 Authenticated Only |
+| `ProjectImage` | ✅ Public | 🔒 Authenticated Only | 🔒 Authenticated Only |
+| `TimelineEntry` | ✅ Public | 🔒 Authenticated Only | 🔒 Authenticated Only |
+| `SocialLink` | ✅ Public (where `isActive = true`) | 🔒 Authenticated Only | 🔒 Authenticated Only |
+| `SurveyQuestion` | ✅ Public (where `isActive = true`) | 🔒 Authenticated Only | 🔒 Authenticated Only |
+| `SurveyResponse` | 🔒 Authenticated Only | ✅ Public (Rate Limited) | ❌ Restricted |
+| `Message` | 🔒 Authenticated Only | ✅ Public (Rate Limited) | 🔒 Authenticated Only |
 
 ---
 
-### 6.3 Public Endpoints
+### 6.2 Public API Endpoints
 
-#### `GET /api/projects`
-**Usage:** Fetches published portfolio items.
-**Parameters:** `?featured=true` restricts results to featured entries for home landing cycles.
-```json
-// Response 200
-{
-  "projects": [
-    {
-      "id": "...",
-      "slug": "my-saas-project",
-      "title_ar": "مشروعي الأول",
-      "title_en": "My First Project",
-      "summary_ar": "ملخص المشروع...",
-      "summary_en": "Project summary...",
-      "skills": ["Next.js", "Supabase"],
-      "images": [
-        { "url": "https://...", "alt_ar": "...", "alt_en": "..." }
-      ]
-    }
-  ]
-}
-```
+| Method | Endpoint | Description | Rate Limit |
+|---|---|---|---|
+| `GET` | `/api/public/projects` | List all published projects | None |
+| `GET` | `/api/public/projects/:slug` | Retrieve full project details by unique slug | None |
+| `GET` | `/api/public/projects-list` | Catalog of published project titles for issue picker | None |
+| `GET` | `/api/public/timeline` | List chronological journey milestone checkpoints | None |
+| `GET` | `/api/public/social-links` | List active social navigation shortcuts | None |
+| `POST` | `/api/public/messages` | Submit smart contact form payload | 5 req / IP / hr |
 
-#### `GET /api/projects/:slug`
-**Usage:** Fetches project details matching a unique URI parameter.
+#### `POST /api/public/messages` Payload Schema:
 ```json
-// Response 200
 {
-  "project": {
-    "id": "...",
-    "slug": "my-saas-project",
-    "title_ar": "...",
-    "title_en": "...",
-    "body_ar": "القصة الكاملة...",
-    "body_en": "Full story...",
-    "previewUrl": "https://...",
-    "skills": ["..."],
-    "buildTime": "أسبوعان",
-    "images": [...]
-  }
-}
-```
-
-#### `GET /api/timeline`
-**Usage:** Fetches chronological journey checkpoints.
-```json
-// Response 200
-{
-  "entries": [
-    {
-      "id": "...",
-      "date": "2020-01-15",
-      "age": 18,
-      "title_ar": "بداية تعلم البرمجة",
-      "title_en": "Started Learning Programming",
-      "story_ar": "...",
-      "story_en": "...",
-      "imageUrl": "https://..."
-    }
-  ]
-}
-```
-
-#### `GET /api/social-links`
-**Usage:** Fetches active social shortcuts for navigation components.
-```json
-// Response 200
-{
-  "links": [
-    {
-      "platform": "whatsapp",
-      "url": "https://...",
-      "label_ar": "واتساب",
-      "label_en": "WhatsApp",
-      "icon": "whatsapp"
-    }
-  ]
+  "senderName": "Dr. Alan Turing",
+  "senderEmail": "alan@turing.ac.uk",
+  "reason": "academic",
+  "projectRef": "quantum-double-slit-sim",
+  "body": "Inquiry regarding the interference simulation methodology...",
+  "locale": "en"
 }
 ```
 
 ---
 
-### 6.4 Interaction Endpoints
+### 6.3 Admin Protected Endpoints
 
-#### `GET /api/survey/questions`
-**Usage:** Fetches questions for the welcome survey.
-```json
-// Response 200
-{
-  "questions": [
-    {
-      "id": "...",
-      "text_ar": "كيف عرفت عني؟",
-      "text_en": "How did you find me?",
-      "type": "multiple_choice",
-      "options_ar": ["LinkedIn", "GitHub", "أخرى"],
-      "options_en": ["LinkedIn", "GitHub", "Other"],
-      "isRequired": false
-    }
-  ]
-}
-```
-
-#### `POST /api/survey/responses`
-**Usage:** Commits survey answers from welcome prompts.
-```json
-// Request
-{
-  "visitorId": "anonymous-uuid",
-  "locale": "ar",
-  "responses": [
-    { "questionId": "...", "answer": "LinkedIn" },
-    { "questionId": "...", "answer": "نص حر..." }
-  ]
-}
-
-// Response 201
-{ "success": true }
-```
-
-#### `POST /api/messages`
-**Usage:** Stores contact information and body payload.
-```json
-// Request
-{
-  "senderName": "أحمد",
-  "senderEmail": "ahmed@example.com",
-  "serviceType": "SaaS",
-  "budget": "$500-$1000",
-  "body": "أريد بناء منصة SaaS لإدارة المخزون...",
-  "locale": "ar"
-}
-
-// Response 201
-{ "success": true, "message": "تم استلام طلبك بنجاح" }
-```
-
-> **Side Effect:** Submitting a message stores the payload to PostgreSQL and triggers an email alert using **Resend**.
-> Failures in Resend execution **must not** rollback the database transaction, but should record a fail status in PostgreSQL.
-
----
-
-### 6.5 Admin Endpoints (Protected)
-
-> All endpoints in this category require a valid **Supabase Auth Session** header validation.
-
-#### Projects Administration (CMS)
+> All admin routes validate Supabase Auth session tokens via Next.js middleware and `requireAdmin` helper.
 
 | Method | Endpoint | Description |
 |---|---|---|
-| `GET` | `/api/admin/projects` | Fetch all project records (including drafts) |
-| `POST` | `/api/admin/projects` | 🆕 Create a new project record |
-| `PUT` | `/api/admin/projects/:id` | Update project parameters |
-| `DELETE` | `/api/admin/projects/:id` | Destroy project record |
-
-> [!WARNING]
-> **Orphan Cleanup Policy:** On project deletion, all associated files stored inside the Supabase Storage Bucket must be programmatically deleted. Failing to perform this cleanup leaves orphaned media assets.
-
-> [!NOTE]
-> **Slug Uniqueness Policy:** When parsing title inputs into slugs, duplicate strings must trigger auto-incremental suffixes (e.g. `my-project-2`, `my-project-3`) or reject with a user-facing validation prompt to prevent Prisma unique constraint violations.
-
-**`POST /api/admin/projects` — Create Project:**
-```json
-// Request (multipart/form-data for image upload)
-{
-  "title_ar": "...",
-  "title_en": "...",
-  "summary_ar": "...",
-  "summary_en": "...",
-  "body_ar": "...",
-  "body_en": "...",
-  "previewUrl": "...",
-  "skills": ["Next.js", "Supabase"],
-  "buildTime": "أسبوعان",
-  "isPublished": true,
-  "isFeatured": true,          // Displays on Home landing page
-  "images": [File, File, ...]  // Uploaded directly to Supabase Storage
-}
-```
-
-#### Timeline Administration
-
-| Method | Endpoint | Description |
-|---|---|---|
-| `GET` | `/api/admin/timeline` | Fetch all timeline checkpoints |
-| `POST` | `/api/admin/timeline` | Create timeline checkpoint |
-| `PUT` | `/api/admin/timeline/:id` | Update timeline parameters |
-| `DELETE` | `/api/admin/timeline/:id` | Destroy timeline entry |
-
-#### Social Links Administration
-
-| Method | Endpoint | Description |
-|---|---|---|
-| `GET` | `/api/admin/social-links` | Fetch active social links |
-| `PUT` | `/api/admin/social-links` | Batch update social links parameters |
-
-#### Survey & Analytics Administration
-
-| Method | Endpoint | Description |
-|---|---|---|
-| `GET` | `/api/admin/analytics/survey` | Fetch survey metrics categorized by options |
-| `GET` | `/api/admin/analytics/export` | Dump raw survey response logs as a JSON payload |
-
-#### Contact Inbox Management
-
-| Method | Endpoint | Description |
-|---|---|---|
-| `GET` | `/api/admin/messages` | Fetch received messages (paginated) |
-| `PUT` | `/api/admin/messages/:id/read` | Mark message as read |
-| `DELETE` | `/api/admin/messages/:id` | Destroy message record |
-| `POST` | `/api/admin/messages/:id/resend` | 🆕 Manually retry Resend delivery on status failures |
+| `GET` / `POST` | `/api/admin/projects` | List all projects (including drafts) / Create project |
+| `PUT` / `DELETE` | `/api/admin/projects/:id` | Update project parameters / Delete project & purge media from Supabase Storage |
+| `GET` / `POST` | `/api/admin/timeline` | List milestone checkpoints / Create timeline milestone |
+| `PUT` / `DELETE` | `/api/admin/timeline/:id` | Update milestone parameters / Delete milestone |
+| `GET` / `POST` | `/api/admin/social-links` | List all social links / Create new social link |
+| `PUT` / `DELETE` | `/api/admin/social-links/:id` | Update social link parameters / Delete social link |
+| `GET` | `/api/admin/messages` | List received contact submissions |
+| `PUT` / `DELETE` | `/api/admin/messages/:id` | Mark message as read / Destroy message record |
+| `GET` | `/api/admin/export` | Export full database records (projects, timeline, social links, messages) as JSON |
+| `POST` | `/api/admin/upload` | Upload media files to Supabase Storage bucket (`uploads`) |
 
 ---
 
-## 7. Security & Protection Policies
+## 7. Security, Resilience & Rate Limiting
 
-### 7.1 API Rate Limiting
+### 7.1 Upstash Redis Rate Limiting
 
-> [!CAUTION]
-> Lack of rate limiting on transactional endpoints leaves Resend email credits open to exploitation.
+To protect Resend transactional email quotas and prevent database flooding:
+- **Contact Form Limit:** Max **5 messages per IP per hour** via sliding-window algorithm.
+- **Exceeded Threshold Response:** Returns HTTP `429 Too Many Requests` with retry headers.
 
-| Policy | Configuration |
-|---|---|
-| **Core Service** | **Upstash Rate Limit** (Redis-backed serverless limiter) |
-| **Contact Form Limit** | **Max 5 messages per IP per hour** |
-| **Survey Submit Limit** | **Max 3 submissions per IP per hour** |
-| **Protected Routes** | `POST /api/messages` + `POST /api/survey/responses` |
-| **Exceeded Action** | HTTP `429 Too Many Requests` |
+### 7.2 Email Forwarding Fail-Safe Policy
 
-### 7.2 Email Forwarding Policy
-
-| Policy | Configuration |
-|---|---|
-| **Gateway provider** | **Resend** |
-| **Trigger Mechanism** | Automatic dispatch on valid `POST /api/messages` |
-| **Email Content** | Full client parameters: Sender Name, Email, Service Type, Budget, Details |
-| **Transaction Boundary** | Failed email dispatches **must not** revert database record storage |
+- When a contact form is submitted, the payload is committed to PostgreSQL **first**.
+- Resend email forwarding executes asynchronously:
+  - If Resend succeeds, `emailStatus` is marked `sent`.
+  - If Resend fails, `emailStatus` is marked `failed` without rolling back the database transaction.
+  - The admin inbox dashboard provides a manual retry trigger for failed deliveries.
 
 ---
 
-## 8. Performance & Optimization
+## 8. Theme Strategy & Dark-Only Architecture
 
-Designed to satisfy **NFR-01** (Minimizing loading durations):
-
-| Strategy | Details |
+| Parameter | Specification |
 |---|---|
-| **SSG / ISR** | Use Static Site Generation (SSG) with Incremental Static Regeneration (ISR) |
-| **Image Optimization** | Leverage Next.js `next/image` + Vercel Image Optimization (WebP compression) |
-| **Code Splitting** | Use dynamic imports for complex, non-critical modules (Animation Engine, Welcome Survey Popup) |
-| **Font Optimization** | Load typography resources locally using `next/font/google` |
-| **Edge CDN** | Vercel Edge Network routing (automated CDN caching) |
-| **Bundle Analysis** | Continuous profiling of compilation bundles to prevent package bloating |
-| **Supabase Connection** | Utilize pgBouncer connection pooling |
+| **Architecture** | **Dark-Only** (Light mode variants permanently retired) |
+| **Base Canvas** | `--bg: #050f0a` (Deep green-black obsidian) |
+| **Radial Glow** | `--bg-radial-inner: #081a10` (Subtle center ambient wash) |
+| **Primary Accent** | `--accent: #4ade80` (Primary emerald green for borders, buttons, links) |
+| **Highlight Accent**| `--accent-bright: #a7f3c4` (Pulse leading edges and headline gradient stop) |
+| **Text Hierarchy** | `--text: #eafbf1` (High contrast primary) · `--muted: #82a898` (Secondary captions) |
+| **Surfaces** | Glassmorphism: `rgba(255, 255, 255, 0.03–0.045)` with `--card-border: rgba(134, 239, 172, 0.16)` |
 
 ---
 
-## 9. Localization (i18n) Strategy
+## 9. Client-Side Animation & Routing Architecture
 
-| Metric | Configuration |
-|---|---|
-| **Supported Locales** | Arabic (ar) + English (en) |
-| **Locale Resolution** | 🆕 Parse `Accept-Language` headers in **`proxy.ts`** (prevents client hydration mismatches) |
-| **Manual Switching** | Interactive locale toggling within the Navigation bar |
-| **Visual Direction** | Dynamic CSS styling: RTL for Arabic, LTR for English |
-| **URI Patterns** | Routing prefixes `/{locale}/page` (e.g. `/ar/portfolio`, `/en/portfolio`) |
-| **Localized Dictionaries** | `src/messages/ar.json` + `src/messages/en.json` |
-| **CMS Entities** | Database entries require localized field pairs (`title_ar`, `title_en`, etc.) |
-
-> [!WARNING]
-> **Hydration Warning:** Do not read `navigator.language` directly in Client Components to resolve default locales. This leads to Hydration Mismatches between server renders and client instances. Always resolve locales on edge routes (proxy.ts).
-
----
-
-## 10. Theme Strategy
-
-| Parameter | Configuration |
-|---|---|
-| **Default State** | **Dark Mode (Default)** |
-| **Interactive Toggle** | Theme Toggle switch located in the navbar |
-| **Persistence** | Cache configuration in `localStorage` or Cookie stores |
-| **Technical Stack** | CSS Custom Properties + dynamic `data-theme` attribute |
-| **Stylesheets** | Two independent stylesheet collections (Dark + Light configurations) |
-
----
-
-## 11. Additional Policies
-
-### 11.1 SEO Policy
-
-| Strategy | Details |
-|---|---|
-| **Metadata** | Dynamic parameter mapping for each route (`title`, `description`, `og:image`) |
-| **Sitemap** | Native `sitemap.xml` generated automatically from dynamic page routing |
-| **Crawling Policy** | `robots.txt` allowing public indexing of all landing pages |
-| **Structured Data** | Schema.org JSON-LD profiles for Projects (`SoftwareApplication`) and Personal bio (`Person`) |
-| **Open Graph** | Social graphics configured for all public URLs |
-| **Cross-Referencing** | `hreflang` header mapping to link localized translation variations |
-
-### 11.2 Analytics Policy
-
-| Parameter | Details |
-|---|---|
-| **Behavioral Metrics** | **Vercel Analytics** (Native tracking without database overhead) |
-| **Engagement Logs** | PostgreSQL entries stored via welcome survey APIs |
-| **Privacy Standards** | IP addresses and personal identifiers are omitted from database metrics |
-| **Motivation** | Prevent write bottlenecks on landing queries and satisfy GDPR regulations |
-
----
-
-## 12. Client-Side Animation & Routing Architecture
-
-### 12.1 App Router Context Preservation (`FrozenRouter`)
+### 9.1 Router Context Preservation (`FrozenRouter`)
 
 When combining Framer Motion's `<AnimatePresence mode="wait">` with Next.js App Router and `next-intl` localization, client-side navigation (`<Link>` transitions) can suffer from **Router Context Tearing**.
 
@@ -787,17 +592,73 @@ The `FrozenRouter` pattern is implemented in [`src/components/shared/PageTransit
 - Wraps exiting children inside `<LayoutRouterContext.Provider value={frozen}>` during the exit transition.
 - Guarantees that unmounting page trees preserve their original route context, server props, and translation messages without context tearing.
 
-> [!WARNING]
-> **Internal Next.js API Maintenance Note:**
-> `FrozenRouter` imports `LayoutRouterContext` from `next/dist/shared/lib/app-router-context.shared-runtime`. This is an internal Next.js import path. An explicit warning comment is maintained above the import. Re-verify this import path whenever upgrading Next.js versions.
+---
+
+### 9.2 Path-Preserving i18n & Scroll Restoration Architecture
+
+- **Navigation Helper:** Router navigation uses `createNavigation(routing)` in `src/i18n/routing.ts`.
+- **Route Preservation:** Navbar and Footer extract the active pathname via `usePathname()` and generate target locale links, preserving the exact active sub-path (e.g. `/ar/portfolio/slug` ↔ `/en/portfolio/slug`).
+- **Scroll Override:** Language switcher links specify `scroll={false}` to prevent jarring scroll-to-top jumps.
+- **Global Scroll Restoration:** Dedicated component `ScrollRestoration.tsx` in `src/components/shared/`:
+  - Sets `window.history.scrollRestoration = 'manual'`.
+  - Persists `window.scrollY` in `sessionStorage` throttled via `requestAnimationFrame` at 60fps.
+  - Instantly restores scroll coordinates upon locale toggle or reload (`window.scrollTo({ top: savedY, behavior: 'instant' })`).
 
 ---
 
-### 12.2 Shared-Element Expansion & Backdrop Overlay Isolation
+## 10. Core Shared Services & Rendering Infrastructure
 
-In [`src/components/portfolio/PortfolioList.tsx`](file:///d:/Projects/abdullah-div/src/components/portfolio/PortfolioList.tsx), shared-element card expansions (`layoutId`) and modal backdrops are architected with strict isolation:
+### 10.1 Universal Markdown Pipeline (`MarkdownRenderer.tsx`)
 
-- **Single Encapsulation:** Backdrop overlay (`fixed inset-0 z-40`) and modal card container are encapsulated within a single `<AnimatePresence>` block to prevent orphan backdrop layers.
-- **Route & Unmount Cleanup:** A `useEffect` hook listening to `pathname` automatically resets `selectedId` to `null` on route changes or component unmounting.
-- **Isolated LayoutGroup:** Grid items are wrapped in `<LayoutGroup id={`portfolio-grid-${locale}`}>` to prevent Framer Motion from registering layout projection nodes globally across route boundaries.
+To support rich formatting without HTML injection vulnerabilities:
+- **`react-markdown`:** Parses standard Markdown strings into React component trees safely.
+- **`remark-gfm`:** Provides GitHub Flavored Markdown (tables, task lists, strikethrough).
+- **`remark-breaks` + `whitespace-pre-line`:** Preserves single soft newlines (`\n`) as `<br />` breaks automatically.
+- **Code Highlighting:** Code blocks render with `JetBrains Mono` font (`var(--font-jetbrains-mono)`), dark backdrop (`rgba(5, 15, 10, 0.85)`), and card borders.
 
+---
+
+### 10.2 Structured Build Duration & Localized Pluralization Engine (`format-build-time.ts`)
+
+To eliminate un-localizable free-text duration strings in CMS data, project build durations are stored in `{amount}:{unit}` format (e.g. `"10:days"`, `"2:weeks"`, `"3:months"`, `"1:years"`):
+1. **Parser:** Converts `{amount}:{unit}` into total days.
+2. **Normalizer:** Computes normalized years, months, weeks, and remaining days.
+3. **Pluralization Engine:** Uses dictionary keys in `messages/ar.json` and `messages/en.json`:
+   - Arabic grammatical pluralization: `unit_1` (1), `unit_2` (2), `unit_few` (3–10), `unit_many` (11+).
+   - English grammatical pluralization: `unit` (1), `units` (plural).
+
+---
+
+### 10.3 Lissajous Tri-Curve Oscilloscope Engine (`LissajousCurve.tsx`)
+
+- **Parametric Formulation:** $x(t) = A \cdot \sin(at + \delta), y(t) = B \cdot \sin(bt)$.
+- **Kepler Speed Variation:** Angular velocity is modulated by orbital distance from center:
+  $$speed = baseSpeed \times \left(1 - k \cdot \frac{r}{maxRadius}\right)$$
+- **Phosphor Persistence:** Points record past coordinates, rendering fading opacity trails to evoke an oscilloscope CRT beam.
+- **Performance Gating:** Component unmounts entirely below tablet breakpoint (`<768px`) to prevent invisible background animation loops.
+
+---
+
+### 10.4 Deterministic Lava Lamp Sine Background (`LavaBackground.tsx`)
+
+- **Mathematical Drift:** Wobble is evaluated as a deterministic sum of sine terms:
+  $$drift(t) = \sum A_i \cdot \sin(\omega_i \cdot t + \phi_i)$$
+- **Hydration Safety:** Generated strictly from element index without `Math.random()`, ensuring identical server and client outputs.
+- **Decoupled Keyframes:** Separate animation timelines for vertical rise (`translateY`) vs. shape breathing (`border-radius` morphing) to prevent visual tilting illusions.
+
+---
+
+### 10.5 Directional `PulseBorder` Micro-Interaction (`PulseBorder.tsx`)
+
+- **Contact Sweep:** On `pointerenter`, border reveals outward in two directions from the contact point using a CSS conic/radial mask gradient.
+- **Static Lit State:** Settles into static emerald glow without continuous animation loops.
+- **Zero DOM Pollution:** Pure CSS custom property animation without creating or destroying DOM nodes.
+
+---
+
+### 10.6 Client-Side Draft Persistence Engine (`ContactForm.tsx`)
+
+- **Storage Target:** `sessionStorage` under key `contact_form_draft`.
+- **500ms Debounce:** Saves draft payload only after a 500ms typing pause.
+- **Rolling 10-Minute TTL:** Payload stores `{ timestamp: Date.now(), data: formData }`. If `Date.now() - timestamp > 10 * 60 * 1000`, the draft is automatically discarded.
+- **Hydration Parity:** Form reset button is guarded with `isMounted && isDirty` to prevent SSR mismatch warnings.

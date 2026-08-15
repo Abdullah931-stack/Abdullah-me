@@ -19,7 +19,6 @@ const SIDEBAR_LINKS = [
     { href: "/admin/timeline", label: "Timeline", icon: "📅" },
     { href: "/admin/social-links", label: "Social Links", icon: "🔗" },
     { href: "/admin/messages", label: "Messages", icon: "✉️" },
-    { href: "/admin/survey", label: "Survey Analytics", icon: "📈" },
 ];
 
 export default function AdminLayout({

@@ -11,7 +11,6 @@ interface Stats {
     projects: number;
     messages: number;
     unreadMessages: number;
-    surveyResponses: number;
 }
 
 export default function AdminOverviewPage() {
@@ -21,15 +20,13 @@ export default function AdminOverviewPage() {
     useEffect(() => {
         async function fetchStats() {
             try {
-                const [projectsRes, messagesRes, surveyRes] = await Promise.all([
+                const [projectsRes, messagesRes] = await Promise.all([
                     fetch("/api/admin/projects"),
                     fetch("/api/admin/messages"),
-                    fetch("/api/admin/survey/analytics"),
                 ]);
 
                 const projectsData = await projectsRes.json();
                 const messagesData = await messagesRes.json();
-                const surveyData = await surveyRes.json();
 
                 setStats({
                     projects: projectsData.data?.length || 0,
@@ -37,7 +34,6 @@ export default function AdminOverviewPage() {
                     unreadMessages:
                         messagesData.data?.filter((m: { isRead: boolean }) => !m.isRead)
                             .length || 0,
-                    surveyResponses: surveyData.data?.summary?.totalResponses || 0,
                 });
             } catch {
                 // Handle errors silently
@@ -70,13 +66,6 @@ export default function AdminOverviewPage() {
             icon: "🔔",
             color: "text-amber-400",
             bg: "bg-amber-500/10",
-        },
-        {
-            label: "Survey Responses",
-            value: stats?.surveyResponses || 0,
-            icon: "📈",
-            color: "text-purple-400",
-            bg: "bg-purple-500/10",
         },
     ];
 

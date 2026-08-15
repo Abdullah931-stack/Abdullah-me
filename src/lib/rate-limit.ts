@@ -31,20 +31,6 @@ export function getMessageRateLimiter(): Ratelimit | null {
     });
 }
 
-/**
- * Rate limiter for Survey responses.
- * Limit: 3 submissions per IP per hour.
- */
-export function getSurveyRateLimiter(): Ratelimit | null {
-    const redis = createRedisClient();
-    if (!redis) return null;
-
-    return new Ratelimit({
-        redis,
-        limiter: Ratelimit.slidingWindow(3, "1 h"),
-        prefix: "ratelimit:survey",
-    });
-}
 
 /**
  * Checks rate limit for a given IP address.

@@ -215,4 +215,52 @@ describe("Timeline Math & Algorithm Suite — §12 Specifications", () => {
     render(<Timeline entries={entries} />);
     expect(screen.getByText("مشروع المحاكاة")).toBeInTheDocument();
   });
+
+  it("should fetch project details from public API endpoint /api/public/projects/[slug]", async () => {
+    const fetchSpy = vi.spyOn(global, "fetch").mockResolvedValueOnce({
+      json: async () => ({
+        success: true,
+        data: {
+          id: "p1",
+          slug: "quantum-sim",
+          titleAr: "مشروع",
+          titleEn: "Project",
+          summaryAr: "ملخص",
+          summaryEn: "Summary",
+          bodyAr: "محتوى",
+          bodyEn: "Body",
+          skills: ["React"],
+          order: 0,
+          isPublished: true,
+          isFeatured: true,
+          images: [],
+          createdAt: new Date(),
+          updatedAt: new Date(),
+        },
+      }),
+    } as unknown as Response);
+
+    const entries: TimelineEntry[] = [
+      {
+        id: "1",
+        date: new Date("2023-01-01"),
+        dateTo: null,
+        projectSlug: "quantum-sim",
+        age: 20,
+        titleAr: "محطة",
+        titleEn: "Milestone",
+        storyAr: "",
+        storyEn: "",
+        imageUrl: null,
+        order: 0,
+      },
+    ];
+
+    render(<Timeline entries={entries} />);
+    const btn = screen.getByText("fullProjectDetails");
+    btn.click();
+
+    expect(fetchSpy).toHaveBeenCalledWith("/api/public/projects/quantum-sim");
+    fetchSpy.mockRestore();
+  });
 });

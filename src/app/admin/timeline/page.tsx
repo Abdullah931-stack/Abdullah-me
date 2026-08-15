@@ -12,6 +12,7 @@ import type { TimelineRow } from "@/types";
 
 export default function AdminTimelinePage() {
     const [entries, setEntries] = useState<TimelineRow[]>([]);
+    const [projects, setProjects] = useState<{ id: string; slug: string; titleAr: string; titleEn: string }[]>([]);
     const [isLoading, setIsLoading] = useState(true);
     const [showForm, setShowForm] = useState(false);
     const [editing, setEditing] = useState<TimelineRow | null>(null);
@@ -22,6 +23,8 @@ export default function AdminTimelinePage() {
         age: 0,
         titleAr: "",
         titleEn: "",
+        summaryAr: "",
+        summaryEn: "",
         storyAr: "",
         storyEn: "",
         imageUrl: "",
@@ -30,7 +33,18 @@ export default function AdminTimelinePage() {
 
     useEffect(() => {
         fetchEntries();
+        fetchProjects();
     }, []);
+
+    async function fetchProjects() {
+        try {
+            const res = await fetch("/api/admin/projects");
+            const data = await res.json();
+            if (data.success) setProjects(data.data);
+        } catch {
+            // Handle error silently
+        }
+    }
 
     async function fetchEntries() {
         try {
@@ -86,10 +100,12 @@ export default function AdminTimelinePage() {
             dateTo: entry.dateTo ? entry.dateTo.split("T")[0] : "",
             projectSlug: entry.projectSlug || "",
             age: entry.age,
-            titleAr: entry.titleAr,
-            titleEn: entry.titleEn,
-            storyAr: entry.storyAr,
-            storyEn: entry.storyEn,
+            titleAr: entry.titleAr || "",
+            titleEn: entry.titleEn || "",
+            summaryAr: entry.summaryAr || "",
+            summaryEn: entry.summaryEn || "",
+            storyAr: entry.storyAr || "",
+            storyEn: entry.storyEn || "",
             imageUrl: entry.imageUrl || "",
             order: entry.order,
         });
@@ -104,6 +120,8 @@ export default function AdminTimelinePage() {
             age: 0,
             titleAr: "",
             titleEn: "",
+            summaryAr: "",
+            summaryEn: "",
             storyAr: "",
             storyEn: "",
             imageUrl: "",
@@ -180,22 +198,26 @@ export default function AdminTimelinePage() {
                             className="rounded-lg border border-gray-700 bg-gray-800 px-4 py-2.5 text-white focus:border-teal-500 focus:outline-none"
                         />
                     </div>
-                    {/* §12.7 — Related Project Slug (optional) */}
+                    {/* Related Project Selection (optional) */}
                     <div>
-                        <label className="block text-xs mb-1" style={{ color: 'var(--color-muted)', fontFamily: 'var(--font-jetbrains-mono), monospace' }}>
-                            Related Project Slug (optional — §12.7)
+                        <label className="block text-xs mb-1 font-mono" style={{ color: 'var(--color-muted)' }}>
+                            Link to Uploaded Project (optional — §12.7)
                         </label>
-                        <input
-                            type="text"
-                            placeholder="e.g. quantum-sim"
-                            value={form.projectSlug}
-                            onChange={(e) => setForm({ ...form, projectSlug: e.target.value })}
-                            className="w-full rounded-lg px-4 py-2.5 focus:outline-none transition-all"
-                            style={{ border: '1px solid var(--color-card-border)', background: 'rgba(255,255,255,0.04)', color: 'var(--color-text)' }}
-                        />
-                        <p className="text-xs mt-1" style={{ color: 'var(--color-muted)', opacity: 0.7 }}>
-                            If provided, expanding this milestone will show 1–2 lines of personal context and a link to the project detail page.
-                        </p>
+                        <div className="flex gap-2">
+                            <select
+                                value={form.projectSlug}
+                                onChange={(e) => setForm({ ...form, projectSlug: e.target.value })}
+                                className="flex-1 rounded-lg px-4 py-2.5 focus:outline-none transition-all cursor-pointer"
+                                style={{ border: '1px solid var(--color-card-border)', background: 'rgba(255,255,255,0.04)', color: 'var(--color-text)' }}
+                            >
+                                <option value="" className="bg-zinc-900 text-zinc-400">-- None (No Linked Project) --</option>
+                                {projects.map((p) => (
+                                    <option key={p.id} value={p.slug} className="bg-zinc-900 text-white">
+                                        {p.titleAr} ({p.titleEn}) — [{p.slug}]
+                                    </option>
+                                ))}
+                            </select>
+                        </div>
                     </div>
                     <div className="grid grid-cols-1 gap-4 md:grid-cols-2">
                         <input
@@ -215,18 +237,33 @@ export default function AdminTimelinePage() {
                             required
                         />
                         <textarea
-                            placeholder="Story (English)"
-                            value={form.storyEn}
-                            onChange={(e) => setForm({ ...form, storyEn: e.target.value })}
-                            className="rounded-lg border border-gray-700 bg-gray-800 px-4 py-2.5 text-white focus:border-teal-500 focus:outline-none"
-                            rows={3}
+                            placeholder="Summary Markdown (English — optional)"
+                            value={form.summaryEn}
+                            onChange={(e) => setForm({ ...form, summaryEn: e.target.value })}
+                            className="rounded-lg border border-gray-700 bg-gray-800 px-4 py-2.5 text-white focus:border-teal-500 focus:outline-none font-mono text-sm"
+                            rows={2}
                         />
                         <textarea
-                            placeholder="القصة (عربي)"
+                            placeholder="الملخص المنسق Markdown (عربي — اختياري)"
+                            value={form.summaryAr}
+                            onChange={(e) => setForm({ ...form, summaryAr: e.target.value })}
+                            className="rounded-lg border border-gray-700 bg-gray-800 px-4 py-2.5 text-white focus:border-teal-500 focus:outline-none font-mono text-sm"
+                            rows={2}
+                            dir="rtl"
+                        />
+                        <textarea
+                            placeholder="Full Story Markdown (English — optional)"
+                            value={form.storyEn}
+                            onChange={(e) => setForm({ ...form, storyEn: e.target.value })}
+                            className="rounded-lg border border-gray-700 bg-gray-800 px-4 py-2.5 text-white focus:border-teal-500 focus:outline-none font-mono text-sm"
+                            rows={4}
+                        />
+                        <textarea
+                            placeholder="القصة الكاملة Markdown (عربي — اختياري)"
                             value={form.storyAr}
                             onChange={(e) => setForm({ ...form, storyAr: e.target.value })}
-                            className="rounded-lg border border-gray-700 bg-gray-800 px-4 py-2.5 text-white focus:border-teal-500 focus:outline-none"
-                            rows={3}
+                            className="rounded-lg border border-gray-700 bg-gray-800 px-4 py-2.5 text-white focus:border-teal-500 focus:outline-none font-mono text-sm"
+                            rows={4}
                             dir="rtl"
                         />
                     </div>

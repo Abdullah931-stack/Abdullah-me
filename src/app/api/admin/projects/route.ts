@@ -1,13 +1,12 @@
 import { NextResponse, type NextRequest } from "next/server";
 import { prisma } from "@/lib/prisma";
 import { requireAdmin } from "@/lib/auth/require-admin";
+import type { ProjectImage } from "@/types";
 
 /**
  * Admin Projects API — CRUD
- * All routes require authentication via Supabase Auth.
- *
- * GET  — List all projects (including unpublished)
- * POST — Create a new project
+ * GET  — List all projects (including unpublished) with images
+ * POST — Create a new project with images, single cover enforcement, and custom ordering
  */
 
 // GET /api/admin/projects — List all projects
@@ -40,7 +39,7 @@ export async function POST(request: NextRequest) {
         const body = await request.json();
 
         // Generate slug from English title
-        const slug = body.titleEn
+        const slug = (body.titleEn || "project")
             .toLowerCase()
             .replace(/[^a-z0-9]+/g, "-")
             .replace(/^-|-$/g, "");
@@ -48,6 +47,35 @@ export async function POST(request: NextRequest) {
         // Check for slug collision
         const existing = await prisma.project.findUnique({ where: { slug } });
         const finalSlug = existing ? `${slug}-${Date.now()}` : slug;
+
+        // Process images payload with single cover enforcement & priority ordering
+        let rawImages: Partial<ProjectImage>[] = body.images || [];
+        if (body.coverImage && rawImages.length === 0) {
+            rawImages = [{ url: body.coverImage, isCover: true, order: 0 }];
+        }
+
+        let coverAssigned = false;
+        const processedImages = rawImages.map((img, idx) => {
+            let isCover = false;
+            if (img.isCover && !coverAssigned) {
+                isCover = true;
+                coverAssigned = true;
+            } else if (!img.isCover && idx === 0 && !coverAssigned && rawImages.some((i) => i.isCover)) {
+                isCover = false;
+            }
+            return {
+                url: img.url || "",
+                altAr: img.altAr || body.titleAr || null,
+                altEn: img.altEn || body.titleEn || null,
+                order: typeof img.order === "number" ? img.order : idx,
+                isCover,
+            };
+        });
+
+        // Ensure at least 1 image is cover if images exist
+        if (!coverAssigned && processedImages.length > 0) {
+            processedImages[0].isCover = true;
+        }
 
         const project = await prisma.project.create({
             data: {
@@ -60,26 +88,16 @@ export async function POST(request: NextRequest) {
                 bodyEn: body.bodyEn || "",
                 previewUrl: body.previewUrl || null,
                 repoUrl: body.repoUrl || null,
-                skills: body.skills || [],
+                skills: Array.isArray(body.skills) ? body.skills : [],
                 buildTime: body.buildTime || null,
                 order: body.order || 0,
                 isPublished: body.isPublished ?? false,
                 isFeatured: body.isFeatured ?? false,
-                // Create cover image if provided
-                ...(body.coverImage
-                    ? {
-                        images: {
-                            create: {
-                                url: body.coverImage,
-                                altEn: body.titleEn,
-                                altAr: body.titleAr,
-                                order: 0,
-                            },
-                        },
-                    }
-                    : {}),
+                images: {
+                    create: processedImages,
+                },
             },
-            include: { images: true },
+            include: { images: { orderBy: { order: "asc" } } },
         });
 
         return NextResponse.json(

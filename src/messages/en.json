@@ -1,94 +1,87 @@
 {
-    "common": {
-        "siteTitle": "Advanced Personal Page",
-        "siteDescription": "A professional digital identity showcasing projects, career journey, and visitor engagement"
+  "common": {
+    "siteTitle": "Abdullah — Advanced Personal Page",
+    "siteDescription": "A professional digital identity showcasing projects, career journey, and visitor engagement"
+  },
+  "nav": {
+    "home": "Home",
+    "portfolio": "Portfolio",
+    "journey": "My Journey",
+    "contact": "Contact"
+  },
+  "footer": {
+    "rights": "All rights reserved",
+    "madeWith": "Made with"
+  },
+  "language": {
+    "ar": "العربية",
+    "en": "English",
+    "switch": "Switch Language"
+  },
+  "hero": {
+    "eyebrow": "Systems · Signals · Simulation",
+    "name": "Abdullah.",
+    "bio": "Turns complex ideas into working systems — through AI model orchestration and precise simulation of physical phenomena.",
+    "cta": "Contact Me",
+    "work": "My Work"
+  },
+  "projects": {
+    "title": "My Projects",
+    "subtitle": "Selected works reflecting my passion for development",
+    "preview": "Preview",
+    "buildTime": "Build Time",
+    "noProjects": "No projects yet",
+    "backToProjects": "Back to Portfolio",
+    "repository": "Repository",
+    "close": "Close"
+  },
+  "buildTimeUnits": {
+    "day": "{count} day",
+    "days": "{count} days",
+    "week": "{count} week",
+    "weeks": "{count} weeks",
+    "month": "{count} month",
+    "months": "{count} months",
+    "year": "{count} year",
+    "years": "{count} years",
+    "and": " and "
+  },
+  "journey": {
+    "title": "My Journey",
+    "subtitle": "A story of passion that started from scratch",
+    "age": "Age at the time",
+    "noEntries": "No entries yet",
+    "rangeTooltip": "Estimated range interval ({days} days)",
+    "fullProjectDetails": "Full project details →"
+  },
+  "contact": {
+    "title": "Get in Touch",
+    "subtitle": "I'd be glad to hear from you",
+    "name": "Name",
+    "email": "Email",
+    "reason": "Reason for reaching out",
+    "message": "Message",
+    "submit": "Send",
+    "sending": "Sending...",
+    "clearForm": "Clear form",
+    "reasons": {
+      "general": "General inquiry",
+      "bug-report": "Report an issue in a project",
+      "academic": "Academic / research inquiry",
+      "collaboration": "Collaboration or hiring opportunity"
     },
-    "nav": {
-        "home": "Home",
-        "portfolio": "Portfolio",
-        "journey": "My Journey",
-        "contact": "Contact"
+    "projectPicker": "Select a project",
+    "projectPickerOther": "Other (not listed)",
+    "projectPickerOtherInput": "Enter the project name",
+    "success": {
+      "title": "Message sent",
+      "message": "Thank you for reaching out. I'll read your message and reply as soon as I can."
     },
-    "footer": {
-        "rights": "All rights reserved",
-        "madeWith": "Made with"
-    },
-    "theme": {
-        "dark": "Dark Mode",
-        "light": "Light Mode",
-        "toggle": "Toggle Theme"
-    },
-    "language": {
-        "ar": "العربية",
-        "en": "English",
-        "switch": "Switch Language"
-    },
-    "hero": {
-        "eyebrow": "Systems · Signals · Simulation",
-        "name": "Abdullah.",
-        "bio": "Turns complex ideas into working systems — through AI model orchestration and precise simulation of physical phenomena.",
-        "cta": "Contact Me",
-        "work": "My Work"
-    },
-    "projects": {
-        "title": "My Projects",
-        "subtitle": "Selected works reflecting my passion for development",
-        "viewProject": "View Project",
-        "preview": "Preview",
-        "skills": "Technologies Used",
-        "buildTime": "Build Time",
-        "story": "Development Story",
-        "challenges": "Challenges & Solutions",
-        "reason": "Why I Built This",
-        "noProjects": "No projects yet"
-    },
-    "journey": {
-        "title": "My Journey",
-        "subtitle": "A story of passion that started from scratch",
-        "age": "Age at the time"
-    },
-    "contact": {
-        "title": "Get in Touch",
-        "subtitle": "I'd be glad to hear from you",
-        "name": "Name",
-        "email": "Email",
-        "reason": "Reason for reaching out",
-        "message": "Message",
-        "submit": "Send",
-        "clearForm": "Clear form",
-        "reasons": {
-            "general": "General inquiry",
-            "bug-report": "Report an issue in a project",
-            "academic": "Academic / research inquiry",
-            "collaboration": "Collaboration or hiring opportunity"
-        },
-        "projectPicker": "Select a project",
-        "projectPickerOther": "Other (not listed)",
-        "projectPickerOtherInput": "Enter the project name",
-        "success": {
-            "title": "Message sent",
-            "message": "Thank you for reaching out. I'll read your message and reply as soon as I can."
-        },
-        "errors": {
-            "required": "This field is required",
-            "email": "Invalid email address",
-            "rateLimit": "Too many requests. Please try again later.",
-            "generic": "An error occurred. Please try again."
-        }
-    },
-    "feedback": {
-        "title": "Help Me Improve",
-        "subtitle": "Your feedback helps me enhance the site experience",
-        "placeholder": "Write your feedback or suggestion here...",
-        "submit": "Send Feedback"
-    },
-    "survey": {
-        "title": "Welcome! 👋",
-        "subtitle": "I'd love to know more about you — just a few seconds",
-        "skip": "Skip",
-        "skipAll": "Skip Survey",
-        "next": "Next",
-        "finish": "Finish",
-        "freeTextPlaceholder": "Type your answer here..."
+    "errors": {
+      "required": "This field is required",
+      "email": "Invalid email address",
+      "rateLimit": "Too many requests. Please try again later.",
+      "generic": "An error occurred. Please try again."
     }
+  }
 }

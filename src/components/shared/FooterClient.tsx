@@ -138,6 +138,7 @@ function PlatformIcon({ platform }: { platform: string }) {
 
 export default function FooterClient({ socialLinks }: FooterClientProps) {
     const t = useTranslations("footer");
+    const tLang = useTranslations("language");
     const locale = useLocale();
     const pathname = usePathname();
     const currentYear = new Date().getFullYear();
@@ -182,7 +183,7 @@ export default function FooterClient({ socialLinks }: FooterClientProps) {
                             scroll={false}
                             className="font-medium hover:text-[var(--color-accent)] transition-colors"
                         >
-                            {locale === "ar" ? "English" : "AR"}
+                            {tLang(otherLocale)}
                         </Link>
                     </div>
                 </div>

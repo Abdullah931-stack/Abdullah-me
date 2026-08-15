@@ -100,12 +100,14 @@ export default function PulseBorder({
     return () => cancelAnimationFrame(animFrameRef.current);
   }, []);
 
-  // Check reduced motion (§10.5)
+  // Check reduced motion (§11.6)
   const [reducedMotion, setReducedMotion] = useState(false);
   useEffect(() => {
-    setReducedMotion(
-      window.matchMedia("(prefers-reduced-motion: reduce)").matches
-    );
+    if (typeof window !== "undefined" && typeof window.matchMedia === "function") {
+      setReducedMotion(
+        window.matchMedia("(prefers-reduced-motion: reduce)").matches
+      );
+    }
   }, []);
 
   // §7.3 — Mask: conic gradient from contact angle, revealing border

@@ -79,7 +79,7 @@ export default function Navbar() {
             title={tLang("switch")}
           >
             <span className="hidden md:inline-block opacity-0 lg:opacity-100 transition-opacity">
-              {locale === "ar" ? "English" : "Arabic"}
+              {tLang(otherLocale)}
             </span>
             <span
               className="flex h-8 w-8 items-center justify-center rounded-full border transition-all group-hover:border-[var(--color-accent)]"

@@ -12,7 +12,7 @@ export async function GET(request: NextRequest) {
     if (!auth.authenticated) return auth.response;
 
     try {
-        const [projects, timeline, socialLinks, messages, surveyQuestions, surveyResponses] =
+        const [projects, timeline, socialLinks, messages] =
             await Promise.all([
                 prisma.project.findMany({
                     include: { images: true },
@@ -21,8 +21,6 @@ export async function GET(request: NextRequest) {
                 prisma.timelineEntry.findMany({ orderBy: { order: "asc" } }),
                 prisma.socialLink.findMany({ orderBy: { order: "asc" } }),
                 prisma.message.findMany({ orderBy: { createdAt: "desc" } }),
-                prisma.surveyQuestion.findMany({ orderBy: { order: "asc" } }),
-                prisma.surveyResponse.findMany({ orderBy: { createdAt: "desc" } }),
             ]);
 
         const exportData = {
@@ -32,8 +30,6 @@ export async function GET(request: NextRequest) {
                 timeline,
                 socialLinks,
                 messages,
-                surveyQuestions,
-                surveyResponses,
             },
         };
 

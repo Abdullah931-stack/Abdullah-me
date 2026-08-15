@@ -44,6 +44,8 @@ export type TimelineEntryMinAggregateOutputType = {
   age: number | null
   titleAr: string | null
   titleEn: string | null
+  summaryAr: string | null
+  summaryEn: string | null
   storyAr: string | null
   storyEn: string | null
   imageUrl: string | null
@@ -60,6 +62,8 @@ export type TimelineEntryMaxAggregateOutputType = {
   age: number | null
   titleAr: string | null
   titleEn: string | null
+  summaryAr: string | null
+  summaryEn: string | null
   storyAr: string | null
   storyEn: string | null
   imageUrl: string | null
@@ -76,6 +80,8 @@ export type TimelineEntryCountAggregateOutputType = {
   age: number
   titleAr: number
   titleEn: number
+  summaryAr: number
+  summaryEn: number
   storyAr: number
   storyEn: number
   imageUrl: number
@@ -104,6 +110,8 @@ export type TimelineEntryMinAggregateInputType = {
   age?: true
   titleAr?: true
   titleEn?: true
+  summaryAr?: true
+  summaryEn?: true
   storyAr?: true
   storyEn?: true
   imageUrl?: true
@@ -120,6 +128,8 @@ export type TimelineEntryMaxAggregateInputType = {
   age?: true
   titleAr?: true
   titleEn?: true
+  summaryAr?: true
+  summaryEn?: true
   storyAr?: true
   storyEn?: true
   imageUrl?: true
@@ -136,6 +146,8 @@ export type TimelineEntryCountAggregateInputType = {
   age?: true
   titleAr?: true
   titleEn?: true
+  summaryAr?: true
+  summaryEn?: true
   storyAr?: true
   storyEn?: true
   imageUrl?: true
@@ -239,8 +251,10 @@ export type TimelineEntryGroupByOutputType = {
   age: number
   titleAr: string
   titleEn: string
-  storyAr: string
-  storyEn: string
+  summaryAr: string | null
+  summaryEn: string | null
+  storyAr: string | null
+  storyEn: string | null
   imageUrl: string | null
   order: number
   createdAt: Date
@@ -278,8 +292,10 @@ export type TimelineEntryWhereInput = {
   age?: Prisma.IntFilter<"TimelineEntry"> | number
   titleAr?: Prisma.StringFilter<"TimelineEntry"> | string
   titleEn?: Prisma.StringFilter<"TimelineEntry"> | string
-  storyAr?: Prisma.StringFilter<"TimelineEntry"> | string
-  storyEn?: Prisma.StringFilter<"TimelineEntry"> | string
+  summaryAr?: Prisma.StringNullableFilter<"TimelineEntry"> | string | null
+  summaryEn?: Prisma.StringNullableFilter<"TimelineEntry"> | string | null
+  storyAr?: Prisma.StringNullableFilter<"TimelineEntry"> | string | null
+  storyEn?: Prisma.StringNullableFilter<"TimelineEntry"> | string | null
   imageUrl?: Prisma.StringNullableFilter<"TimelineEntry"> | string | null
   order?: Prisma.IntFilter<"TimelineEntry"> | number
   createdAt?: Prisma.DateTimeFilter<"TimelineEntry"> | Date | string
@@ -294,8 +310,10 @@ export type TimelineEntryOrderByWithRelationInput = {
   age?: Prisma.SortOrder
   titleAr?: Prisma.SortOrder
   titleEn?: Prisma.SortOrder
-  storyAr?: Prisma.SortOrder
-  storyEn?: Prisma.SortOrder
+  summaryAr?: Prisma.SortOrderInput | Prisma.SortOrder
+  summaryEn?: Prisma.SortOrderInput | Prisma.SortOrder
+  storyAr?: Prisma.SortOrderInput | Prisma.SortOrder
+  storyEn?: Prisma.SortOrderInput | Prisma.SortOrder
   imageUrl?: Prisma.SortOrderInput | Prisma.SortOrder
   order?: Prisma.SortOrder
   createdAt?: Prisma.SortOrder
@@ -313,8 +331,10 @@ export type TimelineEntryWhereUniqueInput = Prisma.AtLeast<{
   age?: Prisma.IntFilter<"TimelineEntry"> | number
   titleAr?: Prisma.StringFilter<"TimelineEntry"> | string
   titleEn?: Prisma.StringFilter<"TimelineEntry"> | string
-  storyAr?: Prisma.StringFilter<"TimelineEntry"> | string
-  storyEn?: Prisma.StringFilter<"TimelineEntry"> | string
+  summaryAr?: Prisma.StringNullableFilter<"TimelineEntry"> | string | null
+  summaryEn?: Prisma.StringNullableFilter<"TimelineEntry"> | string | null
+  storyAr?: Prisma.StringNullableFilter<"TimelineEntry"> | string | null
+  storyEn?: Prisma.StringNullableFilter<"TimelineEntry"> | string | null
   imageUrl?: Prisma.StringNullableFilter<"TimelineEntry"> | string | null
   order?: Prisma.IntFilter<"TimelineEntry"> | number
   createdAt?: Prisma.DateTimeFilter<"TimelineEntry"> | Date | string
@@ -329,8 +349,10 @@ export type TimelineEntryOrderByWithAggregationInput = {
   age?: Prisma.SortOrder
   titleAr?: Prisma.SortOrder
   titleEn?: Prisma.SortOrder
-  storyAr?: Prisma.SortOrder
-  storyEn?: Prisma.SortOrder
+  summaryAr?: Prisma.SortOrderInput | Prisma.SortOrder
+  summaryEn?: Prisma.SortOrderInput | Prisma.SortOrder
+  storyAr?: Prisma.SortOrderInput | Prisma.SortOrder
+  storyEn?: Prisma.SortOrderInput | Prisma.SortOrder
   imageUrl?: Prisma.SortOrderInput | Prisma.SortOrder
   order?: Prisma.SortOrder
   createdAt?: Prisma.SortOrder
@@ -353,8 +375,10 @@ export type TimelineEntryScalarWhereWithAggregatesInput = {
   age?: Prisma.IntWithAggregatesFilter<"TimelineEntry"> | number
   titleAr?: Prisma.StringWithAggregatesFilter<"TimelineEntry"> | string
   titleEn?: Prisma.StringWithAggregatesFilter<"TimelineEntry"> | string
-  storyAr?: Prisma.StringWithAggregatesFilter<"TimelineEntry"> | string
-  storyEn?: Prisma.StringWithAggregatesFilter<"TimelineEntry"> | string
+  summaryAr?: Prisma.StringNullableWithAggregatesFilter<"TimelineEntry"> | string | null
+  summaryEn?: Prisma.StringNullableWithAggregatesFilter<"TimelineEntry"> | string | null
+  storyAr?: Prisma.StringNullableWithAggregatesFilter<"TimelineEntry"> | string | null
+  storyEn?: Prisma.StringNullableWithAggregatesFilter<"TimelineEntry"> | string | null
   imageUrl?: Prisma.StringNullableWithAggregatesFilter<"TimelineEntry"> | string | null
   order?: Prisma.IntWithAggregatesFilter<"TimelineEntry"> | number
   createdAt?: Prisma.DateTimeWithAggregatesFilter<"TimelineEntry"> | Date | string
@@ -369,8 +393,10 @@ export type TimelineEntryCreateInput = {
   age: number
   titleAr: string
   titleEn: string
-  storyAr: string
-  storyEn: string
+  summaryAr?: string | null
+  summaryEn?: string | null
+  storyAr?: string | null
+  storyEn?: string | null
   imageUrl?: string | null
   order?: number
   createdAt?: Date | string
@@ -385,8 +411,10 @@ export type TimelineEntryUncheckedCreateInput = {
   age: number
   titleAr: string
   titleEn: string
-  storyAr: string
-  storyEn: string
+  summaryAr?: string | null
+  summaryEn?: string | null
+  storyAr?: string | null
+  storyEn?: string | null
   imageUrl?: string | null
   order?: number
   createdAt?: Date | string
@@ -401,8 +429,10 @@ export type TimelineEntryUpdateInput = {
   age?: Prisma.IntFieldUpdateOperationsInput | number
   titleAr?: Prisma.StringFieldUpdateOperationsInput | string
   titleEn?: Prisma.StringFieldUpdateOperationsInput | string
-  storyAr?: Prisma.StringFieldUpdateOperationsInput | string
-  storyEn?: Prisma.StringFieldUpdateOperationsInput | string
+  summaryAr?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  summaryEn?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  storyAr?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  storyEn?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   imageUrl?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   order?: Prisma.IntFieldUpdateOperationsInput | number
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
@@ -417,8 +447,10 @@ export type TimelineEntryUncheckedUpdateInput = {
   age?: Prisma.IntFieldUpdateOperationsInput | number
   titleAr?: Prisma.StringFieldUpdateOperationsInput | string
   titleEn?: Prisma.StringFieldUpdateOperationsInput | string
-  storyAr?: Prisma.StringFieldUpdateOperationsInput | string
-  storyEn?: Prisma.StringFieldUpdateOperationsInput | string
+  summaryAr?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  summaryEn?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  storyAr?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  storyEn?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   imageUrl?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   order?: Prisma.IntFieldUpdateOperationsInput | number
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
@@ -433,8 +465,10 @@ export type TimelineEntryCreateManyInput = {
   age: number
   titleAr: string
   titleEn: string
-  storyAr: string
-  storyEn: string
+  summaryAr?: string | null
+  summaryEn?: string | null
+  storyAr?: string | null
+  storyEn?: string | null
   imageUrl?: string | null
   order?: number
   createdAt?: Date | string
@@ -449,8 +483,10 @@ export type TimelineEntryUpdateManyMutationInput = {
   age?: Prisma.IntFieldUpdateOperationsInput | number
   titleAr?: Prisma.StringFieldUpdateOperationsInput | string
   titleEn?: Prisma.StringFieldUpdateOperationsInput | string
-  storyAr?: Prisma.StringFieldUpdateOperationsInput | string
-  storyEn?: Prisma.StringFieldUpdateOperationsInput | string
+  summaryAr?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  summaryEn?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  storyAr?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  storyEn?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   imageUrl?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   order?: Prisma.IntFieldUpdateOperationsInput | number
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
@@ -465,8 +501,10 @@ export type TimelineEntryUncheckedUpdateManyInput = {
   age?: Prisma.IntFieldUpdateOperationsInput | number
   titleAr?: Prisma.StringFieldUpdateOperationsInput | string
   titleEn?: Prisma.StringFieldUpdateOperationsInput | string
-  storyAr?: Prisma.StringFieldUpdateOperationsInput | string
-  storyEn?: Prisma.StringFieldUpdateOperationsInput | string
+  summaryAr?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  summaryEn?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  storyAr?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  storyEn?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   imageUrl?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   order?: Prisma.IntFieldUpdateOperationsInput | number
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
@@ -481,6 +519,8 @@ export type TimelineEntryCountOrderByAggregateInput = {
   age?: Prisma.SortOrder
   titleAr?: Prisma.SortOrder
   titleEn?: Prisma.SortOrder
+  summaryAr?: Prisma.SortOrder
+  summaryEn?: Prisma.SortOrder
   storyAr?: Prisma.SortOrder
   storyEn?: Prisma.SortOrder
   imageUrl?: Prisma.SortOrder
@@ -502,6 +542,8 @@ export type TimelineEntryMaxOrderByAggregateInput = {
   age?: Prisma.SortOrder
   titleAr?: Prisma.SortOrder
   titleEn?: Prisma.SortOrder
+  summaryAr?: Prisma.SortOrder
+  summaryEn?: Prisma.SortOrder
   storyAr?: Prisma.SortOrder
   storyEn?: Prisma.SortOrder
   imageUrl?: Prisma.SortOrder
@@ -518,6 +560,8 @@ export type TimelineEntryMinOrderByAggregateInput = {
   age?: Prisma.SortOrder
   titleAr?: Prisma.SortOrder
   titleEn?: Prisma.SortOrder
+  summaryAr?: Prisma.SortOrder
+  summaryEn?: Prisma.SortOrder
   storyAr?: Prisma.SortOrder
   storyEn?: Prisma.SortOrder
   imageUrl?: Prisma.SortOrder
@@ -545,6 +589,8 @@ export type TimelineEntrySelect<ExtArgs extends runtime.Types.Extensions.Interna
   age?: boolean
   titleAr?: boolean
   titleEn?: boolean
+  summaryAr?: boolean
+  summaryEn?: boolean
   storyAr?: boolean
   storyEn?: boolean
   imageUrl?: boolean
@@ -561,6 +607,8 @@ export type TimelineEntrySelectCreateManyAndReturn<ExtArgs extends runtime.Types
   age?: boolean
   titleAr?: boolean
   titleEn?: boolean
+  summaryAr?: boolean
+  summaryEn?: boolean
   storyAr?: boolean
   storyEn?: boolean
   imageUrl?: boolean
@@ -577,6 +625,8 @@ export type TimelineEntrySelectUpdateManyAndReturn<ExtArgs extends runtime.Types
   age?: boolean
   titleAr?: boolean
   titleEn?: boolean
+  summaryAr?: boolean
+  summaryEn?: boolean
   storyAr?: boolean
   storyEn?: boolean
   imageUrl?: boolean
@@ -593,6 +643,8 @@ export type TimelineEntrySelectScalar = {
   age?: boolean
   titleAr?: boolean
   titleEn?: boolean
+  summaryAr?: boolean
+  summaryEn?: boolean
   storyAr?: boolean
   storyEn?: boolean
   imageUrl?: boolean
@@ -601,7 +653,7 @@ export type TimelineEntrySelectScalar = {
   updatedAt?: boolean
 }
 
-export type TimelineEntryOmit<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetOmit<"id" | "date" | "dateTo" | "projectSlug" | "age" | "titleAr" | "titleEn" | "storyAr" | "storyEn" | "imageUrl" | "order" | "createdAt" | "updatedAt", ExtArgs["result"]["timelineEntry"]>
+export type TimelineEntryOmit<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetOmit<"id" | "date" | "dateTo" | "projectSlug" | "age" | "titleAr" | "titleEn" | "summaryAr" | "summaryEn" | "storyAr" | "storyEn" | "imageUrl" | "order" | "createdAt" | "updatedAt", ExtArgs["result"]["timelineEntry"]>
 
 export type $TimelineEntryPayload<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
   name: "TimelineEntry"
@@ -614,8 +666,10 @@ export type $TimelineEntryPayload<ExtArgs extends runtime.Types.Extensions.Inter
     age: number
     titleAr: string
     titleEn: string
-    storyAr: string
-    storyEn: string
+    summaryAr: string | null
+    summaryEn: string | null
+    storyAr: string | null
+    storyEn: string | null
     imageUrl: string | null
     order: number
     createdAt: Date
@@ -1050,6 +1104,8 @@ export interface TimelineEntryFieldRefs {
   readonly age: Prisma.FieldRef<"TimelineEntry", 'Int'>
   readonly titleAr: Prisma.FieldRef<"TimelineEntry", 'String'>
   readonly titleEn: Prisma.FieldRef<"TimelineEntry", 'String'>
+  readonly summaryAr: Prisma.FieldRef<"TimelineEntry", 'String'>
+  readonly summaryEn: Prisma.FieldRef<"TimelineEntry", 'String'>
   readonly storyAr: Prisma.FieldRef<"TimelineEntry", 'String'>
   readonly storyEn: Prisma.FieldRef<"TimelineEntry", 'String'>
   readonly imageUrl: Prisma.FieldRef<"TimelineEntry", 'String'>

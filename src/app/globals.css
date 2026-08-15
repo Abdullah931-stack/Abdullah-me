@@ -184,13 +184,13 @@ body {
 }
 
 /* ═══════════════════════════════════════════════
-   prefers-reduced-motion — §10.5
-   Disable Tier-3 cinematic motion
+   prefers-reduced-motion — §11.6
+   Disable Tier-3 cinematic ambient background motion
+   (Lissajous curve handles reduced motion internally via §5.2.4)
    ═══════════════════════════════════════════════ */
 @media (prefers-reduced-motion: reduce) {
 
-  .blob-field,
-  .lissajous-canvas {
+  .blob-field {
     display: none !important;
   }
 

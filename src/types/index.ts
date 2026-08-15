@@ -35,6 +35,7 @@ export interface ProjectImage {
     altAr: string | null;
     altEn: string | null;
     order: number;
+    isCover?: boolean;
 }
 
 export interface Project {
@@ -69,38 +70,12 @@ export interface TimelineEntry {
     age: number;
     titleAr: string;
     titleEn: string;
-    storyAr: string;
-    storyEn: string;
+    summaryAr?: string | null;
+    summaryEn?: string | null;
+    storyAr?: string | null;
+    storyEn?: string | null;
     imageUrl: string | null;
     order: number;
-}
-
-// ─────────────────────────────────────────────
-// Survey
-// ─────────────────────────────────────────────
-export type SurveyQuestionType = "multiple_choice" | "free_text";
-
-export interface SurveyQuestion {
-    id: string;
-    textAr: string;
-    textEn: string;
-    type: SurveyQuestionType;
-    optionsAr: string[];
-    optionsEn: string[];
-    order: number;
-    isRequired: boolean;
-    isActive: boolean;
-}
-
-export interface SurveyResponseInput {
-    questionId: string;
-    answer: string;
-}
-
-export interface SurveySubmission {
-    visitorId: string;
-    locale: Locale;
-    responses: SurveyResponseInput[];
 }
 
 // ─────────────────────────────────────────────
@@ -158,10 +133,19 @@ export interface ProjectRow {
     id: string;
     titleEn: string;
     titleAr: string;
+    summaryEn?: string;
+    summaryAr?: string;
+    bodyEn?: string;
+    bodyAr?: string;
+    previewUrl?: string | null;
+    repoUrl?: string | null;
+    skills?: string[];
+    buildTime?: string | null;
     slug: string;
     isPublished: boolean;
     isFeatured: boolean;
     order: number;
+    images?: ProjectImage[];
 }
 
 export interface TimelineRow {
@@ -172,8 +156,10 @@ export interface TimelineRow {
     age: number;
     titleAr: string;
     titleEn: string;
-    storyAr: string;
-    storyEn: string;
+    summaryAr?: string | null;
+    summaryEn?: string | null;
+    storyAr?: string | null;
+    storyEn?: string | null;
     imageUrl: string | null;
     order: number;
 }

@@ -4,10 +4,11 @@ import Timeline from "@/components/journey/Timeline";
 import { prisma } from "@/lib/prisma";
 
 /**
- * Journey Page — "My Story"
- * Per 04-PAGE-SPECIFICATIONS.md:
- * - Page header with title + subtitle
- * - Timeline with scroll-triggered animations
+ * Journey Page — Scientific Milestone Log
+ * Implements §12 of UI/UX Specifications v2.0:
+ * - Single-rail reading layout aligned to locale reading direction (§12.3)
+ * - Logarithmic time compression between entries (§12.4)
+ * - Uncertainty interval brackets (`dateTo`) and in-place project detail modals (§12.5, §12.7)
  */
 interface JourneyPageProps {
     params: Promise<{ locale: string }>;

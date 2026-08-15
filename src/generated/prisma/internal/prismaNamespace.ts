@@ -1012,6 +1012,7 @@ export const ProjectImageScalarFieldEnum = {
   altAr: 'altAr',
   altEn: 'altEn',
   order: 'order',
+  isCover: 'isCover',
   projectId: 'projectId'
 } as const
 
@@ -1026,6 +1027,8 @@ export const TimelineEntryScalarFieldEnum = {
   age: 'age',
   titleAr: 'titleAr',
   titleEn: 'titleEn',
+  summaryAr: 'summaryAr',
+  summaryEn: 'summaryEn',
   storyAr: 'storyAr',
   storyEn: 'storyEn',
   imageUrl: 'imageUrl',

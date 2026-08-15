@@ -71,6 +71,7 @@ export async function POST(request: NextRequest) {
                 reason:      body.reason,
                 projectRef:  body.projectRef?.trim() || null, // §9.3 — only for bug-report
                 body:        body.body.trim(),
+                locale:      body.locale || "ar",
             },
         });
 
