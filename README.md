@@ -1,14 +1,22 @@
-# Abdullah.div — Advanced Digital Platform & CMS
-### v2.0 "Signal & Growth" — Engineering Precision, Visibly Alive
+<p align="center">
+  <a href="https://abdullah-me-m.vercel.app">
+    <img src="./public/logo.svg" alt="Lissajous Physics Logo" width="120" height="120" />
+  </a>
+</p>
 
-[![Next.js](https://img.shields.io/badge/Next.js-16.1-black?style=flat-square&logo=next.js)](https://nextjs.org/)
-[![React](https://img.shields.io/badge/React-19.2-61DAFB?style=flat-square&logo=react)](https://react.dev/)
-[![TypeScript](https://img.shields.io/badge/TypeScript-5.0-blue?style=flat-square&logo=typescript)](https://www.typescriptlang.org/)
-[![Prisma](https://img.shields.io/badge/Prisma-7.3-2D3748?style=flat-square&logo=prisma)](https://www.prisma.io/)
-[![Supabase](https://img.shields.io/badge/Supabase-PostgreSQL%20%7C%20Auth%20%7C%20Storage-3ECF8E?style=flat-square&logo=supabase)](https://supabase.com/)
-[![Tailwind CSS](https://img.shields.io/badge/Tailwind_CSS-v4-38B2AC?style=flat-square&logo=tailwind-css)](https://tailwindcss.com/)
-[![Vitest](https://img.shields.io/badge/Vitest-78%20Passed-6E9F18?style=flat-square&logo=vitest)](https://vitest.dev/)
-[![Theme](https://img.shields.io/badge/Theme-Dark--Only%20%23050f0a-050f0a?style=flat-square)](https://github.com/Abdullah931-stack/Abdullah-div)
+<h1 align="center">Abdullah.div — Advanced Digital Platform & CMS</h1>
+<p align="center"><strong>v2.0 "Signal & Growth" — Engineering Precision, Visibly Alive</strong></p>
+
+<p align="center">
+  <a href="https://nextjs.org/"><img src="https://img.shields.io/badge/Next.js-16.1-black?style=flat-square&logo=next.js" alt="Next.js" /></a>
+  <a href="https://react.dev/"><img src="https://img.shields.io/badge/React-19.2-61DAFB?style=flat-square&logo=react" alt="React" /></a>
+  <a href="https://www.typescriptlang.org/"><img src="https://img.shields.io/badge/TypeScript-5.0-blue?style=flat-square&logo=typescript" alt="TypeScript" /></a>
+  <a href="https://www.prisma.io/"><img src="https://img.shields.io/badge/Prisma-7.3-2D3748?style=flat-square&logo=prisma" alt="Prisma" /></a>
+  <a href="https://supabase.com/"><img src="https://img.shields.io/badge/Supabase-PostgreSQL%20%7C%20Auth%20%7C%20Storage-3ECF8E?style=flat-square&logo=supabase" alt="Supabase" /></a>
+  <a href="https://tailwindcss.com/"><img src="https://img.shields.io/badge/Tailwind_CSS-v4-38B2AC?style=flat-square&logo=tailwind-css" alt="Tailwind CSS" /></a>
+  <a href="https://vitest.dev/"><img src="https://img.shields.io/badge/Vitest-83%20Passed-6E9F18?style=flat-square&logo=vitest" alt="Vitest" /></a>
+  <a href="https://abdullah-me-m.vercel.app"><img src="https://img.shields.io/badge/Theme-Dark--Only%20%23050f0a-050f0a?style=flat-square" alt="Theme" /></a>
+</p>
 
 > ∿ A high-performance, bilingual (Arabic RTL / English LTR) digital portfolio & CMS built on **Next.js 16 (App Router)**, **React 19**, **Prisma 7**, and **Supabase**. Built around the philosophy of **"Engineering Precision, Visibly Alive"** — combining physical simulation, procedural mathematical motion, and resilient system architecture.
 
@@ -101,7 +109,7 @@ The platform moves beyond traditional static portfolios and template-driven desi
 | **Email Services** | **Resend 6.9** | Asynchronous email forwarding with transactional fail-safes |
 | **Internationalization** | **`next-intl` 4.8** | Dual-locale dictionary routing, edge header negotiation |
 | **Markdown Pipeline** | `react-markdown`, `remark-gfm`, `remark-breaks` | Safe rich-text rendering with automated line breaks and GitHub markdown extensions |
-| **Testing** | **Vitest 4**, `@testing-library/react`, `jsdom` | 78 automated unit tests covering math models, components, API endpoints, and storage |
+| **Testing** | **Vitest 4**, `@testing-library/react`, `jsdom` | 83 automated unit tests across 13 test suites covering math models, components, API endpoints, auth guards, and storage |
 
 ---
 
