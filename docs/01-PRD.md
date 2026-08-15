@@ -101,6 +101,6 @@
 | NFR-03 | **Dark-Only Visual Identity:** Base `#050f0a`, emerald `#4ade80`/`#a7f3c4`, typography `Space Grotesk`, `IBM Plex Sans Arabic`, `JetBrains Mono`. | **High** |
 | NFR-04 | **API Security & Rate Limiting:** Upstash Redis sliding-window limiters restricting public endpoints (max 5 contact messages/IP/hr). | **Critical** |
 | NFR-05 | **Database Security & RLS:** PostgreSQL Row-Level Security active across all tables with public registration guarded. | **Critical** |
-| NFR-06 | **Edge Analytics & Web Vitals:** Integrated `@vercel/analytics` cookieless, GDPR-compliant privacy-first visitor analytics with zero database overhead. | **High** |
+| NFR-06 | **Edge Analytics & Speed Insights:** Integrated `@vercel/analytics` & `@vercel/speed-insights` cookieless, GDPR-compliant privacy-first visitor and Core Web Vitals performance analytics with zero database overhead. | **High** |
 | NFR-07 | **Accessibility & Reduced Motion:** Respect `prefers-reduced-motion` with graceful calm-motion degradation (e.g. constant-speed Lissajous trails). | **High** |
 | NFR-08 | **Automated Test Quality:** 100% pass rate across Vitest unit and integration suites covering math models, draft persistence, API routes, and components. | **High** |

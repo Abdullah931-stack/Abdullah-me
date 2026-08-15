@@ -57,29 +57,40 @@ export default function ProjectLightbox({
 
     // Keyboard navigation (Escape, ArrowLeft, ArrowRight)
     useEffect(() => {
-        if (lightboxIndex === null) return;
-
         const handleKeyDown = (e: KeyboardEvent) => {
             if (e.key === "Escape") {
-                setLightboxIndex(null);
+                if (lightboxIndex !== null) {
+                    setLightboxIndex(null);
+                }
             } else if (e.key === "ArrowLeft") {
-                if (isRtl) {
-                    handleLightboxNext();
+                if (lightboxIndex !== null) {
+                    if (isRtl) handleLightboxNext();
+                    else handleLightboxPrev();
                 } else {
-                    handleLightboxPrev();
+                    if (isRtl) handleShowcaseNext();
+                    else handleShowcasePrev();
                 }
             } else if (e.key === "ArrowRight") {
-                if (isRtl) {
-                    handleLightboxPrev();
+                if (lightboxIndex !== null) {
+                    if (isRtl) handleLightboxPrev();
+                    else handleLightboxNext();
                 } else {
-                    handleLightboxNext();
+                    if (isRtl) handleShowcasePrev();
+                    else handleShowcaseNext();
                 }
             }
         };
 
         window.addEventListener("keydown", handleKeyDown);
         return () => window.removeEventListener("keydown", handleKeyDown);
-    }, [lightboxIndex, isRtl, handleLightboxPrev, handleLightboxNext]);
+    }, [
+        lightboxIndex,
+        isRtl,
+        handleLightboxPrev,
+        handleLightboxNext,
+        handleShowcasePrev,
+        handleShowcaseNext,
+    ]);
 
     if (!images || images.length === 0) return null;
 
@@ -165,15 +176,11 @@ export default function ProjectLightbox({
                             <button
                                 key={image.id || index}
                                 type="button"
-                                onClick={() => {
-                                    setActiveIndex(index);
-                                    setLightboxIndex(index);
-                                }}
-                                className={`relative cursor-pointer overflow-hidden rounded-xl border p-1 transition-all flex-shrink-0 ${
-                                    isSelected
+                                onClick={() => setActiveIndex(index)}
+                                className={`relative cursor-pointer overflow-hidden rounded-xl border p-1 transition-all flex-shrink-0 ${isSelected
                                         ? "border-[var(--color-accent-bright)] ring-2 ring-[var(--color-accent-bright)]/30 scale-105"
                                         : "border-white/10 opacity-60 hover:opacity-100 hover:border-white/30"
-                                }`}
+                                    }`}
                             >
                                 <img
                                     src={image.url}
@@ -228,21 +235,33 @@ export default function ProjectLightbox({
                                     }
                                     className="max-h-[72vh] w-auto object-contain rounded-lg shadow-2xl"
                                 />
-                            </div>
-
-                            {/* Close Button */}
-                            <button
+                                                       {/* Close Button — Disciplined Precision Micro-Interaction */}
+                            <motion.button
                                 onClick={() => setLightboxIndex(null)}
-                                className="absolute top-4 right-4 z-50 rounded-full p-2.5 transition-colors hover:bg-[rgba(255,255,255,0.2)]"
+                                whileHover={{ scale: 1.04 }}
+                                whileTap={{ scale: 0.96 }}
+                                transition={{ duration: 0.15, ease: "easeOut" }}
+                                className="absolute top-4 right-4 z-50 rounded-full p-2.5 shadow-md flex items-center justify-center transition-all duration-150 border border-[var(--color-card-border)] hover:border-[var(--color-accent-bright)] hover:bg-[rgba(74,222,128,0.12)] text-[var(--color-text)]"
                                 style={{
-                                    background: "rgba(5, 15, 10, 0.75)",
-                                    color: "var(--color-text)",
-                                    border: "1px solid var(--color-card-border)",
+                                    background: "rgba(5, 15, 10, 0.85)",
                                 }}
                                 aria-label={t("close")}
                             >
-                                ✕
-                            </button>
+                                <svg
+                                    width="18"
+                                    height="18"
+                                    viewBox="0 0 24 24"
+                                    fill="none"
+                                    stroke="currentColor"
+                                    strokeWidth="2"
+                                    strokeLinecap="round"
+                                    strokeLinejoin="round"
+                                >
+                                    <line x1="18" y1="6" x2="6" y2="18" />
+                                    <line x1="6" y1="6" x2="18" y2="18" />
+                                </svg>
+                            </motion.button>
+                            </div>
 
                             {/* §8.2 — PulseBorder Navigation Arrows */}
                             {images.length > 1 && (

@@ -597,9 +597,9 @@ A component driven by a persistent loop (`requestAnimationFrame`, or any `setInt
 | Lazy-load Framer Motion | Dynamic import to protect first-contentful-paint |
 | Page transitions | Fade, 300–500ms, `ease-in-out` |
 
-### 11.7 Privacy-First Edge Analytics Integration (`@vercel/analytics`)
+### 11.7 Privacy-First Edge Analytics & Speed Insights Integration
 
-Legacy visitor survey popups have been retired in favor of high-performance, cookieless, GDPR-compliant edge analytics via `@vercel/analytics/next` embedded directly into [`layout.tsx`](../src/app/[locale]/layout.tsx), providing real-time Web Vitals and visitor traffic intelligence with zero database write load or runtime interruption.
+Legacy visitor survey popups have been retired in favor of high-performance, cookieless, GDPR-compliant edge analytics via `@vercel/analytics/next` and real-world Core Web Vitals profiling via `@vercel/speed-insights/next` embedded directly into [`layout.tsx`](../src/app/[locale]/layout.tsx), providing real-time Web Vitals, user experience scoring, and visitor traffic intelligence with zero database write load or runtime interruption.
 
 ### 11.8 Path-Preserving i18n Routing & Scroll Restoration Architecture
 

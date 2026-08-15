@@ -443,19 +443,32 @@ export default function Timeline({ entries }: TimelineProps) {
               className="relative max-h-[90vh] w-full max-w-[92vw] xl:max-w-6xl overflow-y-auto rounded-2xl p-6 sm:p-8 md:p-10 shadow-2xl border border-[var(--color-card-border)] bg-[var(--color-bg)] my-auto"
               onClick={(e) => e.stopPropagation()}
             >
-              <button
+                 {/* Close Button — Disciplined Precision Micro-Interaction */}
+              <motion.button
                 onClick={() => setSelectedProject(null)}
-                className="absolute top-4 right-4 z-50 rounded-full p-2.5 transition-colors hover:bg-white/20"
+                whileHover={{ scale: 1.04 }}
+                whileTap={{ scale: 0.96 }}
+                transition={{ duration: 0.15, ease: "easeOut" }}
+                className="absolute top-4 right-4 z-50 rounded-full p-2.5 shadow-md flex items-center justify-center transition-all duration-150 border border-[var(--color-card-border)] hover:border-[var(--color-accent-bright)] hover:bg-[rgba(74,222,128,0.12)] text-[var(--color-text)]"
                 style={{
-                  background: "rgba(5, 15, 10, 0.75)",
-                  color: "var(--color-text)",
-                  border: "1px solid var(--color-card-border)",
+                  background: "rgba(5, 15, 10, 0.85)",
                 }}
                 aria-label="Close"
               >
-                ✕
-              </button>
-
+                <svg
+                  width="18"
+                  height="18"
+                  viewBox="0 0 24 24"
+                  fill="none"
+                  stroke="currentColor"
+                  strokeWidth="2"
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                >
+                  <line x1="18" y1="6" x2="6" y2="18" />
+                  <line x1="6" y1="6" x2="18" y2="18" />
+                </svg>
+              </motion.button>
               <ProjectDetail project={selectedProject} isInline={true} />
             </motion.div>
           </motion.div>

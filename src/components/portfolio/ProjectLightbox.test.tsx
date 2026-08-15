@@ -88,5 +88,16 @@ describe("ProjectLightbox Component Test Suite (§8.2)", () => {
             expect(screen.queryByTestId("lightbox-scrim")).not.toBeInTheDocument();
         });
     });
+
+    it("should allow navigating showcase images inline via keyboard arrows without opening lightbox", () => {
+        render(<ProjectLightbox images={mockImages} projectTitle="Test Project" />);
+
+        // Lightbox scrim is not open
+        expect(screen.queryByTestId("lightbox-scrim")).not.toBeInTheDocument();
+
+        // In RTL mode, ArrowLeft navigates to next image inline (index 0 -> index 1)
+        fireEvent.keyDown(window, { key: "ArrowLeft" });
+        expect(screen.queryByTestId("lightbox-scrim")).not.toBeInTheDocument();
+    });
 });
 

@@ -7,6 +7,7 @@ import Footer from "@/components/shared/Footer";
 import PageTransition from "@/components/shared/PageTransition";
 import ScrollRestoration from "@/components/shared/ScrollRestoration";
 import { Analytics } from "@vercel/analytics/next";
+import { SpeedInsights } from "@vercel/speed-insights/next";
 
 // ─────────────────────────────────────────────
 // Static Params — SSG for all locales
@@ -80,6 +81,7 @@ export default async function LocaleLayout({
                 </PageTransition>
                 <Footer />
                 <Analytics />
+                <SpeedInsights />
             </NextIntlClientProvider>
         </div>
     );

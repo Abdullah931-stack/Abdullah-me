@@ -251,28 +251,32 @@ export default function PortfolioList({ projects }: PortfolioListProps) {
                 exit={{ opacity: 0, scale: 0.96 }}
                 transition={{ duration: 0.35, ease: "easeInOut" }}
               >
-                {/* Close Button */}
-                <button
+                {/* Close Button — Disciplined Precision Micro-Interaction */}
+                <motion.button
                   onClick={() => setSelectedId(null)}
-                  className="absolute top-4 right-4 z-50 rounded-full p-2 transition-colors hover:bg-[rgba(255,255,255,0.2)]"
+                  whileHover={{ scale: 1.04 }}
+                  whileTap={{ scale: 0.96 }}
+                  transition={{ duration: 0.15, ease: "easeOut" }}
+                  className="absolute top-4 right-4 z-50 rounded-full p-2.5 shadow-md flex items-center justify-center transition-all duration-150 border border-[var(--color-card-border)] hover:border-[var(--color-accent-bright)] hover:bg-[rgba(74,222,128,0.12)] text-[var(--color-text)]"
                   style={{
-                    background: "rgba(255, 255, 255, 0.1)",
-                    color: "var(--color-text)",
+                    background: "rgba(5, 15, 10, 0.85)",
                   }}
                   aria-label="Close"
                 >
                   <svg
-                    width="20"
-                    height="20"
+                    width="18"
+                    height="18"
                     viewBox="0 0 24 24"
                     fill="none"
                     stroke="currentColor"
                     strokeWidth="2"
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
                   >
                     <line x1="18" y1="6" x2="6" y2="18" />
                     <line x1="6" y1="6" x2="18" y2="18" />
                   </svg>
-                </button>
+                </motion.button>
 
                 {/* Project Detail Content */}
                 <div className="p-6 md:p-10">
