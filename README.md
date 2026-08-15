@@ -4,7 +4,7 @@
   </a>
 </p>
 
-<h1 align="center">Abdullah.div — Advanced Digital Platform & CMS</h1>
+<h1 align="center">Abdullah.me — Advanced Digital Platform & CMS</h1>
 <p align="center"><strong>v2.0 "Signal & Growth" — Engineering Precision, Visibly Alive</strong></p>
 
 <p align="center">
@@ -138,7 +138,7 @@ The platform moves beyond traditional static portfolios and template-driven desi
 ## 📁 Repository Structure
 
 ```
-abdullah-div/
+Abdullah-me/
 ├── docs/                               # 📚 Comprehensive technical documentation
 │   ├── 01-PRD.md                       # Product Requirements Document
 │   ├── 02-SYSTEM-ARCHITECTURE.md       # Architecture, Data Flow, FrozenRouter & Pipeline Specs
@@ -148,7 +148,8 @@ abdullah-div/
 │   ├── schema.prisma                   # Active Prisma schema (6 core models)
 │   └── migrations/                     # SQL migration history
 ├── public/
-│   └── favicon.ico                     # Static branding assets
+│   ├── logo.svg                        # Lissajous Physics vector brand logo
+│   └── ...                             # Static branding assets
 ├── src/
 │   ├── app/
 │   │   ├── [locale]/                   # 🌐 Bilingual Dynamic Routes (next-intl)
@@ -355,8 +356,8 @@ erDiagram
 ### 1. Clone & Install Dependencies
 
 ```bash
-git clone https://github.com/Abdullah931-stack/Abdullah-div.git
-cd abdullah-div
+git clone https://github.com/Abdullah931-stack/Abdullah-me.git
+cd Abdullah-me
 npm install
 ```
 
@@ -421,7 +422,7 @@ npm test
 npm run test:watch
 ```
 
-### Test Suite Coverage (78 Tests Passing across 12 Suites)
+### Test Suite Coverage (83 Tests Passing across 13 Suites)
 
 - `LissajousCurve.test.tsx` — Parametric trajectory coordinates, Kepler speed variation, canvas rendering lifecycle.
 - `LavaBackground.test.tsx` — Composed sine deterministic parameters, fluid viewport calculations, CSS custom properties.

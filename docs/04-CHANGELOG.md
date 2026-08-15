@@ -1,5 +1,5 @@
 # 📝 Project History & Changelog
-## Abdullah.div — v2.0 "Signal & Growth"
+## Abdullah.me — v2.0 "Signal & Growth"
 
 > **Status:** ✅ All Architectural Transformations Applied & Deployed — August 2026
 

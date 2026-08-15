@@ -1,5 +1,5 @@
 # 📋 Product Requirements Document (PRD)
-## Abdullah.div — v2.0 "Signal & Growth"
+## Abdullah.me — v2.0 "Signal & Growth"
 
 ---
 
@@ -7,7 +7,7 @@
 
 | Parameter | Details |
 |---|---|
-| **Project Name** | Abdullah.div — Advanced Digital Platform & CMS |
+| **Project Name** | Abdullah.me — Advanced Digital Platform & CMS |
 | **Type** | High-Performance Bilingual Digital Platform, Engineering Portfolio & Brand CMS |
 | **Core Objective** | Deliver a rigorous, evidence-grounded digital identity showcasing projects through engineering reasoning, narrating achievements via a scientific single-rail log, providing resilient multi-intent communication, and managing dynamic content via a single-user CMS. |
 | **Target Audience** | Academic institutions, admissions reviewers, engineering teams, potential collaborators, and technical employers. |

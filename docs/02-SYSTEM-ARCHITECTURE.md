@@ -1,5 +1,5 @@
 # 🏗️ System Architecture & Data Model
-## Abdullah.div — v2.0 "Signal & Growth"
+## Abdullah.me — v2.0 "Signal & Growth"
 
 ---
 
@@ -108,7 +108,7 @@ sequenceDiagram
 ## 3. Project Structure
 
 ```
-abdullah-div/
+Abdullah-me/
 ├── docs/                               # 📚 Technical system documentation
 │   ├── 01-PRD.md                       # Product Requirements Document (v2.0)
 │   ├── 02-SYSTEM-ARCHITECTURE.md       # Architecture & Data Model (v2.0)
@@ -118,7 +118,8 @@ abdullah-div/
 │   ├── schema.prisma                   # Active Prisma 7 schema (PostgreSQL)
 │   └── migrations/                     # PostgreSQL SQL migrations
 ├── public/
-│   └── favicon.ico                     # Branding favicon
+│   ├── logo.svg                        # Lissajous Physics vector brand logo
+│   └── ...                             # Static branding assets
 ├── src/
 │   ├── app/
 │   │   ├── [locale]/                   # 🌐 Dynamic i18n routing (next-intl)
@@ -208,7 +209,7 @@ abdullah-div/
 
 ```prisma
 // ==============================================
-// Abdullah.div — Prisma Schema v2.0
+// Abdullah.me — Prisma Schema v2.0
 // Database: Supabase (PostgreSQL)
 // Auth: Supabase Auth (Managed externally)
 // ==============================================

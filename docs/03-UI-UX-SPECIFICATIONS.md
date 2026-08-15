@@ -1,5 +1,5 @@
 # 🎨 UI/UX Design System & Motion Specifications
-## Abdullah.div — v2.0 "Signal & Growth"
+## Abdullah.me — v2.0 "Signal & Growth"
 
 > **File status:** This document is a **full replacement** for both `docs/03-UI-UX-SPECIFICATIONS.md` and `docs/04-MOTION-SPEC.md`. Delete both source files and replace them with this one before beginning implementation. Visual and motion specifications are merged into a single document because, in this redesign, they are not separable: several components (the background system, the card-grid transition, the border-pulse interaction) are defined by their motion behavior as much as by their static appearance.
 >
