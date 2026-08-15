@@ -14,6 +14,14 @@ export const metadata: Metadata = {
   },
   description:
     "A professional digital identity showcasing projects, career journey, and visitor engagement",
+  icons: {
+    icon: [
+      { url: "/icon.svg", type: "image/svg+xml" },
+      { url: "/logo.svg", type: "image/svg+xml" },
+    ],
+    shortcut: "/icon.svg",
+    apple: "/icon.svg",
+  },
 };
 
 export default function RootLayout({

@@ -92,6 +92,14 @@ export async function generateMetadata({
             description: siteDescription,
             creator: "@abdullah",
         },
+        icons: {
+            icon: [
+                { url: "/icon.svg", type: "image/svg+xml" },
+                { url: "/logo.svg", type: "image/svg+xml" },
+            ],
+            shortcut: "/icon.svg",
+            apple: "/icon.svg",
+        },
         robots: {
             index: true,
             follow: true,
@@ -148,6 +156,7 @@ export default async function LocaleLayout({
                 name: "Abdullah",
                 alternateName: "عبدالله",
                 url: siteUrl,
+                image: `${siteUrl}/logo.svg`,
                 jobTitle: "Senior Software Engineer & Systems Architect",
                 description:
                     locale === "ar"
@@ -174,6 +183,7 @@ export default async function LocaleLayout({
                 publisher: {
                     "@id": `${siteUrl}/#person`,
                 },
+                logo: `${siteUrl}/logo.svg`,
                 inLanguage: [locale === "ar" ? "ar-SA" : "en-US"],
             },
         ],

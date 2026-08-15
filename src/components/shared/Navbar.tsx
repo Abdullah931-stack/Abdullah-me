@@ -4,12 +4,14 @@ import { useTranslations, useLocale } from "next-intl";
 import { Link, usePathname } from "@/i18n/routing";
 import { motion, AnimatePresence } from "framer-motion";
 import { useState } from "react";
+import Logo from "@/components/shared/Logo";
 
 /**
  * Navbar — v2.0 "Signal & Growth"
  *
  * Updated per §2 + §7.1 + §9:
  * - Color tokens: --bg, --text, --muted, --accent, --card-border
+ * - Brand: Integrated Lissajous Physics Logo component with glow micro-interaction
  * - §7.1: NO PulseBorder on navbar links (explicitly excluded)
  * - Dark-only — no theme toggle (§2)
  * - Glassmorphism updated to green-tinted palette
@@ -41,16 +43,27 @@ export default function Navbar() {
       }}
     >
       <div className="mx-auto flex max-w-7xl items-center justify-between px-6 py-4">
-        {/* Logo / Name */}
+        {/* Logo / Brand Anchor with Lissajous Physics Icon */}
         <Link
           href="/"
-          className="text-xl font-bold transition-colors"
-          style={{
-            color: "var(--color-text)",
-            fontFamily: "var(--font-space-grotesk), sans-serif",
-          }}
+          className="group flex items-center gap-2.5 transition-transform"
+          aria-label={locale === "ar" ? "الصفحة الرئيسية — عبدالله" : "Home — Abdullah"}
         >
-          Abdullah
+          <div className="relative flex items-center justify-center">
+            <Logo
+              size={32}
+              className="h-8 w-8 object-contain transition-all duration-300 group-hover:scale-110 group-hover:drop-shadow-[0_0_12px_rgba(74,222,128,0.5)]"
+            />
+          </div>
+          <span
+            className="text-xl font-bold tracking-tight transition-colors group-hover:text-[var(--color-accent-bright)]"
+            style={{
+              color: "var(--color-text)",
+              fontFamily: "var(--font-space-grotesk), sans-serif",
+            }}
+          >
+            {locale === "ar" ? "عبدالله" : "Abdullah"}
+          </span>
         </Link>
 
         {/* Desktop Navigation — §7.1: NO PulseBorder here */}

@@ -17,11 +17,10 @@ export const config = {
     // Match all pathnames except:
     // - /api (API routes)
     // - /admin (Admin dashboard — outside i18n)
-    // - /_next (Next.js internals)
-    // - /images, /favicon.ico (static files)
+    // - /_next, /_vercel (Next.js internals)
+    // - All files with extensions (e.g. /logo.svg, /icon.svg, /favicon.ico, /robots.txt, /sitemap.xml)
     matcher: [
-        "/",
+        "/((?!api|admin|_next|_vercel|.*\\..*).*)",
         "/(ar|en)/:path*",
-        "/((?!api|admin|_next|images|favicon.ico).*)",
     ],
 };
