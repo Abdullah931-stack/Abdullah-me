@@ -104,3 +104,5 @@
 | NFR-06 | **Edge Analytics & Speed Insights:** Integrated `@vercel/analytics` & `@vercel/speed-insights` cookieless, GDPR-compliant privacy-first visitor and Core Web Vitals performance analytics with zero database overhead. | **High** |
 | NFR-07 | **Accessibility & Reduced Motion:** Respect `prefers-reduced-motion` with graceful calm-motion degradation (e.g. constant-speed Lissajous trails). | **High** |
 | NFR-08 | **Automated Test Quality:** 100% pass rate across Vitest unit and integration suites covering math models, draft persistence, API routes, and components. | **High** |
+| NFR-09 | **Next-Gen Media Delivery & Mobile LCP:** Next.js `<Image />` optimization with AVIF/WebP formats, responsive `sizes`, above-the-fold `priority` preloading, and client-side canvas WebP 90% ingestion compression. | **Critical** |
+| NFR-10 | **Search Engine Optimization & Indexing:** Dynamic `sitemap.xml` with multilingual alternates, dynamic `robots.txt`, OpenGraph metadata, and Schema.org JSON-LD structured data for Google Knowledge Graph. | **High** |

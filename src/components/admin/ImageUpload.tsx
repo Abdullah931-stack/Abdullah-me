@@ -27,14 +27,86 @@ export default function ImageUpload({
     const [error, setError] = useState("");
     const fileRef = useRef<HTMLInputElement>(null);
 
+    /**
+     * Compresses image using HTML5 Canvas to WebP at 90% quality
+     * Scales down dimensions proportionally if width or height exceeds 1920px.
+     * Leaves SVGs untouched.
+     */
+    async function compressImage(file: File): Promise<File> {
+        if (file.type === "image/svg+xml" || !file.type.startsWith("image/")) {
+            return file;
+        }
+
+        return new Promise((resolve) => {
+            const img = new Image();
+            const objectUrl = URL.createObjectURL(file);
+
+            img.onload = () => {
+                URL.revokeObjectURL(objectUrl);
+
+                let { width, height } = img;
+                const maxDimension = 1920;
+
+                if (width > maxDimension || height > maxDimension) {
+                    if (width > height) {
+                        height = Math.round((height * maxDimension) / width);
+                        width = maxDimension;
+                    } else {
+                        width = Math.round((width * maxDimension) / height);
+                        height = maxDimension;
+                    }
+                }
+
+                const canvas = document.createElement("canvas");
+                canvas.width = width;
+                canvas.height = height;
+
+                const ctx = canvas.getContext("2d");
+                if (!ctx) {
+                    resolve(file);
+                    return;
+                }
+
+                ctx.drawImage(img, 0, 0, width, height);
+
+                canvas.toBlob(
+                    (blob) => {
+                        if (blob) {
+                            const newFilename = file.name.replace(/\.[^/.]+$/, "") + ".webp";
+                            const compressedFile = new File([blob], newFilename, {
+                                type: "image/webp",
+                                lastModified: Date.now(),
+                            });
+                            resolve(compressedFile);
+                        } else {
+                            resolve(file);
+                        }
+                    },
+                    "image/webp",
+                    0.90
+                );
+            };
+
+            img.onerror = () => {
+                URL.revokeObjectURL(objectUrl);
+                resolve(file);
+            };
+
+            img.src = objectUrl;
+        });
+    }
+
     async function handleUpload(e: React.ChangeEvent<HTMLInputElement>) {
-        const file = e.target.files?.[0];
-        if (!file) return;
+        const rawFile = e.target.files?.[0];
+        if (!rawFile) return;
 
         setIsUploading(true);
         setError("");
 
         try {
+            // Compress image client-side to WebP 90% before uploading to Supabase
+            const file = await compressImage(rawFile);
+
             const formData = new FormData();
             formData.append("file", file);
             formData.append("folder", folder);

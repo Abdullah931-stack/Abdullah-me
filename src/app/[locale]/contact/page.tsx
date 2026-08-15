@@ -1,5 +1,5 @@
-import { setRequestLocale } from "next-intl/server";
-import { getTranslations } from "next-intl/server";
+import type { Metadata } from "next";
+import { setRequestLocale, getTranslations } from "next-intl/server";
 import ContactForm from "@/components/contact/ContactForm";
 
 /**
@@ -12,6 +12,18 @@ import ContactForm from "@/components/contact/ContactForm";
  */
 interface ContactPageProps {
     params: Promise<{ locale: string }>;
+}
+
+export async function generateMetadata({
+    params,
+}: ContactPageProps): Promise<Metadata> {
+    const { locale } = await params;
+    const t = await getTranslations({ locale, namespace: "contact" });
+
+    return {
+        title: t("title"),
+        description: t("subtitle"),
+    };
 }
 
 export default async function ContactPage({ params }: ContactPageProps) {

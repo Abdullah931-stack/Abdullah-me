@@ -1,6 +1,7 @@
 "use client";
 
 import { useState, useCallback, useMemo, useEffect } from "react";
+import Image from "next/image";
 import { motion, AnimatePresence, LayoutGroup } from "framer-motion";
 import { useLocale, useTranslations } from "next-intl";
 import { usePathname } from "next/navigation";
@@ -148,18 +149,21 @@ export default function PortfolioList({ projects }: PortfolioListProps) {
                       background: "rgba(255, 255, 255, 0.035)",
                     }}
                   >
-                    {/* Cover Image — Full uncropped aspect ratio */}
+                    {/* Cover Image — Full uncropped aspect ratio with responsive AVIF/WebP optimization */}
                     {coverImage && (
                       <div className="w-full overflow-hidden flex items-center justify-center bg-black/30 p-2 min-h-[180px] max-h-[300px]">
-                        <img
+                        <Image
                           src={coverImage.url}
                           alt={
                             locale === "ar"
                               ? coverImage.altAr || title
                               : coverImage.altEn || title
                           }
+                          width={600}
+                          height={340}
+                          priority={index === 0}
+                          sizes="(max-width: 640px) 100vw, (max-width: 1024px) 50vw, 33vw"
                           className="max-h-[280px] w-auto max-w-full object-contain transition-transform duration-500 hover:scale-105"
-                          loading="lazy"
                         />
                       </div>
                     )}
@@ -195,6 +199,7 @@ export default function PortfolioList({ projects }: PortfolioListProps) {
                                   src={skillIcon}
                                   alt={skillName}
                                   className="h-3.5 w-3.5 rounded-full object-cover"
+                                  loading="lazy"
                                 />
                               )}
                               <span>{skillName}</span>

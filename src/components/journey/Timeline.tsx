@@ -1,6 +1,7 @@
 "use client";
 
 import { useState, useMemo } from "react";
+import Image from "next/image";
 import { motion, AnimatePresence } from "framer-motion";
 import { useLocale, useTranslations } from "next-intl";
 import type { TimelineEntry, Project } from "@/types";
@@ -235,15 +236,15 @@ export default function Timeline({ entries }: TimelineProps) {
                       "calc(var(--rail-offset, 1.5rem) + 1rem)",
                   }}
                 >
-                  <img
+                  <Image
                     src={entry.imageUrl}
                     alt={title}
+                    width={28}
+                    height={28}
+                    className="rounded-md object-cover border border-[var(--color-card-border)]"
                     style={{
                       width: "28px",
                       height: "28px",
-                      borderRadius: "6px",
-                      objectFit: "cover",
-                      border: "1px solid var(--color-card-border)",
                     }}
                   />
                 </div>

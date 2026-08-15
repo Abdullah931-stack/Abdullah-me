@@ -1,5 +1,5 @@
-import { setRequestLocale } from "next-intl/server";
-import { getTranslations } from "next-intl/server";
+import type { Metadata } from "next";
+import { setRequestLocale, getTranslations } from "next-intl/server";
 import Timeline from "@/components/journey/Timeline";
 import { prisma } from "@/lib/prisma";
 
@@ -12,6 +12,18 @@ import { prisma } from "@/lib/prisma";
  */
 interface JourneyPageProps {
     params: Promise<{ locale: string }>;
+}
+
+export async function generateMetadata({
+    params,
+}: JourneyPageProps): Promise<Metadata> {
+    const { locale } = await params;
+    const t = await getTranslations({ locale, namespace: "journey" });
+
+    return {
+        title: t("title"),
+        description: t("subtitle"),
+    };
 }
 
 export default async function JourneyPage({ params }: JourneyPageProps) {

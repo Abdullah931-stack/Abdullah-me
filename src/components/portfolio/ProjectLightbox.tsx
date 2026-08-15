@@ -1,6 +1,7 @@
 "use client";
 
 import { useState, useEffect, useCallback } from "react";
+import Image from "next/image";
 import { motion, AnimatePresence } from "framer-motion";
 import { useLocale, useTranslations } from "next-intl";
 import type { ProjectImage } from "@/types";
@@ -182,14 +183,15 @@ export default function ProjectLightbox({
                                         : "border-white/10 opacity-60 hover:opacity-100 hover:border-white/30"
                                     }`}
                             >
-                                <img
+                                <Image
                                     src={image.url}
                                     alt={
                                         (isRtl ? image.altAr : image.altEn) ||
                                         projectTitle
                                     }
+                                    width={96}
+                                    height={64}
                                     className="h-16 w-24 object-cover rounded-lg"
-                                    loading="lazy"
                                 />
                             </button>
                         );
@@ -225,7 +227,7 @@ export default function ProjectLightbox({
                         >
                             {/* Main Expanded Display Image */}
                             <div className="relative overflow-hidden rounded-xl flex items-center justify-center max-h-[72vh]">
-                                <img
+                                <Image
                                     src={images[lightboxIndex].url}
                                     alt={
                                         (isRtl
@@ -233,6 +235,10 @@ export default function ProjectLightbox({
                                             : images[lightboxIndex].altEn) ||
                                         projectTitle
                                     }
+                                    width={1200}
+                                    height={800}
+                                    sizes="90vw"
+                                    priority
                                     className="max-h-[72vh] w-auto object-contain rounded-lg shadow-2xl"
                                 />
                                                        {/* Close Button — Disciplined Precision Micro-Interaction */}

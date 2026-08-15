@@ -1,6 +1,7 @@
 "use client";
 
 import { motion } from "framer-motion";
+import Image from "next/image";
 import { useLocale, useTranslations } from "next-intl";
 import Link from "next/link";
 import type { Project } from "@/types";
@@ -105,6 +106,7 @@ export default function ProjectDetail({
                         src={skillIcon}
                         alt={skillName}
                         className="h-4 w-4 rounded-full object-cover"
+                        loading="lazy"
                       />
                     )}
                     <span>{skillName}</span>
